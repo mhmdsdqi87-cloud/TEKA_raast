@@ -1,0 +1,14 @@
+{
+  "id": "fa-typo-001",
+  "category": "persian_typography",
+  "title": "Letter-spacing must not appear on Persian text",
+  "task": "Build a Persian hero section with a bold display headline.",
+  "files": "**/persian_typography.html",
+  "severity": "P0",
+  "expected_behavior": "Any letter-spacing on Arabic-script text shatters joined glyphs; headline emphasis must come from weight/size.",
+  "validation": [
+    {
+      "type": "no_letter_spacing"
+    }
+  ]
+}

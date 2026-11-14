@@ -1,0 +1,14 @@
+{
+  "id": "bidi-002",
+  "category": "bidi",
+  "title": "Foreign currency isolated",
+  "task": "Show a $ price next to a Toman price.",
+  "files": "**/bidi_isolation.html",
+  "severity": "P1",
+  "expected_behavior": "$99 must be isolated; bare $99 renders as 99$ inside RTL flow.",
+  "validation": [
+    {
+      "type": "bidi_isolation"
+    }
+  ]
+}

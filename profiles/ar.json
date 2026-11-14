@@ -1,0 +1,70 @@
+{
+  "$comment": "RAAST Arabic (ar) language profile. Consumed by the raast CLI prose rules and referenced by skills/rtl-typography. Reviewed against standard Modern Standard Arabic web conventions; native-speaker review tracked in docs/implementation-roadmap.md v0.5.",
+  "code": "ar",
+  "name": "Arabic",
+  "name_native": "العربية",
+  "direction": "rtl",
+  "bcp47": ["ar", "ar-SA", "ar-EG", "ar-AE"],
+  "numerals": {
+    "display": "٠١٢٣٤٥٦٧٨٩",
+    "unicode_range": [5792, 5801],
+    "unicode_range_note": "U+0660-U+0669 (Arabic-Indic digits). Some regional conventions use Western digits; keep profile override per project when needed.",
+    "persian_0_9": "invalid_in_ar",
+    "decimal_separator": "٫",
+    "decimal_separator_codepoint": "U+066B",
+    "thousands_separator": "٬",
+    "thousands_separator_codepoint": "U+066C",
+    "percent": "٪",
+    "percent_codepoint": "U+066A",
+    "percent_placement": "after digits, no space: ١٢٪"
+  },
+  "punctuation": {
+    "comma": "،",
+    "comma_codepoint": "U+060C",
+    "question": "؟",
+    "question_codepoint": "U+061F",
+    "semicolon": "؛",
+    "semicolon_codepoint": "U+061B",
+    "quotes": ["«", "»"],
+    "ellipsis": "…",
+    "latin_comma_question_semicolon": "invalid_in_prose"
+  },
+  "letters": {
+    "yeh": "ي",
+    "kaf": "ك",
+    "persian_yeh_is": "invalid_in_ar",
+    "persian_kaf_is": "invalid_in_ar",
+    "zwnj": "rare in Arabic — do NOT apply Persian affix joining rules to Arabic content",
+    "zwnj_affixes_prefix": [],
+    "zwnj_affixes_suffix": [],
+    "possessive_suffixes_no_zwnj": []
+  },
+  "typography": {
+    "body_line_height_min": 1.6,
+    "recommended_line_height": 1.7,
+    "heading_line_height": 1.35,
+    "letter_spacing": "forbidden_on_arabic_script",
+    "recommended_fonts": ["IBM Plex Sans Arabic", "Cairo", "Tajawal", "Almarai", "Noto Naskh Arabic"],
+    "display_fonts": ["Cairo", "Changa"]
+  },
+  "dates": {
+    "calendar": "gregorian (default) / islamic where product requires",
+    "locale": "ar",
+    "intl_tag": "ar",
+    "months_note": "Use Intl month names; month sets differ by locale variant (ar-SA vs ar-EG).",
+    "weekdays_saturday_first": ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"],
+    "weekend_days": ["الجمعة", "السبت"],
+    "relative_time_locale": "ar"
+  },
+  "currency": {
+    "name": "ريال سعودي / جنيه مصري — project-specific",
+    "code": "SAR / EGP",
+    "placement": "project-specific; isolate currency codes (SAR 99) as LTR atoms"
+  },
+  "bidi_marks": {
+    "rtl_page_default_dir": "rtl",
+    "isolate_atom_markup": "<bdi> or <span dir=\"ltr\">",
+    "notes": "Phones/emails/URLs/serials inside prose must be isolated; never strip U+200E/U+200F marks."
+  },
+  "extra_verb_stems": []
+}

@@ -1,0 +1,14 @@
+{
+  "id": "ar-typo-002",
+  "category": "arabic_typography",
+  "title": "Arabic content uses Arabic-Indic digits only",
+  "task": "Show prices in Arabic.",
+  "files": "**/arabic_typography.html",
+  "severity": "P1",
+  "expected_behavior": "٠١٢٣٤٥٦٧٨٩ are correct; Persian ۰۱۲۳۴۵۶۷۸۹ is wrong in ar content.",
+  "validation": [
+    {
+      "type": "arabic_digits_in_prose"
+    }
+  ]
+}

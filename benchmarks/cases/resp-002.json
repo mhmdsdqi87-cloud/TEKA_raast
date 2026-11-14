@@ -1,0 +1,14 @@
+{
+  "id": "resp-002",
+  "category": "responsive",
+  "title": "Responsive signals present",
+  "task": "Make the grid responsive.",
+  "files": "**/responsive_a11y.html",
+  "severity": "P2",
+  "expected_behavior": "At least @media queries or sm:/md: breakpoint classes alongside the viewport meta.",
+  "validation": [
+    {
+      "type": "responsive_signals"
+    }
+  ]
+}

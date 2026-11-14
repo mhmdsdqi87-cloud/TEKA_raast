@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="raast-title">
+  <title id="raast-title">RAAST - RTL engineering for AI-powered development</title>
+  <desc>RAAST hero banner. Persian and Latin wordmarks with an emerald underline shimmer alternating between them every 3 seconds, six skill chips, tagline and footer strip.</desc>
+
+  <defs>
+    <radialGradient id="heroGlow">
+      <stop offset="0" stop-color="#34D399"/>
+      <stop offset="0.38" stop-color="#34D399" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="wordGlow">
+      <stop offset="0" stop-color="#34D399" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#34D399" stop-opacity="0"/>
+      <stop offset="0.25" stop-color="#34D399"/>
+      <stop offset="0.75" stop-color="#34D399"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="gridFade" cx="0.5" cy="0.42" r="0.72">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.15"/>
+    </radialGradient>
+    <mask id="gridMask">
+      <rect width="1280" height="640" fill="url(#gridFade)"/>
+    </mask>
+    <pattern id="grid48" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#FFFFFF" stroke-opacity="0.05"/>
+    </pattern>
+    <filter id="softBlur" x="-60%" y="-600%" width="220%" height="1300%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+  </defs>
+
+  <!-- background: base + 48px grid fading toward edges + breathing emerald glow -->
+  <rect width="1280" height="640" fill="#0B0D0C"/>
+  <rect width="1280" height="640" fill="url(#grid48)" mask="url(#gridMask)"/>
+  <ellipse cx="640" cy="192" rx="450" ry="300" fill="url(#heroGlow)" opacity="0.08">
+    <animate attributeName="opacity" values="0.05;0.12;0.05" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" dur="6s" repeatCount="indefinite"/>
+  </ellipse>
+  <rect x="12" y="12" width="1256" height="616" rx="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.09" stroke-width="1.5"/>
+
+  <!-- skill chip row (static) -->
+  <g font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="13" text-anchor="middle">
+    <rect x="249" y="136" width="141" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <text x="319.5" y="156" fill="#9AA3A0">rtl-typography</text>
+    <rect x="402" y="136" width="118" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <text x="461" y="156" fill="#9AA3A0">rtl-landing</text>
+    <rect x="532" y="136" width="141" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <text x="602.5" y="156" fill="#9AA3A0">rtl-components</text>
+    <rect x="685" y="136" width="95" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <text x="732.5" y="156" fill="#9AA3A0">rtl-bidi</text>
+    <rect x="792" y="136" width="126" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <text x="855" y="156" fill="#9AA3A0">jalali-dates</text>
+    <rect x="930" y="136" width="102" height="30" rx="15" fill="#FFFFFF" fill-opacity="0.03" stroke="#FFFFFF" stroke-opacity="0.14"/>
+    <text x="981" y="156" fill="#9AA3A0">rtl-audit</text>
+  </g>
+
+  <!-- alternating emphasis glows behind each wordmark -->
+  <ellipse cx="445" cy="298" rx="150" ry="100" fill="url(#wordGlow)" opacity="0.3">
+    <animate attributeName="opacity" values="0.3;0.3;0.07;0.07;0.3" keyTimes="0;0.15;0.5;0.85;1" dur="3s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="812" cy="298" rx="185" ry="100" fill="url(#wordGlow)" opacity="0.07">
+    <animate attributeName="opacity" values="0.07;0.07;0.3;0.3;0.07;0.07" keyTimes="0;0.35;0.5;0.85;0.95;1" dur="3s" repeatCount="indefinite"/>
+  </ellipse>
+
+  <!-- wordmark pair: Persian + divider + Latin -->
+  <text x="445" y="336" text-anchor="middle" font-family="'Vazirmatn', Tahoma, sans-serif" font-size="130" font-weight="700" fill="#34D399">راست</text>
+  <rect x="609.5" y="250" width="1.5" height="86" fill="#FFFFFF" fill-opacity="0.16"/>
+  <text x="812" y="336" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="110" font-weight="700" fill="#E7EAE8">raast</text>
+
+  <!-- signature animation: emerald underline shimmer slides from under the Persian word to under the Latin word -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 0;367 0;367 0" keyTimes="0;0.12;0.5;1" calcMode="spline" keySplines="0 0 1 1;0.45 0 0.25 1;0 0 1 1" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0.5;1;1;0" keyTimes="0;0.05;0.15;0.32;0.5;0.9;1" dur="3s" repeatCount="indefinite"/>
+    <rect x="330" y="372" width="230" height="5" rx="2.5" fill="url(#shine)" filter="url(#softBlur)" opacity="0.75"/>
+    <rect x="330" y="372" width="230" height="5" rx="2.5" fill="url(#shine)"/>
+  </g>
+
+  <!-- RTL forward chevron sliding leftward near the tagline -->
+  <g transform="translate(310 416)" opacity="0">
+    <animateTransform attributeName="transform" type="translate" additive="sum" values="0 0;-46 0;-46 0" keyTimes="0;0.8;1" calcMode="spline" keySplines="0.4 0 0.6 1;0 0 1 1" dur="3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.95;0;0" keyTimes="0;0.25;0.8;1" dur="3s" repeatCount="indefinite"/>
+    <path d="M12 1L1 11L12 21" fill="none" stroke="#34D399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- tagline -->
+  <text x="640" y="436" text-anchor="middle" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="500" fill="#C9CFCC"><tspan fill="#34D399">RTL engineering</tspan> for AI-powered development</text>
+  <text x="640" y="474" text-anchor="middle" font-family="-apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="19" fill="#9AA3A0">Build RTL right. Everywhere.</text>
+
+  <!-- footer strip -->
+  <rect x="460" y="542" width="360" height="1" fill="#FFFFFF" fill-opacity="0.07"/>
+  <text x="640" y="584" text-anchor="middle" font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="14" fill="#9AA3A0">6 skills<tspan fill="#34D399"> · </tspan>CLI doctor<tspan fill="#34D399"> · </tspan>browser tests<tspan fill="#34D399"> · </tspan>benchmark<tspan fill="#34D399"> · </tspan>MIT</text>
+</svg>

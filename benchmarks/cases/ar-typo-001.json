@@ -1,0 +1,16 @@
+{
+  "id": "ar-typo-001",
+  "category": "arabic_typography",
+  "title": "Document declares ar/rtl",
+  "task": "Scaffold an Arabic page shell.",
+  "files": "**/arabic_typography.html",
+  "severity": "P0",
+  "expected_behavior": "Document declares ar/rtl",
+  "validation": [
+    {
+      "type": "html_lang_dir",
+      "lang": "ar",
+      "dir": "rtl"
+    }
+  ]
+}

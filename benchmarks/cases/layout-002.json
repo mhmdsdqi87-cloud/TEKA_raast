@@ -1,0 +1,14 @@
+{
+  "id": "layout-002",
+  "category": "rtl_layout",
+  "title": "No physical margin/padding declarations",
+  "task": "Style the layout.",
+  "files": "**/rtl_layout.html",
+  "severity": "P1",
+  "expected_behavior": "Use margin-inline-start/end and padding-inline-start/end.",
+  "validation": [
+    {
+      "type": "no_physical_margin"
+    }
+  ]
+}

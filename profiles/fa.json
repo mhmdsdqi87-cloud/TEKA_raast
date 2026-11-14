@@ -1,0 +1,70 @@
+{
+  "$comment": "RAAST Persian (fa) language profile. Consumed by the raast CLI prose rules and referenced by skills/rtl-typography. Single source of truth for Persian text conventions in tooling.",
+  "code": "fa",
+  "name": "Persian",
+  "name_native": "فارسی",
+  "direction": "rtl",
+  "bcp47": ["fa", "fa-IR"],
+  "numerals": {
+    "display": "۰۱۲۳۴۵۶۷۸۹",
+    "unicode_range": [5936, 5945],
+    "unicode_range_note": "U+06F0-U+06F9 (Extended Arabic-Indic / Persian digits). Western 0-9 acceptable ONLY inside isolated LTR atoms (phone, serial, code).",
+    "arabic_indic_0_9": "invalid_in_fa_prose",
+    "decimal_separator": "٫",
+    "decimal_separator_codepoint": "U+066B",
+    "thousands_separator": "٬",
+    "thousands_separator_codepoint": "U+066C",
+    "percent": "٪",
+    "percent_codepoint": "U+066A",
+    "percent_placement": "after digits, no space: ۱۲٪"
+  },
+  "punctuation": {
+    "comma": "،",
+    "comma_codepoint": "U+060C",
+    "question": "؟",
+    "question_codepoint": "U+061F",
+    "semicolon": "؛",
+    "semicolon_codepoint": "U+061B",
+    "quotes": ["«", "»"],
+    "ellipsis": "…",
+    "latin_comma_question_semicolon": "invalid_in_prose"
+  },
+  "letters": {
+    "yeh": "ی",
+    "kaf": "ک",
+    "arabic_yeh_is": "invalid_in_fa",
+    "arabic_kaf_is": "invalid_in_fa",
+    "zwnj": "U+200C required in affix compounds",
+    "zwnj_affixes_prefix": ["می", "نمی", "بی", "هم", "نا", "باز", "فرا"],
+    "zwnj_affixes_suffix": ["ها", "های", "تر", "ترین"],
+    "possessive_suffixes_no_zwnj": ["ام", "ات", "اش"]
+  },
+  "typography": {
+    "body_line_height_min": 1.8,
+    "recommended_line_height": 1.9,
+    "heading_line_height": 1.35,
+    "letter_spacing": "forbidden_on_arabic_script",
+    "recommended_fonts": ["Vazirmatn", "Estedad", "Lalezar", "Markazi Text", "Sahel", "Shabnam"],
+    "display_fonts": ["Lalezar", "Estedad"]
+  },
+  "dates": {
+    "calendar": "persian (Solar Hijri / Jalali)",
+    "locale": "fa-IR",
+    "intl_tag": "fa-IR",
+    "months": ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"],
+    "weekdays_saturday_first": ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"],
+    "weekend_days": ["جمعه"],
+    "relative_time_locale": "fa"
+  },
+  "currency": {
+    "name": "تومان",
+    "code": "IRT",
+    "placement": "after amount, separated by space: ۱۲۵٬۰۰۰ تومان"
+  },
+  "bidi_marks": {
+    "rtl_page_default_dir": "rtl",
+    "isolate_atom_markup": "<bdi> or <span dir=\"ltr\">",
+    "notes": "Phones/emails/URLs/serials inside prose must be isolated; never strip U+200E/U+200F marks."
+  },
+  "extra_verb_stems": []
+}

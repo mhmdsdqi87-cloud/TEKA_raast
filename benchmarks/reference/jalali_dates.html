@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>رفرنس تاریخ شمسی</title>
+</head>
+<body>
+  <main>
+    <time datetime="2026-11-14" id="today">امروز</time>
+    <p id="relative">سه روز پیش</p>
+    <script>
+      // Localized display formatting (see jalali-dates skill §0):
+      document.getElementById('today').textContent =
+        new Intl.DateTimeFormat('fa-IR', { dateStyle: 'long' }).format(new Date());
+      // Relative time in Persian:
+      document.getElementById('relative').textContent =
+        new Intl.RelativeTimeFormat('fa').format(-3, 'day');
+    </script>
+  </main>
+</body>
+</html>

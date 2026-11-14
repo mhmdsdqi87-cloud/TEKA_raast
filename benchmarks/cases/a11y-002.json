@@ -1,0 +1,14 @@
+{
+  "id": "a11y-002",
+  "category": "accessibility",
+  "title": "Icon-only buttons have accessible names",
+  "task": "Add a mobile menu button.",
+  "files": "**/responsive_a11y.html",
+  "severity": "P1",
+  "expected_behavior": "Icon-only buttons have accessible names",
+  "validation": [
+    {
+      "type": "icon_button_labels"
+    }
+  ]
+}

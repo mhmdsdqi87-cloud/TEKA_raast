@@ -1,0 +1,14 @@
+{
+  "id": "bidi-001",
+  "category": "bidi",
+  "title": "Phone numbers isolated in RTL prose",
+  "task": "Show a support phone number inside a Persian sentence.",
+  "files": "**/bidi_isolation.html",
+  "severity": "P0",
+  "expected_behavior": "+98… must sit inside <bdi> or dir=ltr, otherwise + and groups reorder.",
+  "validation": [
+    {
+      "type": "bidi_isolation"
+    }
+  ]
+}

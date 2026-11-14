@@ -1,0 +1,19 @@
+{
+  "id": "fa-typo-004",
+  "category": "persian_typography",
+  "title": "Document declares fa/rtl with a Persian-capable font stack",
+  "task": "Scaffold the page shell.",
+  "files": "**/persian_typography.html",
+  "severity": "P0",
+  "expected_behavior": "Document declares fa/rtl with a Persian-capable font stack",
+  "validation": [
+    {
+      "type": "html_lang_dir",
+      "lang": "fa",
+      "dir": "rtl"
+    },
+    {
+      "type": "logical_text_align"
+    }
+  ]
+}

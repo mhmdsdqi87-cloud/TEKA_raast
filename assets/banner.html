@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&family=Lalezar&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px; height: 640px; overflow: hidden;
+    background: #0B0D0C; color: #E7EAE8;
+    font-family: 'Vazirmatn', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, black 30%, transparent 75%);
+  }
+  .glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 55% 45% at 50% 42%, rgba(52,211,153,0.10), transparent 70%);
+  }
+  .frame {
+    position: absolute; inset: 24px;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 24px;
+  }
+  .content { position: relative; text-align: center; }
+  .chips { display: flex; gap: 10px; justify-content: center; margin-bottom: 34px; }
+  .chip {
+    font-family: 'JetBrains Mono', monospace; font-size: 15px;
+    color: #9AA3A0; border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.03);
+    padding: 8px 18px; border-radius: 999px;
+  }
+  .wordmark { display: flex; align-items: center; justify-content: center; gap: 28px; }
+  .fa-mark {
+    font-family: 'Lalezar', cursive; font-size: 150px; line-height: 1;
+    color: #34D399;
+  }
+  .divider { width: 2px; height: 108px; background: rgba(255,255,255,0.12); border-radius: 2px; }
+  .latin-mark {
+    font-family: 'JetBrains Mono', monospace; font-weight: 700;
+    font-size: 118px; letter-spacing: -0.04em; color: #E7EAE8; line-height: 1;
+  }
+  .tagline-en {
+    margin-top: 30px; font-size: 26px; color: #C9CFCC; font-weight: 500;
+  }
+  .tagline-en .accent { color: #34D399; }
+  .tagline-fa {
+    margin-top: 12px; font-size: 20px; color: #9AA3A0;
+    font-family: 'Vazirmatn', sans-serif;
+  }
+  .foot {
+    position: absolute; bottom: 44px; left: 0; right: 0;
+    display: flex; justify-content: center; gap: 14px; align-items: center;
+    font-family: 'JetBrains Mono', monospace; font-size: 15px; color: #9AA3A0;
+  }
+  .foot .dot { color: #34D399; }
+</style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="glow"></div>
+  <div class="frame"></div>
+  <div class="content">
+    <div class="chips">
+      <span class="chip">rtl-typography</span>
+      <span class="chip">rtl-landing</span>
+      <span class="chip">rtl-components</span>
+      <span class="chip">rtl-bidi</span>
+      <span class="chip">jalali-dates</span>
+      <span class="chip">rtl-audit</span>
+    </div>
+    <div class="wordmark">
+      <span class="fa-mark">راست</span>
+      <span class="divider"></span>
+      <span class="latin-mark">raast</span>
+    </div>
+    <p class="tagline-en">RTL &amp; Persian <span class="accent">typography skills</span> for Claude Code</p>
+    <p class="tagline-fa" dir="rtl">فارسی روی وب، همان‌طور که باید باشد</p>
+  </div>
+  <div class="foot">
+    <span>6 skills</span><span class="dot">·</span><span>MIT</span><span class="dot">·</span><span>github.com/mhmdsdqi87-cloud/raast</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,444 @@
+{
+  "tool": "raast-benchmark",
+  "tool_version": "0.1.0",
+  "condition": "C-reference",
+  "candidate": "/home/z/my-project/raast/benchmarks/reference",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41",
+    "evaluated_at": "2026-11-14T21:30:49+00:00"
+  },
+  "summary": {
+    "total": 24,
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0,
+    "categories": {
+      "accessibility": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      "arabic_typography": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "skipped": 0
+      },
+      "bidi": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      "component_correctness": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "persian_typography": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      "jalali_dates": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      "rtl_layout": {
+        "total": 4,
+        "passed": 4,
+        "failed": 0,
+        "skipped": 0
+      },
+      "responsive": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "a11y-001",
+      "category": "accessibility",
+      "title": "Images have alt text",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/responsive_a11y.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "img_alt",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "a11y-002",
+      "category": "accessibility",
+      "title": "Icon-only buttons have accessible names",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/responsive_a11y.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "icon_button_labels",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "a11y-003",
+      "category": "accessibility",
+      "title": "html declares lang",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/responsive_a11y.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "html_lang_dir",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "ar-typo-001",
+      "category": "arabic_typography",
+      "title": "Document declares ar/rtl",
+      "severity": "P0",
+      "file": "/home/z/my-project/raast/benchmarks/reference/arabic_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "html_lang_dir",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "ar-typo-002",
+      "category": "arabic_typography",
+      "title": "Arabic content uses Arabic-Indic digits only",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/arabic_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "arabic_digits_in_prose",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "ar-typo-003",
+      "category": "arabic_typography",
+      "title": "No letter-spacing on Arabic display text",
+      "severity": "P0",
+      "file": "/home/z/my-project/raast/benchmarks/reference/arabic_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "no_letter_spacing",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "bidi-001",
+      "category": "bidi",
+      "title": "Phone numbers isolated in RTL prose",
+      "severity": "P0",
+      "file": "/home/z/my-project/raast/benchmarks/reference/bidi_isolation.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "bidi_isolation",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "bidi-002",
+      "category": "bidi",
+      "title": "Foreign currency isolated",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/bidi_isolation.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "bidi_isolation",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "bidi-003",
+      "category": "bidi",
+      "title": "Code/command blocks are LTR",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/bidi_isolation.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "code_dir_ltr",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "bidi-004",
+      "category": "bidi",
+      "title": "Emails and URLs isolated",
+      "severity": "P2",
+      "file": "/home/z/my-project/raast/benchmarks/reference/bidi_isolation.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "bidi_isolation",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "comp-001",
+      "category": "component_correctness",
+      "title": "Forward affordances do not use right-pointing arrows",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/components.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "no_ltr_next_arrow",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "comp-002",
+      "category": "component_correctness",
+      "title": "Interactive controls expose accessible names",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/components.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "icon_button_labels",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "fa-typo-001",
+      "category": "persian_typography",
+      "title": "Letter-spacing must not appear on Persian text",
+      "severity": "P0",
+      "file": "/home/z/my-project/raast/benchmarks/reference/persian_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "no_letter_spacing",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "fa-typo-002",
+      "category": "persian_typography",
+      "title": "Affix compounds use ZWNJ",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/persian_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "zwnj_min_count",
+          "status": "pass",
+          "detail": "5 ZWNJ found"
+        }
+      ]
+    },
+    {
+      "id": "fa-typo-003",
+      "category": "persian_typography",
+      "title": "Persian digits and punctuation in prose",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/persian_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "persian_digits_in_prose",
+          "status": "pass",
+          "detail": "ok"
+        },
+        {
+          "type": "persian_punctuation",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "fa-typo-004",
+      "category": "persian_typography",
+      "title": "Document declares fa/rtl with a Persian-capable font stack",
+      "severity": "P0",
+      "file": "/home/z/my-project/raast/benchmarks/reference/persian_typography.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "html_lang_dir",
+          "status": "pass",
+          "detail": "ok"
+        },
+        {
+          "type": "logical_text_align",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "jalali-001",
+      "category": "jalali_dates",
+      "title": "Dates via Intl fa-IR or a vetted Jalali library",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/jalali_dates.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "intl_jalali",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "jalali-002",
+      "category": "jalali_dates",
+      "title": "Jalali rendering referenced alongside Persian locale data",
+      "severity": "P2",
+      "file": "/home/z/my-project/raast/benchmarks/reference/jalali_dates.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "intl_jalali",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "layout-001",
+      "category": "rtl_layout",
+      "title": "html carries dir=rtl",
+      "severity": "P0",
+      "file": "/home/z/my-project/raast/benchmarks/reference/rtl_layout.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "html_lang_dir",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "layout-002",
+      "category": "rtl_layout",
+      "title": "No physical margin/padding declarations",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/rtl_layout.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "no_physical_margin",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "layout-003",
+      "category": "rtl_layout",
+      "title": "Tailwind utilities are logical",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/rtl_layout.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "logical_tailwind",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "layout-004",
+      "category": "rtl_layout",
+      "title": "Alignment uses start/end",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/rtl_layout.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "logical_text_align",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "resp-001",
+      "category": "responsive",
+      "title": "Viewport meta present",
+      "severity": "P1",
+      "file": "/home/z/my-project/raast/benchmarks/reference/responsive_a11y.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "viewport_meta",
+          "status": "pass",
+          "detail": "ok"
+        }
+      ]
+    },
+    {
+      "id": "resp-002",
+      "category": "responsive",
+      "title": "Responsive signals present",
+      "severity": "P2",
+      "file": "/home/z/my-project/raast/benchmarks/reference/responsive_a11y.html",
+      "status": "pass",
+      "checks": [
+        {
+          "type": "responsive_signals",
+          "status": "pass",
+          "detail": "viewport + responsive signals found"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Static validators inspect markup and text; they cannot certify visual rendering.",
+    "Condition A/B results require running agents externally; this report only reflects the files given to it.",
+    "Font availability and OS rendering differ across machines; browser suite adds computed-style checks but not pixel truth."
+  ]
+}

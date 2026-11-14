@@ -1,0 +1,18 @@
+{
+  "id": "comp-001",
+  "category": "component_correctness",
+  "title": "Forward affordances do not use right-pointing arrows",
+  "task": "Build pagination for an RTL list.",
+  "files": "**/components.html",
+  "severity": "P1",
+  "expected_behavior": "In RTL, next/forward points left (ChevronLeft / rtl:rotate-180).",
+  "validation": [
+    {
+      "type": "no_ltr_next_arrow",
+      "words": [
+        "بعدی",
+        "ادامه"
+      ]
+    }
+  ]
+}

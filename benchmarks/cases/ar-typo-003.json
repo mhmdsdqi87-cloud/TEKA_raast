@@ -1,0 +1,14 @@
+{
+  "id": "ar-typo-003",
+  "category": "arabic_typography",
+  "title": "No letter-spacing on Arabic display text",
+  "task": "Build an Arabic hero headline.",
+  "files": "**/arabic_typography.html",
+  "severity": "P0",
+  "expected_behavior": "No letter-spacing on Arabic display text",
+  "validation": [
+    {
+      "type": "no_letter_spacing"
+    }
+  ]
+}

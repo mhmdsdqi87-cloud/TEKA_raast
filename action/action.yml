@@ -1,0 +1,59 @@
+name: "RAAST Doctor"
+description: "Run RAAST RTL diagnostics on your project and fail by severity threshold."
+author: "mhmdsdqi87-cloud"
+
+branding:
+  icon: "file-code"
+  color: "emerald"
+
+inputs:
+  path:
+    description: "Project path to scan (default: repository root)"
+    required: false
+    default: "."
+  language:
+    description: "Primary RTL language profile (fa or ar)"
+    required: false
+    default: "fa"
+  fail-on:
+    description: "Exit non-zero when findings at this severity or higher exist (P0, P1, P2, off)"
+    required: false
+    default: "P0"
+  config:
+    description: "Path to raast.config.json (default: auto-discovered)"
+    required: false
+    default: ""
+  report-output:
+    description: "Write a markdown report to this path (optional)"
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install RAAST CLI
+      shell: bash
+      run: pip install "${{ github.action_path }}/../.."
+    - name: Run RAAST doctor
+      id: doctor
+      shell: bash
+      env:
+        RAAST_INPUT_PATH: ${{ inputs.path }}
+        RAAST_INPUT_LANGUAGE: ${{ inputs.language }}
+        RAAST_INPUT_FAIL_ON: ${{ inputs.fail-on }}
+        RAAST_INPUT_CONFIG: ${{ inputs.config }}
+        RAAST_INPUT_REPORT: ${{ inputs.report-output }}
+      run: |
+        set +e
+        ARGS="$RAAST_INPUT_PATH --language $RAAST_INPUT_LANGUAGE --fail-on $RAAST_INPUT_FAIL_ON"
+        if [ -n "$RAAST_INPUT_CONFIG" ]; then ARGS="$ARGS --config $RAAST_INPUT_CONFIG"; fi
+        if [ -n "$RAAST_INPUT_REPORT" ]; then
+          python3 -m raast.cli report $RAAST_INPUT_PATH --output "$RAAST_INPUT_REPORT"
+        fi
+        python3 -m raast.cli doctor $ARGS --format github
+        CODE=$?
+        echo "exitcode=$CODE" >> "$GITHUB_OUTPUT"
+        exit $CODE

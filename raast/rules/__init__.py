@@ -1,0 +1,469 @@
+"""RAAST static diagnostics engine.
+
+Rule inventory (IDs shared with skills/rtl-audit):
+  RTL001  physical margin-left/right           P1  fixable
+  RTL002  physical padding-left/right          P1  fixable
+  RTL003  physical left:/right: positioning    P2  review-only
+  RTL004  text-align: left|right               P1  fixable
+  RTL005  letter-spacing on Arabic-script      P0  fixable
+  RTL006  missing dir on <html>                P0  review-only
+  RTL007  Tailwind translate-x-*               P2  review-only
+  RTL008  Tailwind physical utilities          P1  fixable
+  RTL009  Latin punctuation in Arabic prose    P2  opt-in fix
+  RTL010  Western digits in Arabic prose       P2  config-gated
+  RTL011  broken ZWNJ compounds                P1  fixable (--zwnj)
+  RTL012  un-isolated LTR atoms in prose       P2  review-only
+  RTL013  dir="ltr" on Arabic-only element     P0  review-only
+  RTL014  missing lang on <html>               P1  review-only
+
+False-positive policy: CSS/Tailwind rules only fire when the file itself
+contains Arabic-script evidence, unless the rule is forced via config
+(`"rules": {"RTL001": {"force": true}}`). A left/right declaration in a
+pure-LTR file of a mixed project is NOT reported by default.
+"""
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass
+from pathlib import Path
+
+from ..normalizer import ARABIC_RE, detect_broken_zwnj
+from ..profiles import load_profile
+
+CSS_EXT = {".css", ".scss", ".sass"}
+TAILWIND_EXT = {".html", ".vue", ".jsx", ".tsx", ".js", ".ts", ".mjs", ".astro", ".mdx", ".md", ".php"}
+PROSE_EXT = {".html", ".vue", ".jsx", ".tsx", ".js", ".ts", ".mjs", ".astro", ".mdx", ".md", ".txt"}
+
+SEVERITY_ORDER = {"P0": 0, "P1": 1, "P2": 2}
+
+FORCEABLE_CSS_RULES = {"RTL001", "RTL002", "RTL003", "RTL004", "RTL005", "RTL008"}
+
+
+@dataclass
+class Finding:
+    rule: str
+    severity: str  # P0 | P1 | P2
+    confidence: str  # high | medium | low
+    file: str
+    line: int
+    column: int | None
+    message: str
+    explanation: str
+    suggested_fix: str
+    fixable: bool = False
+
+    def as_dict(self) -> dict:
+        return {
+            "rule": self.rule, "severity": self.severity, "confidence": self.confidence,
+            "file": self.file, "line": self.line, "column": self.column,
+            "message": self.message, "explanation": self.explanation,
+            "suggested_fix": self.suggested_fix, "fixable": self.fixable,
+        }
+
+
+def _has_arabic(text: str) -> bool:
+    return bool(ARABIC_RE.search(text))
+
+
+def _force_enabled(config: dict, rule_id: str) -> bool:
+    opts = config.get("rules", {}).get(rule_id, {})
+    return bool(isinstance(opts, dict) and opts.get("force"))
+
+
+def _strip_inline_code_and_fences(text: str) -> tuple[str, dict[int, int]]:
+    """Mask fenced blocks + inline code + URLs for prose analysis; map lines back."""
+    out_lines: list[str] = []
+    mapping: dict[int, int] = {}
+    in_fence = False
+    for orig_no, line in enumerate(text.splitlines(), 1):
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        stripped = re.sub(r"`[^`]*`", "", line)
+        stripped = re.sub(r"https?://\S+", "", stripped)
+        out_lines.append(stripped)
+        mapping[len(out_lines)] = orig_no
+    return "\n".join(out_lines), mapping
+
+
+# ---------------------------------------------------------------- CSS rules
+
+_CSS_DECL = re.compile(r"(?P<prop>[-a-zA-Z]+)\s*:\s*(?P<value>[^;{}]+)")
+
+_PHYSICAL = {
+    "margin-left": ("RTL001", "start"),
+    "margin-right": ("RTL001", "end"),
+    "padding-left": ("RTL002", "start"),
+    "padding-right": ("RTL002", "end"),
+}
+
+
+def rule_css_physical(path: str, content: str, config: dict) -> list[Finding]:
+    if not _has_arabic(content) and not _force_enabled(config, "RTL001"):
+        return []
+    findings: list[Finding] = []
+    for i, line in enumerate(content.splitlines(), 1):
+        for m in _CSS_DECL.finditer(line):
+            prop = m.group("prop").strip().lower()
+            if prop in _PHYSICAL:
+                rule, end = _PHYSICAL[prop]
+                axis = "margin" if rule == "RTL001" else "padding"
+                logical = f"{axis}-inline-{end}"
+                scoped_ltr = '[dir="ltr"]' in line
+                findings.append(Finding(
+                    rule=rule, severity="P1",
+                    confidence="low" if scoped_ltr else "high",
+                    file=path, line=i, column=m.start("prop") + 1,
+                    message=f"physical {prop} declaration",
+                    explanation=(
+                        f"`{prop}` hardcodes one side of the inline axis. Under dir=\"rtl\" the "
+                        "visual side flips, so spacing lands on the wrong side."
+                        if not scoped_ltr else
+                        "Declaration appears inside a [dir=\"ltr\"] scope — verify it is intentional."
+                    ),
+                    suggested_fix=f"{logical}: {m.group('value').strip()}",
+                    fixable=not scoped_ltr,
+                ))
+    return findings
+
+
+def rule_css_text_align(path: str, content: str, config: dict) -> list[Finding]:
+    if not _has_arabic(content) and not _force_enabled(config, "RTL004"):
+        return []
+    findings = []
+    for i, line in enumerate(content.splitlines(), 1):
+        for m in re.finditer(r"text-align\s*:\s*(left|right)\b", line, re.IGNORECASE):
+            val = m.group(1).lower()
+            findings.append(Finding(
+                rule="RTL004", severity="P1", confidence="high",
+                file=path, line=i, column=m.start() + 1,
+                message=f"text-align: {val}",
+                explanation=(
+                    "Physical alignment does not flip with document direction. "
+                    "start/end track the inline direction in both LTR and RTL."
+                ),
+                suggested_fix=f"text-align: {'start' if val == 'left' else 'end'}",
+                fixable=True,
+            ))
+    return findings
+
+
+def rule_css_left_right(path: str, content: str, config: dict) -> list[Finding]:
+    if not _has_arabic(content) and not _force_enabled(config, "RTL003"):
+        return []
+    findings = []
+    for i, line in enumerate(content.splitlines(), 1):
+        for m in _CSS_DECL.finditer(line):
+            prop = m.group("prop").strip().lower()
+            if prop in ("left", "right"):
+                findings.append(Finding(
+                    rule="RTL003", severity="P2", confidence="medium",
+                    file=path, line=i, column=m.start("prop") + 1,
+                    message=f"physical `{prop}:` positioning",
+                    explanation=(
+                        "Positioned elements anchored with left/right do not mirror under RTL. "
+                        "Many uses are intentional (decorations, JS-measured positions) — review, "
+                        "then prefer inset-inline-start/end for layout anchors."
+                    ),
+                    suggested_fix="review; prefer inset-inline-start / inset-inline-end",
+                    fixable=False,
+                ))
+    return findings
+
+
+def rule_css_letter_spacing(path: str, content: str, config: dict) -> list[Finding]:
+    if not _has_arabic(content) and not _force_enabled(config, "RTL005"):
+        return []
+    findings = []
+    for i, line in enumerate(content.splitlines(), 1):
+        m = re.search(r"letter-spacing\s*:\s*([^\s;{}]+)", line)
+        if not m:
+            continue
+        if m.group(1).lower() in ("normal", "inherit", "initial", "unset", "0", "0px", "0em", "0rem"):
+            continue
+        findings.append(Finding(
+            rule="RTL005", severity="P0", confidence="high",
+            file=path, line=i, column=m.start() + 1,
+            message=f"letter-spacing: {m.group(1)}",
+            explanation=(
+                "Arabic-script letters are cursive and joined; non-zero letter-spacing inserts "
+                "gaps between joined glyphs and visually shatters words "
+                "(«مدیریت» renders as م د ی ر ی ت)."
+            ),
+            suggested_fix="remove the declaration (use size/weight for display emphasis)",
+            fixable=True,
+        ))
+    return findings
+
+
+# ---------------------------------------------------------------- HTML rules
+
+_DIR_ATTR_RE = re.compile(r"\bdir\s*=\s*[\"'](rtl|ltr|auto)[\"']", re.IGNORECASE)
+
+
+def rule_html_meta(path: str, content: str, project_lang: str) -> list[Finding]:
+    findings = []
+    if not path.endswith(".html") or not _has_arabic(content):
+        return findings
+    html_tag = re.search(r"<html\b([^>]*)>", content, re.IGNORECASE)
+    if not html_tag:
+        return findings
+    attrs = html_tag.group(1)
+    line_no = content[: html_tag.start()].count("\n") + 1
+    if not _DIR_ATTR_RE.search(attrs):
+        findings.append(Finding(
+            rule="RTL006", severity="P0", confidence="high",
+            file=path, line=line_no,
+            column=html_tag.start() - content.rfind("\n", 0, html_tag.start()),
+            message="<html> without dir attribute",
+            explanation=(
+                f"Document contains {project_lang} text but no dir attribute. Browsers, screen "
+                "readers, scrollbars and form controls all key off document direction."
+            ),
+            suggested_fix=f'<html lang="{project_lang}" dir="rtl">',
+            fixable=False,
+        ))
+    if not re.search(r"\blang\s*=\s*[\"'][a-zA-Z-]+[\"']", attrs, re.IGNORECASE):
+        findings.append(Finding(
+            rule="RTL014", severity="P1", confidence="high",
+            file=path, line=line_no,
+            column=html_tag.start() - content.rfind("\n", 0, html_tag.start()),
+            message="<html> without lang attribute",
+            explanation="Screen readers select the pronunciation voice from lang; absence mispronounces the page.",
+            suggested_fix=f'<html lang="{project_lang}" dir="rtl">',
+            fixable=False,
+        ))
+    return findings
+
+
+def rule_html_dir_ltr_on_arabic(path: str, content: str) -> list[Finding]:
+    findings = []
+    if not any(path.endswith(e) for e in (".html", ".vue", ".astro")):
+        return findings
+    for m in re.finditer(
+        r"<([a-zA-Z][^\s>/]*)\b([^>]*\bdir\s*=\s*[\"']ltr[\"'][^>]*)>([^<]*)",
+        content, re.IGNORECASE,
+    ):
+        inner = m.group(3).strip()
+        if inner and ARABIC_RE.search(inner) and not re.search(r"[A-Za-z0-9]", inner):
+            line_no = content[: m.start()].count("\n") + 1
+            findings.append(Finding(
+                rule="RTL013", severity="P0", confidence="medium",
+                file=path, line=line_no, column=None,
+                message=f'dir="ltr" on <{m.group(1)}> containing only Arabic-script text',
+                explanation="Forcing LTR direction on Arabic-script content misorders the inline text.",
+                suggested_fix='remove dir="ltr" or use dir="auto"',
+                fixable=False,
+            ))
+    return findings
+
+
+# ---------------------------------------------------------------- Tailwind rules
+
+_TW_SPACING = re.compile(r"(?<![\w-])(-?)(?:ml|mr|pl|pr)-[\w[\].%/]+")
+_TW_TEXTALIGN = re.compile(r"(?<![\w-])text-(left|right)\b")
+_TW_INSET = re.compile(r"(?<![\w-])(-?)(?:left|right)-[\w[\].%/]+")
+_TW_BORDER = re.compile(r"(?<![\w-])border-[lr]-[\w[\].%/]+")
+_TW_ROUNDED = re.compile(r"(?<![\w-])rounded-[lr][\w[\].%-]*")
+_TW_TRANSLATE = re.compile(r"(?<![\w-])-?translate-x-[\w[\].%/]+")
+
+
+def _tw_fix(token: str) -> str | None:
+    mapping = {"text-left": "text-start", "text-right": "text-end"}
+    if token in mapping:
+        return mapping[token]
+    m = re.fullmatch(r"(-?)(ml|mr|pl|pr)-([\w./%-]+)", token)
+    if m:
+        sign, side, val = m.groups()
+        end = "e" if side in ("mr", "pr") else "s"
+        kind = "m" if side in ("ml", "mr") else "p"
+        return f"{sign}{kind}{end}-{val}"
+    return None
+
+
+def rule_tailwind(path: str, content: str, config: dict) -> list[Finding]:
+    if not _has_arabic(content) and not _force_enabled(config, "RTL008"):
+        return []
+    findings: list[Finding] = []
+    for i, line in enumerate(content.splitlines(), 1):
+        for rx, kind in (
+            (_TW_SPACING, "spacing"),
+            (_TW_TEXTALIGN, "alignment"),
+            (_TW_INSET, "inset"),
+            (_TW_BORDER, "border"),
+            (_TW_ROUNDED, "radius"),
+        ):
+            for m in rx.finditer(line):
+                token = m.group(0)
+                fix = _tw_fix(token)
+                findings.append(Finding(
+                    rule="RTL008",
+                    severity="P1",
+                    confidence="high" if fix else "medium",
+                    file=path, line=i, column=m.start() + 1,
+                    message=f"Tailwind physical utility `{token}`",
+                    explanation=(
+                        f"Physical {kind} utility does not mirror under dir=\"rtl\"; the logical "
+                        "variant flips automatically in both directions."
+                    ),
+                    suggested_fix=f"`{fix}`" if fix else "logical variant (ms/me/ps/pe/start/end)",
+                    fixable=fix is not None,
+                ))
+        for m in _TW_TRANSLATE.finditer(line):
+            findings.append(Finding(
+                rule="RTL007", severity="P2", confidence="medium",
+                file=path, line=i, column=m.start() + 1,
+                message=f"Tailwind `{m.group(0)}`",
+                explanation=(
+                    "translate-x does not mirror with direction; drawers, sliders and shimmer "
+                    "effects move the wrong way under RTL unless mirrored explicitly."
+                ),
+                suggested_fix="mirror with rtl:-translate-x-* twin or logical custom properties",
+                fixable=False,
+            ))
+    return findings
+
+
+# ---------------------------------------------------------------- prose rules
+
+
+def _strip_markup_for_prose(content: str, suffix: str) -> tuple[str, dict[int, int]]:
+    """Reduce markup documents to visible text for prose rules, preserving line numbers.
+
+    - script/style blocks are blanked out (their contents are code, not prose)
+    - tags are removed per line (attributes like className digits must not trigger
+      RTL009/010/011/012 — only human-visible text is prose)
+    - for markdown/txt: fenced blocks + inline code + URLs are masked instead
+    """
+    mapping: dict[int, int] = {}
+    if suffix in (".md", ".mdx", ".txt"):
+        masked, mapping = _strip_inline_code_and_fences(content)
+        return masked, mapping
+
+    def blank_block(m: re.Match) -> str:
+        return "\n" * m.group(0).count("\n")
+
+    text = re.sub(r"<script\b.*?</script\s*>", blank_block, content, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<style\b.*?</style\s*>", blank_block, text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<!--.*?-->", blank_block, text, flags=re.DOTALL)
+    text = re.sub(r"<[^>\n]*>", "", text)
+    out_lines = []
+    for orig_no, line in enumerate(text.splitlines(), 1):
+        stripped = re.sub(r"`[^`]*`", "", line)
+        stripped = re.sub(r"https?://\S+", "", stripped)
+        out_lines.append(stripped)
+        mapping[len(out_lines)] = orig_no
+    return "\n".join(out_lines), mapping
+
+
+def rule_prose(path: str, content: str, profile: dict, options: dict | None = None,
+               suffix: str = "") -> list[Finding]:
+    options = options or {}
+    findings: list[Finding] = []
+    lang = profile.get("code", "fa")
+    digits_name = profile.get("numerals", {}).get("display", "٠–٩/۰–۹")
+    masked, mapping = _strip_markup_for_prose(content, suffix)
+
+    digits_ok = options.get("allow_western_digits_in_prose", False)
+    punct_ok = options.get("allow_latin_punctuation_in_prose", False)
+
+    for masked_no, line in enumerate(masked.splitlines(), 1):
+        orig_no = mapping[masked_no]
+        if not ARABIC_RE.search(line):
+            continue
+
+        # RTL011 — broken ZWNJ compounds
+        for _ln, before, after in detect_broken_zwnj(line):
+            col = line.find(before) + 1
+            findings.append(Finding(
+                rule="RTL011", severity="P1", confidence="high",
+                file=path, line=orig_no, column=col if col > 0 else None,
+                message=f"broken ZWNJ compound: «{before}»",
+                explanation="Affix written with a space instead of U+200C — the most visible Persian orthography defect.",
+                suggested_fix=f"«{after}»",
+                fixable=True,
+            ))
+
+        # Collect LTR-atom spans first so RTL010 can suppress phone/URL internals.
+        atom_spans: list[tuple[int, int]] = []
+        for m in re.finditer(
+            r"(?<![\w>])([\w.+-]+@[\w-]+\.\w+|https?://\S+|\+\d[\d\s-]{6,}\d|\$\d+(?:\.\d+)?)",
+            line,
+        ):
+            atom_spans.append(m.span())
+            findings.append(Finding(
+                rule="RTL012", severity="P2", confidence="medium",
+                file=path, line=orig_no, column=m.start() + 1,
+                message=f"un-isolated LTR atom: {m.group(1)[:32]}…",
+                explanation="URLs/emails/phones/currency inside RTL prose reorder without isolation (bdi or dir=ltr).",
+                suggested_fix='wrap in <bdi>…</bdi> or <span dir="ltr">…</span>',
+                fixable=False,
+            ))
+
+        def in_atom(pos: int) -> bool:
+            return any(s <= pos < e for s, e in atom_spans)
+
+        # RTL009 — Latin punctuation in Arabic prose
+        if not punct_ok:
+            for m in re.finditer(r"(?<=[\u0600-\u06FF])\s*[,;?](?=[\u0600-\u06FF\s]|$)", line):
+                repl = {"": "،", ",": "،", "?": "؟", ";": "؛"}.get(m.group(0).strip(), "،")
+                findings.append(Finding(
+                    rule="RTL009", severity="P2", confidence="high",
+                    file=path, line=orig_no, column=m.start() + 1,
+                    message=f"Latin punctuation `{m.group(0).strip()}` inside {lang} prose",
+                    explanation=f"{lang} prose uses its own marks (، ؟ ؛); Latin marks read as machine-generated output.",
+                    suggested_fix=f"«{repl}»",
+                    fixable=False,
+                ))
+
+        # RTL010 — Western digits in Arabic prose (suppressed inside LTR atoms)
+        if not digits_ok:
+            for m in re.finditer(r"[0-9]+", line):
+                if in_atom(m.start()):
+                    continue
+                before_ok = m.start() == 0 or ARABIC_RE.match(line[m.start() - 1]) or line[m.start() - 1].isspace()
+                after_ok = m.end() >= len(line) or ARABIC_RE.match(line[m.end()]) or line[m.end()].isspace()
+                if not (before_ok and after_ok):
+                    continue
+                findings.append(Finding(
+                    rule="RTL010", severity="P2", confidence="medium",
+                    file=path, line=orig_no, column=m.start() + 1,
+                    message=f"Western digits `{m.group(0)}` in {lang} prose",
+                    explanation=(
+                        f"{lang} copy uses {digits_name} digits. Exceptions (phones, serials, code) "
+                        "should be isolated instead — see rtl-bidi."
+                    ),
+                    suggested_fix=f"convert to {digits_name} digits or isolate with <bdi>/dir=ltr",
+                    fixable=False,
+                ))
+    return findings
+
+
+# ---------------------------------------------------------------- engine
+
+
+@dataclass
+class RuleContext:
+    config: dict
+    profile: dict
+
+    @property
+    def lang(self) -> str:
+        return self.config.get("language", "fa")
+
+
+def run_rules(path: Path, rel: str, content: str, ctx: RuleContext) -> list[Finding]:
+    findings: list[Finding] = []
+    findings += rule_css_physical(rel, content, ctx.config)
+    findings += rule_css_text_align(rel, content, ctx.config)
+    findings += rule_css_left_right(rel, content, ctx.config)
+    findings += rule_css_letter_spacing(rel, content, ctx.config)
+    findings += rule_html_meta(rel, content, ctx.lang)
+    findings += rule_html_dir_ltr_on_arabic(rel, content)
+    findings += rule_tailwind(rel, content, ctx.config)
+    if path.suffix.lower() in PROSE_EXT:
+        findings += rule_prose(rel, content, ctx.profile, ctx.config.get("rules", {}),
+                               suffix=path.suffix.lower())
+    return findings

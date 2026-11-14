@@ -1,0 +1,14 @@
+{
+  "name": "raast-browser",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "RAAST browser validation suite \u2014 real Chromium checks for RTL pages.",
+  "scripts": {
+    "test": "node tests/rtl.spec.mjs",
+    "test:demo": "node tests/rtl.spec.mjs --target file://../demo/index.html --label demo"
+  },
+  "devDependencies": {
+    "playwright": "1.57.0"
+  }
+}

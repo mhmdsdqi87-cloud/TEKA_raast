@@ -1,0 +1,52 @@
+# Compatibility
+
+Honest status of where RAAST works. "Verified" means actually executed in the stated environment during development; "Planned" means designed for but not yet exercised — do not treat planned rows as working.
+
+## Skills hosting environments
+
+| Environment | Status | Install | Notes |
+|---|---|---|---|
+| Claude Code (skills directory) | **Verified** | `cp -r skills/* ~/.claude/skills/` | Format used throughout development: folder per skill with `SKILL.md` (YAML `name` + `description`). Frontmatter of all six skills validated against the published constraints (name `≤64` chars `[a-z0-9-]`, description `≤1024` chars) — see [architecture-audit.md §3](architecture-audit.md). |
+| Claude Code (plugin marketplace) | Planned | — | Requires a `.claude-plugin/plugin.json` manifest and marketplace testing; tracked in the roadmap. |
+| Claude API (Skill upload) | Planned | — | The Agent Skills spec is the same; API upload flow not yet exercised end-to-end. |
+| Generic agent / any LLM chat | Verified (manual) | Paste `SKILL.md` content into system prompt or project context | Skills are plain Markdown; any agent that ingests instructions can use them. Marked "manual" because we cannot enumerate every environment. |
+| Cursor rules / Copilot instructions | Planned | — | Mechanical adaptation is expected to work (plain Markdown) but is not yet documented per-environment. |
+
+## CLI
+
+| Requirement | Status |
+|---|---|
+| Python 3.11+ | Verified on 3.12.x (development) |
+| Runtime dependencies | None (stdlib only) |
+| OS | Verified on Linux (Debian 13). Windows/macOS expected but unverified. |
+| Installation | `pip install -e .` from repo root (editable), or run `python3 -m raast.cli` directly |
+
+## Browser test suite
+
+| Requirement | Status |
+|---|---|
+| Node 18+ / Bun | Verified: Bun 1.3.x with Playwright 1.57.0 |
+| Chromium | Verified: installed via `playwright install chromium` in the development sandbox |
+| Target | Any URL or local file; fixtures included under `browser/fixtures/` |
+
+## GitHub Action
+
+| Requirement | Status |
+|---|---|
+| `actions/checkout@v4`, `actions/setup-python@v5` | Pinned in example workflow |
+| Composite action at `action/` | Provided; runs CLI in `--format github` annotation mode |
+| Browser tests inside Action | Optional, disabled by default (requires `npx playwright install --with-deps chromium`) |
+
+## Language profiles
+
+| Language | Status | Profile |
+|---|---|---|
+| Persian (fa) | Verified — rules and normalizer wired to profile | `profiles/fa.json` |
+| Arabic (ar) | Verified — profile loaded, prose rules use it | `profiles/ar.json` |
+| Hebrew (he) | Planned | profile schema supports it; content needs a native-speaker reviewer |
+| Urdu (ur) | Planned | same |
+
+## Known non-goals
+
+- RAAST does not ship fonts or claim font licenses beyond pointing to their upstream open licenses.
+- The benchmark does not run AI agents itself; it validates HTML artifacts. Condition A/B runs (with/without Skills) happen in *your* agent environment using the methodology in [benchmark-methodology.md](benchmark-methodology.md).

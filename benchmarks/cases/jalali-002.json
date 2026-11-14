@@ -1,0 +1,14 @@
+{
+  "id": "jalali-002",
+  "category": "jalali_dates",
+  "title": "Jalali rendering referenced alongside Persian locale data",
+  "task": "Format a relative timestamp in Persian.",
+  "files": "**/jalali_dates.html",
+  "severity": "P2",
+  "expected_behavior": "Relative time via Intl.RelativeTimeFormat('fa'); digits come out Persian automatically.",
+  "validation": [
+    {
+      "type": "intl_jalali"
+    }
+  ]
+}

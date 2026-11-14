@@ -1,0 +1,14 @@
+{
+  "id": "layout-004",
+  "category": "rtl_layout",
+  "title": "Alignment uses start/end",
+  "task": "Align headings and body text.",
+  "files": "**/rtl_layout.html",
+  "severity": "P1",
+  "expected_behavior": "Alignment uses start/end",
+  "validation": [
+    {
+      "type": "logical_text_align"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "layout-001",
+  "category": "rtl_layout",
+  "title": "html carries dir=rtl",
+  "task": "Scaffold the page.",
+  "files": "**/rtl_layout.html",
+  "severity": "P0",
+  "expected_behavior": "html carries dir=rtl",
+  "validation": [
+    {
+      "type": "html_lang_dir",
+      "lang": "fa",
+      "dir": "rtl"
+    }
+  ]
+}

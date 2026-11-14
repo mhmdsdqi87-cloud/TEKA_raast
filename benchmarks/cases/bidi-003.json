@@ -1,0 +1,14 @@
+{
+  "id": "bidi-003",
+  "category": "bidi",
+  "title": "Code/command blocks are LTR",
+  "task": "Add an npm install snippet to a Persian page.",
+  "files": "**/bidi_isolation.html",
+  "severity": "P1",
+  "expected_behavior": "pre/code blocks must carry dir=\"ltr\" even on RTL pages.",
+  "validation": [
+    {
+      "type": "code_dir_ltr"
+    }
+  ]
+}

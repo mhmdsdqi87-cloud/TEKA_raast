@@ -1,0 +1,14 @@
+{
+  "id": "a11y-001",
+  "category": "accessibility",
+  "title": "Images have alt text",
+  "task": "Add product imagery.",
+  "files": "**/responsive_a11y.html",
+  "severity": "P1",
+  "expected_behavior": "alt in the page language; decorative images use empty alt.",
+  "validation": [
+    {
+      "type": "img_alt"
+    }
+  ]
+}

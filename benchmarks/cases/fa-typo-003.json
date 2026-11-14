@@ -1,0 +1,17 @@
+{
+  "id": "fa-typo-003",
+  "category": "persian_typography",
+  "title": "Persian digits and punctuation in prose",
+  "task": "Show a price and a support line in Persian.",
+  "files": "**/persian_typography.html",
+  "severity": "P1",
+  "expected_behavior": "Prices use ۹۹٬۰۰۰ with ٬; punctuation uses ، ؟ ؛; phones stay isolated Western.",
+  "validation": [
+    {
+      "type": "persian_digits_in_prose"
+    },
+    {
+      "type": "persian_punctuation"
+    }
+  ]
+}

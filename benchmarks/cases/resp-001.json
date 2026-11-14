@@ -1,0 +1,14 @@
+{
+  "id": "resp-001",
+  "category": "responsive",
+  "title": "Viewport meta present",
+  "task": "Scaffold the page.",
+  "files": "**/responsive_a11y.html",
+  "severity": "P1",
+  "expected_behavior": "Viewport meta present",
+  "validation": [
+    {
+      "type": "viewport_meta"
+    }
+  ]
+}

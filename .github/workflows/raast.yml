@@ -1,0 +1,37 @@
+name: RAAST
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  rtl-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: RAAST Doctor (annotations + severity gate)
+        uses: mhmdsdqi87-cloud/TEKA_raast/action@main
+        with:
+          path: .
+          language: fa
+          fail-on: P0
+
+  # Self-check: the RAAST repository validates its own engine
+  raast-self-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -e .
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Benchmark self-validation (condition C)
+        run: python3 -m raast.cli benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference

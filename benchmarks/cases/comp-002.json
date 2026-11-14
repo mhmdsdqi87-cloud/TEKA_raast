@@ -1,0 +1,14 @@
+{
+  "id": "comp-002",
+  "category": "component_correctness",
+  "title": "Interactive controls expose accessible names",
+  "task": "Add toolbar buttons with icons only.",
+  "files": "**/components.html",
+  "severity": "P1",
+  "expected_behavior": "Interactive controls expose accessible names",
+  "validation": [
+    {
+      "type": "icon_button_labels"
+    }
+  ]
+}

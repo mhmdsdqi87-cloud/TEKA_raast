@@ -1,0 +1,15 @@
+{
+  "id": "fa-typo-002",
+  "category": "persian_typography",
+  "title": "Affix compounds use ZWNJ",
+  "task": "Write Persian marketing copy containing verbs and plurals.",
+  "files": "**/persian_typography.html",
+  "severity": "P1",
+  "expected_behavior": "می‌شود، خانه‌ها، بزرگ‌تر must contain U+200C, not spaces.",
+  "validation": [
+    {
+      "type": "zwnj_min_count",
+      "min": 3
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "bidi-004",
+  "category": "bidi",
+  "title": "Emails and URLs isolated",
+  "task": "Add a contact email link inside Persian prose.",
+  "files": "**/bidi_isolation.html",
+  "severity": "P2",
+  "expected_behavior": "Emails and URLs isolated",
+  "validation": [
+    {
+      "type": "bidi_isolation"
+    }
+  ]
+}

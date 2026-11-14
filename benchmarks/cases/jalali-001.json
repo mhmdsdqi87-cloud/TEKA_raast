@@ -1,0 +1,14 @@
+{
+  "id": "jalali-001",
+  "category": "jalali_dates",
+  "title": "Dates via Intl fa-IR or a vetted Jalali library",
+  "task": "Display today's date in Jalali.",
+  "files": "**/jalali_dates.html",
+  "severity": "P1",
+  "expected_behavior": "Intl.DateTimeFormat('fa-IR') or date-fns-jalali/jalaali-js; never hand-rolled conversion.",
+  "validation": [
+    {
+      "type": "intl_jalali"
+    }
+  ]
+}

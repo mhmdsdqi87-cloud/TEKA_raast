@@ -1,0 +1,15 @@
+{
+  "id": "a11y-003",
+  "category": "accessibility",
+  "title": "html declares lang",
+  "task": "Scaffold the page.",
+  "files": "**/responsive_a11y.html",
+  "severity": "P1",
+  "expected_behavior": "html declares lang",
+  "validation": [
+    {
+      "type": "html_lang_dir",
+      "lang": "fa"
+    }
+  ]
+}

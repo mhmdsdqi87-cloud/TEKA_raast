@@ -1,0 +1,14 @@
+{
+  "id": "layout-003",
+  "category": "rtl_layout",
+  "title": "Tailwind utilities are logical",
+  "task": "Use Tailwind spacing utilities.",
+  "files": "**/rtl_layout.html",
+  "severity": "P1",
+  "expected_behavior": "ms/me/ps/pe/start/end instead of ml/mr/pl/pr/left/right.",
+  "validation": [
+    {
+      "type": "logical_tailwind"
+    }
+  ]
+}
