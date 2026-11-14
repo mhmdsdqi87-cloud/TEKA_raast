@@ -16,6 +16,7 @@ CI-green release: the repository's own GitHub Action now passes on every push.
 - **Markdown scanning policy**: CSS/Tailwind/HTML-structure rules no longer run on `.md`/`.mdx` (documents deliberately illustrate wrong patterns); prose rules still scan markdown.
 - **Demo**: pricing badge centered with `inset-inline`/`margin-inline: auto` instead of physical `left: 50%` + `translateX(-50%)`.
 - **CI hygiene**: `actions/checkout@v5`, `actions/setup-python@v6` (Node 24 — removes deprecation warnings); runners pinned to `ubuntu-24.04` for reproducibility.
+- **Packaging**: SPDX license expression (`license = "MIT"` + `license-files`, `setuptools>=77`) — removes pip build-backend deprecation warnings (PEP 639).
 
 ### Added
 - Root `raast.config.json` for self-scanning: benchmark fixtures, browser suite, test fixtures and generated assets are excluded from the doctor gate (intentionally-broken or non-source content).
