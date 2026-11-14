@@ -33,10 +33,10 @@ Meta description in the same language as the page, with correct ZWNJ.
 ## 2. Section order (conversion-tested for Persian markets)
 
 1. **Nav**: brand at inline-start (right side visually), links, CTA at inline-end (left). Sticky, blurred.
-2. **Hero**: badge pill, H1 in display font, subline, 2 CTAs, trust line («مورد اعتماد بیش از X تیم»).
+2. **Hero**: badge pill, H1 in display font, subline, two CTAs, trust line («مورد اعتماد بیش از X تیم»).
 3. **Social proof / logos** (optional but strong in this market).
-4. **Features**: 6 cards, 3-column desktop grid, icons in tinted squares.
-5. **How it works**: 3 numbered steps — numbers as Persian digits ۱ ۲ ۳ in circles.
+4. **Features**: six cards, three-column desktop grid, icons in tinted squares.
+5. **How it works**: three numbered steps — numbers as Persian digits ۱ ۲ ۳ in circles.
 6. **Pricing**: two plans, one highlighted «پیشنهاد ما». Prices: «۲۴۹٬۰۰۰ تومان در ماه». Annual note: «پرداخت سالانه ۲۰٪ تخفیف دارد.»
 7. **Testimonial**: one strong quote with guillemets «...», Persian name + role.
 8. **FAQ**: native `<details>/<summary>`, 4–6 questions, chevron rotates when open.

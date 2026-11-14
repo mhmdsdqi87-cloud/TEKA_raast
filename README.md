@@ -19,7 +19,7 @@ Open-source RTL engineering for AI-powered development — Persian & Arabic firs
 AI coding agents build beautiful interfaces — and then you open them in Persian or Arabic:
 
 - `letter-spacing` **shatters joined Arabic-script letters**: «مدیریت» renders as م د ی ر ی ت
-- Missing **ZWNJ** (`نیم‌فاصله`, U+200C): «می شود»، «خانه ها»، «خوب تر»
+- Missing **ZWNJ** (`نیم‌فاصله`, U+200C): `«می شود»، «خانه ها»، «خوب تر»`
 - Western digits inside Persian copy: "5 ستاره" instead of «۵ ستاره»
 - `text-align: left`, physical `margin-left/right`, icons pointing the wrong way
 - `$99` scrambling to `99$`, URLs reordering inside RTL sentences
@@ -69,7 +69,7 @@ raast doctor ./your-project
 | `RTL007` | `translate-x` without an RTL twin | P2 review |
 | `RTL008` | Tailwind physical utilities (`ml-`, `text-left`, …) | P1 |
 | `RTL009/010` | Latin punctuation / Western digits in Arabic prose | P2 |
-| `RTL011` | broken ZWNJ compounds («می رود») | P1 |
+| `RTL011` | broken ZWNJ compounds (`«می رود»`) | P1 |
 | `RTL012` | un-isolated LTR atoms (URL/phone/$) in RTL prose | P2 review |
 | `RTL013` | `dir="ltr"` on Arabic-only content | P0 |
 

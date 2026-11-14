@@ -21,8 +21,10 @@ from .rules import Finding, RuleContext, run_rules, SEVERITY_ORDER
 from .scanner import iter_files
 
 
-def _build_context(root: Path, config_path: Path | None) -> tuple[RuleContext, str | None]:
+def _build_context(root: Path, config_path: Path | None, language: str | None = None) -> tuple[RuleContext, str | None]:
     config, source = load_config(config_path, root)
+    if language:
+        config["language"] = language
     profile = load_profile(config["language"])
     return RuleContext(config=config, profile=profile), source
 
@@ -97,7 +99,8 @@ def _fmt_report(report: Report, fmt: str) -> str:
 def cmd_doctor(args) -> int:
     root = Path(args.path).resolve()
     try:
-        ctx, source = _build_context(root, Path(args.config) if args.config else None)
+        ctx, source = _build_context(root, Path(args.config) if args.config else None,
+                                     language=getattr(args, "language", None))
     except ConfigError as e:
         print(f"config error: {e}", file=sys.stderr)
         return 2
@@ -227,12 +230,16 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("path", nargs="?", default=".")
     sp.add_argument("--format", choices=["text", "json", "markdown", "github"], default="text")
     sp.add_argument("--fail-on", choices=["P0", "P1", "P2"], default=None)
+    sp.add_argument("--language", choices=["fa", "ar"], default=None,
+                    help="override config language profile")
     sp.add_argument("--config", default=None)
     sp.set_defaults(func=cmd_doctor)
 
     sp = sub.add_parser("audit", help="doctor (markdown) + manual review checklist")
     sp.add_argument("path", nargs="?", default=".")
     sp.add_argument("--fail-on", choices=["P0", "P1", "P2"], default=None)
+    sp.add_argument("--language", choices=["fa", "ar"], default=None,
+                    help="override config language profile")
     sp.add_argument("--config", default=None)
     sp.set_defaults(func=cmd_audit)
 

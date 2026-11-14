@@ -19,7 +19,9 @@ Rule inventory (IDs shared with skills/rtl-audit):
 False-positive policy: CSS/Tailwind rules only fire when the file itself
 contains Arabic-script evidence, unless the rule is forced via config
 (`"rules": {"RTL001": {"force": true}}`). A left/right declaration in a
-pure-LTR file of a mixed project is NOT reported by default.
+pure-LTR file of a mixed project is NOT reported by default. CSS/Tailwind/
+HTML-structure rules do not run on .md/.mdx at all — documents deliberately
+illustrate WRONG patterns; prose rules handle markdown instead.
 """
 from __future__ import annotations
 
@@ -136,16 +138,20 @@ def rule_css_text_align(path: str, content: str, config: dict) -> list[Finding]:
     for i, line in enumerate(content.splitlines(), 1):
         for m in re.finditer(r"text-align\s*:\s*(left|right)\b", line, re.IGNORECASE):
             val = m.group(1).lower()
+            scoped_ltr = '[dir="ltr"]' in line or "dir='ltr'" in line
             findings.append(Finding(
-                rule="RTL004", severity="P1", confidence="high",
+                rule="RTL004", severity="P1",
+                confidence="low" if scoped_ltr else "high",
                 file=path, line=i, column=m.start() + 1,
                 message=f"text-align: {val}",
                 explanation=(
                     "Physical alignment does not flip with document direction. "
                     "start/end track the inline direction in both LTR and RTL."
+                    if not scoped_ltr else
+                    "Declaration appears inside a [dir=\"ltr\"] scope — verify it is intentional."
                 ),
                 suggested_fix=f"text-align: {'start' if val == 'left' else 'end'}",
-                fixable=True,
+                fixable=not scoped_ltr,
             ))
     return findings
 
@@ -178,7 +184,9 @@ def rule_css_letter_spacing(path: str, content: str, config: dict) -> list[Findi
         return []
     findings = []
     for i, line in enumerate(content.splitlines(), 1):
-        m = re.search(r"letter-spacing\s*:\s*([^\s;{}]+)", line)
+        # Value token must stop before quotes/backticks — `` `letter-spacing: 0` ``
+        # in markdown prose must resolve to "0" (legal), not "0`" (false positive).
+        m = re.search(r"letter-spacing\s*:\s*([^\s;{}\"'`]+)", line)
         if not m:
             continue
         if m.group(1).lower() in ("normal", "inherit", "initial", "unset", "0", "0px", "0em", "0rem"):
@@ -262,12 +270,15 @@ def rule_html_dir_ltr_on_arabic(path: str, content: str) -> list[Finding]:
 
 # ---------------------------------------------------------------- Tailwind rules
 
-_TW_SPACING = re.compile(r"(?<![\w-])(-?)(?:ml|mr|pl|pr)-[\w[\].%/]+")
+# Tailwind class tokens. Lookbehind AND lookahead word-boundary guards prevent
+# matches inside hyphenated English prose such as "right-to-left" or "left-aligned"
+# (which are words, not utilities).
+_TW_SPACING = re.compile(r"(?<![\w-])(-?)(?:ml|mr|pl|pr)-[\w[\].%/]+(?![\w-])")
 _TW_TEXTALIGN = re.compile(r"(?<![\w-])text-(left|right)\b")
-_TW_INSET = re.compile(r"(?<![\w-])(-?)(?:left|right)-[\w[\].%/]+")
-_TW_BORDER = re.compile(r"(?<![\w-])border-[lr]-[\w[\].%/]+")
-_TW_ROUNDED = re.compile(r"(?<![\w-])rounded-[lr][\w[\].%-]*")
-_TW_TRANSLATE = re.compile(r"(?<![\w-])-?translate-x-[\w[\].%/]+")
+_TW_INSET = re.compile(r"(?<![\w-])(-?)(?:left|right)-[\w[\].%/]+(?![\w-])")
+_TW_BORDER = re.compile(r"(?<![\w-])border-[lr]-[\w[\].%/]+(?![\w-])")
+_TW_ROUNDED = re.compile(r"(?<![\w-])rounded-[lr][\w[\].%-]*(?![\w-])")
+_TW_TRANSLATE = re.compile(r"(?<![\w-])-?translate-x-[\w[\].%/]+(?![\w-])")
 
 
 def _tw_fix(token: str) -> str | None:
@@ -345,9 +356,21 @@ def _strip_markup_for_prose(content: str, suffix: str) -> tuple[str, dict[int, i
     def blank_block(m: re.Match) -> str:
         return "\n" * m.group(0).count("\n")
 
+    def blank_span(m: re.Match) -> str:
+        """Whitespace-preserving mask: newlines survive, every other char becomes a space."""
+        return re.sub(r"[^\n]", " ", m.group(0))
+
     text = re.sub(r"<script\b.*?</script\s*>", blank_block, content, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"<style\b.*?</style\s*>", blank_block, text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"<!--.*?-->", blank_block, text, flags=re.DOTALL)
+    # Isolated regions (<bdi>, dir="ltr") are the engine's OWN recommendation —
+    # their contents are protected LTR atoms and must never re-flag as RTL009/
+    # 010/012 findings. Benchmark validator follows the same isolation model.
+    text = re.sub(r"<bdi\b[^>]*>.*?</bdi\s*>", blank_span, text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(
+        r"<(?:span|div|p|pre|code|td|li|h[1-6])\b[^>]*\bdir\s*=\s*[\"']ltr[\"'][^>]*>.*?</(?:span|div|p|pre|code|td|li|h[1-6])\s*>",
+        blank_span, text, flags=re.DOTALL | re.IGNORECASE,
+    )
     text = re.sub(r"<[^>\n]*>", "", text)
     out_lines = []
     for orig_no, line in enumerate(text.splitlines(), 1):
@@ -456,14 +479,22 @@ class RuleContext:
 
 def run_rules(path: Path, rel: str, content: str, ctx: RuleContext) -> list[Finding]:
     findings: list[Finding] = []
-    findings += rule_css_physical(rel, content, ctx.config)
-    findings += rule_css_text_align(rel, content, ctx.config)
-    findings += rule_css_left_right(rel, content, ctx.config)
-    findings += rule_css_letter_spacing(rel, content, ctx.config)
-    findings += rule_html_meta(rel, content, ctx.lang)
-    findings += rule_html_dir_ltr_on_arabic(rel, content)
-    findings += rule_tailwind(rel, content, ctx.config)
-    if path.suffix.lower() in PROSE_EXT:
+    suffix = path.suffix.lower()
+    # Markdown is documentation: it deliberately shows WRONG patterns inside
+    # code fences and inline spans ("/* WRONG — breaks joining */"). CSS,
+    # Tailwind and HTML-structure rules are source-code rules and would only
+    # produce false positives there. Prose rules (ZWNJ, digits, punctuation,
+    # LTR atoms) still scan markdown with their own fence/inline-code masking.
+    is_markup_doc = suffix in (".md", ".mdx")
+    if not is_markup_doc:
+        findings += rule_css_physical(rel, content, ctx.config)
+        findings += rule_css_text_align(rel, content, ctx.config)
+        findings += rule_css_left_right(rel, content, ctx.config)
+        findings += rule_css_letter_spacing(rel, content, ctx.config)
+        findings += rule_html_meta(rel, content, ctx.lang)
+        findings += rule_html_dir_ltr_on_arabic(rel, content)
+        findings += rule_tailwind(rel, content, ctx.config)
+    if suffix in PROSE_EXT:
         findings += rule_prose(rel, content, ctx.profile, ctx.config.get("rules", {}),
-                               suffix=path.suffix.lower())
+                               suffix=suffix)
     return findings

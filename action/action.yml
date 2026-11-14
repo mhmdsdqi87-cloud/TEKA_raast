@@ -31,12 +31,13 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: "3.12"
     - name: Install RAAST CLI
       shell: bash
-      run: pip install "${{ github.action_path }}/../.."
+      # github.action_path = <action repo checkout>/action → one level up is the repo root
+      run: pip install "${{ github.action_path }}/.."
     - name: Run RAAST doctor
       id: doctor
       shell: bash

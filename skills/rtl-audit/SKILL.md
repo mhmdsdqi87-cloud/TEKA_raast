@@ -12,7 +12,7 @@ Run top-down. Output: severity-ordered report with exact line fixes. Severity: P
 1. **Missing `dir="rtl"`** on `<html>` (or on the subtree). Everything else is moot until set. Symptom: page reads left-to-right, punctuation floats at the wrong end.
 2. **`letter-spacing` on Arabic-script text** — words visually shatter («م د ی ر ی ت»). Search CSS for `letter-spacing` and scope it to Latin-only classes.
 3. **Font without Persian glyphs** for fa content — tofu, wrong ی/ک forms, or silent fallback font mid-paragraph. Check computed font on a Persian string in DevTools.
-4. **Space instead of ZWNJ** in «می شود»، «خانه ها»، «خوب تر» patterns. Fix: `rtl-typography/scripts/fix-zwnj.py --apply`.
+4. **Space instead of ZWNJ** in `«می شود»، «خانه ها»، «خوب تر»` patterns. Fix: `rtl-typography/scripts/fix-zwnj.py --apply`.
 5. **Un-isolated LTR atoms** — phone `+98…` renders as `98+`, `$99` becomes `99$`, URLs break across lines wrongly. Wrap in `<bdi>`/`dir="ltr"`.
 
 ## P1 — visibly wrong

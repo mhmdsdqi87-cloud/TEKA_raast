@@ -9,7 +9,7 @@ Audit date: 2026-11-14 · Auditor: automated audit pass + manual review · Repo 
 | 6 Skills (`skills/*/SKILL.md`) | Working content | All validated against the Agent Skills frontmatter constraints (see §3) |
 | `skills/rtl-typography/fonts.md` | Working | 13 fonts, CDN snippets, pairing recipes |
 | `skills/rtl-typography/scripts/fix-zwnj.py` | Working, untested | Dry-run default, code-block/URL protection verified on sample input |
-| `demo/index.html` | Working | Persian RTL landing (fictional product «سیمرغ»), 45 ZWNJ verified, 0 letter-spacing declarations, 0 text-align:left |
+| `demo/index.html` | Working | Persian RTL landing (fictional product «سیمرغ»), ۴۵ ZWNJ verified, no letter-spacing declarations, no physical text-align |
 | `assets/` | Working | Banner (1280×640), demo + showcase screenshots, banner.html source |
 | `README.md` | Bilingual (EN+FA) | Referenced repo name `raast`; needed rename handling for `TEKA_raast` |
 | `LICENSE` | MIT | — |

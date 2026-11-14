@@ -62,7 +62,7 @@ Facts to respect:
 - Weekend in Iran = Friday (جمعه). Business weeks start Saturday.
 - Leap-year rule differs from Gregorian (33-year cycle approximations exist) — never hand-roll conversion.
 - Jalali year = Gregorian year + 621/622 (birthday of the difference moves at Nowruz ~March 20/21).
-- Nowruz = ۱ فروردین ≈ 21 March. Persian sites commonly show «سال نو مبارک» around it.
+- Nowruz = ۱ فروردین (≈ `21 March`, Gregorian). Persian sites commonly show «سال نو مبارک» around it.
 
 ## 4. Libraries (when Intl isn't enough)
 
@@ -84,7 +84,7 @@ toJalaali(2026, 11, 14) // { jy: 1405, jm: 8, jd: 23 }
 - Convert at the rendering boundary, using the user's timezone.
 - Never store Jalali strings as the source of truth.
 - Persian datepickers: value in ISO, display Jalali.
-- Range pickers for reports: guard month lengths — اسفند has 29/30 days (31 in leap years); مهر/اردیبهشت/خرداد always 30; months 1–6 have 31 days.
+- Range pickers for reports: guard month lengths — اسفند has 29/30 days (`31` in leap years); مهر/اردیبهشت/خرداد always 30; months 1–6 have `31` days.
 
 ## 6. Server vs client rendering
 

@@ -73,16 +73,16 @@ Persian compounds and affixes are written with a Zero-Width Non-Joiner between p
 
 | Wrong (space or joined) | Correct (with U+200C) |
 |---|---|
-| می رود | می‌رود |
-| نمی شود | نمی‌شود |
-| می خواهم | می‌خواهم |
-| خانه ها | خانه‌ها |
-| کتاب های | کتاب‌های |
-| بهترین ها | بهترین‌ها |
-| خوب تر | خوب‌تر |
-| برنامه نویسی | برنامه‌نویسی |
-| راه اندازی | راه‌اندازی |
-| ورود به سیستم می پردازد | ورود به سیستم می‌پردازد |
+| `می رود` | می‌رود |
+| `نمی شود` | نمی‌شود |
+| `می خواهم` | می‌خواهم |
+| `خانه ها` | خانه‌ها |
+| `کتاب های` | کتاب‌های |
+| `بهترین ها` | بهترین‌ها |
+| `خوب تر` | خوب‌تر |
+| `برنامه نویسی` | برنامه‌نویسی |
+| `راه اندازی` | راه‌اندازی |
+| `ورود به سیستم می پردازد` | ورود به سیستم می‌پردازد |
 
 Rules of thumb:
 - Prefixes `می`, `نمی`, `بی`, `هم`, `نا`, `باز` + verb/adjective → ZWNJ: می‌گوید، نمی‌دانست، بی‌نقص، هم‌گام
@@ -131,7 +131,7 @@ Keep Western digits only inside inherently-LTR atoms: phone numbers, URLs, code,
 | Decimal / thousands | ٫ ٬ | . , |
 | Percent | ٪ (U+066A) | % |
 
-Ellipsis is `…`, not three dots. No space before ، ؟ ؛ ; one space after.
+Ellipsis is `…`, not three dots. No space before `، ؟ ؛`; one space after.
 
 ## 8. Persian vs Arabic — decide first
 

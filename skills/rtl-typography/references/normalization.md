@@ -6,9 +6,9 @@ What automated tooling may and may not transform in Arabic-script text. The CLI 
 
 | Transformation | Example | Why safe |
 |---|---|---|
-| Join `می/نمی/بی/هم/باز/نا/فرا` + known verb stem with U+200C | «می رود» → «می‌رود» | Space between prefix and verb is never correct in modern Persian orthography |
-| Join plural `ها/های` to a preceding Arabic-script word | «خانه ها» → «خانه‌ها» | «ها» is never a standalone word in prose |
-| Join `تر/ترین` after an Arabic-script word | «خوب تر» → «خوب‌تر» | Attached comparative, per Academy orthography |
+| Join `می/نمی/بی/هم/باز/نا/فرا` + known verb stem with U+200C | `«می رود» → «می‌رود»` | Space between prefix and verb is never correct in modern Persian orthography |
+| Join plural `ها/های` to a preceding Arabic-script word | `«خانه ها» → «خانه‌ها»` | «ها» is never a standalone word in prose |
+| Join `تر/ترین` after an Arabic-script word | `«خوب تر» → «خوب‌تر»` | Attached comparative, per Academy orthography |
 | Arabic Yeh/Kaf → Persian | ي→ی، ك→ک | In **fa** content these are always legacy-keyboard artifacts |
 | Arabic Tatweel (U+0640) removal in UI copy | «مـدیـریـت» → «مدیریت» | Kashida stretching is a print-era decoration; in web UI it breaks search. **Warn first** — legit in decorative logos |
 
