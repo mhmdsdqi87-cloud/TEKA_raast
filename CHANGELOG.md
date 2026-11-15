@@ -2,6 +2,27 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.4.1] — 2026-11-15
+
+The verification-debt release: every capability shipped in 0.4.0 now has a dedicated, independent test module of its own. The green self-test run no longer rests on the old engine suite alone — the Runtime Inspector, the PR reviewer, the diff scoper, the fix journal/revert path and the Language Quality Gate each prove their own edge cases.
+
+### Added
+- **`tests/test_runtime.py`** — Runtime Inspector: pure-logic tests for the pass-1/pass-2 detectors (RT001–RT006), tolerance behavior, report writers and CLI usage errors, PLUS real headless-Chromium tests against calibrated fixtures (`tests/fixtures/runtime/`): a clean RTL page must produce zero findings (exit 0, mirror pass included), a broken page planting one instance of every RT rule class must fire exactly RT001–RT006 (exit 1). Browser tests self-skip where Playwright is absent and run in a dedicated CI job (`runtime-inspector-tests`) that installs the `runtime` extra + Chromium.
+- **`tests/test_review.py`** — PR review against a real temporary git repository: a base branch with pre-existing debt and a feature branch with new debt prove the core promise (findings only on changed lines — new line reported, untouched debt silent, clean branch passes despite repo debt), plus exit-code thresholds (`--fail-on P0/P2/off`), usage errors (bad ref / not a repo → exit 2), comment/annotation builders, severity ordering and the reviewed-extension filter.
+- **`tests/test_diffscope.py`** — unified-diff parsing contract: deleted files (`+++ /dev/null`), created files, binary files, renames (ranges attach to the NEW path), GNU `diff -u` timestamps, quoted paths, omitted hunk counts (`@@ -3 +3 @@`), zero-count hunks, `\ No newline` markers, hunk bodies that look like metadata, `-U0` tight ranges vs `-U3` spans, and tolerant path matching (component-boundary suffix match, never `cardx.css` ≈ `card.css`).
+- **`tests/test_autofix.py`** — Auto-Fix 2.0: the three-tier classification table covers exactly RTL001–RTL017 with valid tiers, safe fixes rewrite only the flagged declaration, low-confidence/unfixable/out-of-range findings are ignored, manual tier never writes, suggested tier stays gated behind `--tier all` + flags (fa-only digit conversion; `$` amounts and phone numbers survive), journal append/load roundtrip with corrupt/non-list/non-dict tolerance, `revert_all` restores EXACT bytes (multi-file, subdirectory), refuses backups without a journal entry and entries that escape the root, plus an end-to-end `raast fix --apply` → `raast revert --yes` CLI roundtrip.
+- **`tests/test_i18n.py`** — Language Quality Gate: all nine LQG rules with their suppression cases (URLs, tech atoms, short/numeric identity, placeholder masking, `1,500` comma masking, `he`/`es` LQG006 exemption, LQG007 isolation via Unicode isolates and `<bdi>`, LQG009 opt-in), flattening (arrays, nulls, dot-paths), placeholder extraction across `{name}`/`{0}`/`{{name}}`/printf syntax, locale discovery layouts (flat, subdirectory merge order, hidden entries, subdir-wins, BOM), renderers and CLI exit codes (0 clean / 1 gate / 2 usage, offending filename in the error).
+- **CI job `runtime-inspector-tests`** — installs `.[runtime]` + headless Chromium and runs the browser layer in CI, so the Runtime Inspector is genuinely exercised on every push (the unit-test job keeps running the same module without Playwright, where browser tests self-skip).
+
+### Changed
+- **Docs truthfulness fixes**: `docs/i18n-gate.md` no longer says the `raast-i18n` console-script wiring is "planned" — it has existed since 0.4.0; `docs/pr-review.md` and `pr-review.yml` now document the fork-PR limitation (read-only token → comment posting fails for fork PRs; annotations and the exit gate still work) with an explicit warning NOT to switch to `pull_request_target` and safer alternatives instead.
+- README test-evidence transcript updated to the current suite and now names the per-capability test modules.
+
+### Verification (all run locally before push)
+- `python3 -m unittest discover -s tests` → 264 tests OK (1 skipped: the ImportError guard, which only runs where Playwright is absent)
+- `python3 -m unittest discover -s tests -p test_runtime.py -v` → browser layer re-verified in real Chromium (clean page exit 0; broken page fires exactly RT001–RT006)
+- Workflow YAML validated for `raast.yml`, `pr-review.yml`, `release.yml`
+
 ## [0.4.0] — 2026-11-15
 
 The verification release: RAAST now observes real browser behavior (Runtime Inspector), reviews pull requests line-by-line (PR Reviewer), repairs code under an explicit three-tier safety policy (Auto-Fix 2.0), backs its claims with a machine-verified bug corpus, extends quality checks from RTL pages to translation files (Language Quality Gate), and documents framework compatibility from real runs instead of manual claims.

@@ -19,6 +19,13 @@
 
 name: "RAAST PR Review"
 
+# Fork-PR note: `pull_request` gives fork-triggered runs a READ-ONLY token,
+# so the comment-posting step below fails with 403 for PRs opened from
+# forks (annotations and the exit gate still work). Do NOT "fix" this by
+# switching to `pull_request_target` — that runs untrusted PR code with a
+# writable token and is a known privilege-escalation vector. See
+# docs/pr-review.md ("Fork pull requests") for safe alternatives.
+
 on:
   pull_request:
 

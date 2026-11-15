@@ -118,6 +118,14 @@ the Files tab.
 
 ## Limitations
 
+- **Fork pull requests cannot post comments.** The workflow declares
+  `pull-requests: write`, but GitHub restricts the `GITHUB_TOKEN` of
+  `pull_request` workflows triggered from forks to read-only. For a PR
+  opened from a fork the review itself still runs and inline annotations
+  still appear on the Files tab (annotations are emitted by the job log,
+  which does not need write access), but the "Post or update review
+  comment" step fails with a 403. This is the documented, deliberate
+  trade-off — see the next section for why and what to do instead.
 - **Full history required.** The review computes
   `git merge-base <base> HEAD`; the workflow therefore checks out with
   `fetch-depth: 0`. Shallow clones cannot compute the merge base.
@@ -138,3 +146,28 @@ the Files tab.
 - **Engine errors are not commented.** Exit code 2 (bad ref, invalid
   config, ...) skips the comment step so a broken setup never posts a
   misleading "Passed".
+
+## Fork pull requests: read this before changing the trigger
+
+External contributors open PRs from forks, and for those the comment-posting
+step fails (read-only token — a GitHub platform restriction, not a RAAST
+bug). The tempting "fix" is switching the workflow to `pull_request_target`,
+which runs with a writable token even for fork PRs.
+
+**Do not do that.** `pull_request_target` checks out and runs workflow logic
+in the context of the BASE repository with write permissions; combined with
+a checkout of the PR head it lets an untrusted PR execute arbitrary code
+with repository secrets — a well-known privilege-escalation vector.
+
+Safer options, in order of preference:
+
+1. **Accept the limitation (default).** Fork PRs still get file annotations
+   and the exit-status gate; only the summary comment is missing. A
+   maintainer can leave one review comment manually when merging.
+2. **Label-gated rerun.** Keep `pull_request` for the report-only run, and
+   add a separate `workflow_dispatch`- or `label`-triggered job that a
+   maintainer explicitly starts for a specific PR. The maintainer's action
+   is the trust boundary, not the event type.
+3. **Post from a dedicated app or PAT** stored as a secret and used only in
+   a job whose inputs a maintainer has reviewed. Never expose repository
+   secrets to untrusted code paths.

@@ -7,13 +7,15 @@ P0/P1/P2 discipline one step upstream, to the locale files that feed those
 pages. It compares every target locale against a source locale and reports
 translation-quality findings with its own rule namespace **LQG001-009**.
 
-Zero dependencies (stdlib only, Python 3.11+). Runs as a module:
+Zero dependencies (stdlib only, Python 3.11+). After
+`pip install raast` the console script is available alongside the main CLI
+(both are registered in `pyproject.toml` under `[project.scripts]`):
 
 ```
+raast-i18n scan --locales <dir> [options]
+# equivalent module form:
 python3 -m raast.i18n scan --locales <dir> [options]
 ```
-
-(A `raast-i18n` console script wiring is planned alongside `raast = raast.cli:main`.)
 
 ## What it checks and why
 

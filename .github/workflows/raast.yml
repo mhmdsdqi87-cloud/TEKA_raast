@@ -54,6 +54,25 @@ jobs:
           print(f"i18n gate detected all {len(expected)} planted error classes ({len(r['findings'])} findings)")
           EOF
 
+  # Runtime Inspector browser tests: real headless Chromium renders the
+  # calibration fixtures and every RT rule must fire. Runs in a dedicated
+  # job because it needs the [runtime] extra + a Chromium download;
+  # the unit-test job above runs the same module WITHOUT playwright,
+  # where the browser tests self-skip and only the pure-logic layer runs.
+  runtime-inspector-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install with runtime extra
+        run: pip install -e '.[runtime]'
+      - name: Install headless Chromium
+        run: playwright install --with-deps chromium
+      - name: Runtime Inspector browser tests (RT001-RT006)
+        run: python3 -m unittest discover -s tests -p test_runtime.py -v
+
   # Packaging smoke test: the wheel a real user installs MUST work outside the
   # repo (profiles shipped as package-data). Regression guard for the
   # "profile not found" bug — editable installs hide it, this job cannot.

@@ -216,7 +216,9 @@ Anything that ingests Markdown can use the skills; verified environments and hon
 
 ```
 $ python3 -m unittest discover -s tests
-Ran 80 tests in 0.5s — OK
+Ran 264 tests in 6.6s — OK (1 skipped)
+# with the [runtime] extra installed; without Playwright the 5 browser
+# tests self-skip and the ImportError guard runs instead
 
 $ raast benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference
 passed 24/24, failed 0, skipped 0
@@ -234,6 +236,18 @@ available language profiles:
 $ raast doctor demo --fail-on P0
 Summary: 1 finding(s): 0 P0, 0 P1, 1 P2      # exit 0
 ```
+
+Every v0.4.0 capability has a dedicated test module: `test_runtime.py`
+(Runtime Inspector — pure-logic detectors plus real headless-Chromium runs
+against calibrated fixtures in CI, self-skipping where Playwright is not
+installed), `test_review.py` (PR review against a real temporary git
+repository: new debt reported, pre-existing debt silent, threshold and
+exit-code contract), `test_diffscope.py` (unified-diff parsing edge cases:
+deletes, renames, binary files, omitted hunk counts, metadata-look-alike
+hunk bodies), `test_autofix.py` (three-tier gating, fix journal, exact
+byte-identical revert, path-escape refusal) and `test_i18n.py` (all nine
+LQG rules with their suppression cases, locale discovery layouts, CLI exit
+codes).
 
 The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (possessive suffixes stay attached), Arabic-Indic digits blocked from conversion in `ar`, Western digits staying valid in `he`/`es` prose, Hebrew `letter-spacing` downgrade to P1, Spanish RTL-run isolation and inverted-mark checks, code-fence protection, config schema validation, scanner globs, end-to-end CLI runs including the backup/restore path — plus packaging regression tests that load every profile from the installed wheel's package directory.
 
