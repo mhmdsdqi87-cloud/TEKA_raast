@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAAST Playground — RTL audit in your browser</title>
+<meta name="description" content="Paste HTML/CSS and get an instant RTL/BiDi audit. Client-side port of all 17 RAAST doctor rules for fa, ar, he and es profiles. No upload — everything runs in your browser.">
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #11161d;
+    --panel-2: #161d26;
+    --border: #232c38;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #34d399;
+    --accent-dim: #34d39922;
+    --p0: #f87171;
+    --p1: #fbbf24;
+    --p2: #60a5fa;
+    --ok: #34d399;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--sans); line-height: 1.6;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+
+  header { border-bottom: 1px solid var(--border); background: var(--panel); }
+  .hdr { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: .2px; }
+  .brand .logo {
+    width: 34px; height: 34px; border-radius: 8px; background: var(--accent-dim);
+    display: grid; place-items: center; color: var(--accent); font-family: var(--mono);
+    font-weight: 700; border: 1px solid var(--accent);
+  }
+  .brand small { color: var(--muted); font-weight: 500; }
+  .hdr-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px;
+    padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font: inherit; cursor: pointer;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #05201a; font-weight: 700; }
+  .btn.primary:hover { filter: brightness(1.1); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+  main { flex: 1; padding: 22px 0 34px; }
+  .lede { color: var(--muted); margin: 0 0 16px; max-width: 900px; }
+  .lede b { color: var(--text); }
+
+  .controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .controls label { color: var(--muted); font-size: 14px; }
+  select {
+    min-height: 44px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font: inherit; cursor: pointer;
+  }
+  .chip {
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px;
+    background: transparent; color: var(--muted); font: inherit; font-size: 13px;
+    cursor: pointer; min-height: 34px;
+  }
+  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  .grid { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.1fr); gap: 18px; }
+  @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-height: 420px; }
+  .panel-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--panel-2); flex-wrap: wrap; }
+  .panel-h h2 { margin: 0; font-size: 14px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .8px; }
+  #editor {
+    flex: 1; width: 100%; min-height: 380px; resize: vertical;
+    background: transparent; color: var(--text); border: 0; outline: none;
+    font-family: var(--mono); font-size: 13px; line-height: 1.55; padding: 14px;
+    tab-size: 2; white-space: pre; overflow: auto;
+  }
+  #editor:focus { box-shadow: inset 0 0 0 2px var(--accent-dim); }
+
+  .summary { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .count { font-size: 13px; border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; min-height: 28px; display: inline-flex; align-items: center; gap: 6px; }
+  .count b { font-family: var(--mono); }
+  .c-p0 { color: var(--p0); border-color: var(--p0); }
+  .c-p1 { color: var(--p1); border-color: var(--p1); }
+  .c-p2 { color: var(--p2); border-color: var(--p2); }
+  .c-ok { color: var(--ok); border-color: var(--ok); }
+
+  #report { flex: 1; overflow-y: auto; padding: 12px; max-height: 640px; }
+  #report::-webkit-scrollbar { width: 10px; }
+  #report::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  .finding { border: 1px solid var(--border); border-left-width: 4px; border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; background: var(--panel-2); }
+  .finding.f-p0 { border-left-color: var(--p0); }
+  .finding.f-p1 { border-left-color: var(--p1); }
+  .finding.f-p2 { border-left-color: var(--p2); }
+  .finding-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+  .rid { font-family: var(--mono); font-size: 12px; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 2px 8px; }
+  .sev { font-size: 12px; font-weight: 800; border-radius: 6px; padding: 2px 8px; letter-spacing: .5px; }
+  .sev-p0 { color: #1a0505; background: var(--p0); }
+  .sev-p1 { color: #241a02; background: var(--p1); }
+  .sev-p2 { color: #04121f; background: var(--p2); }
+  .conf { font-size: 12px; color: var(--muted); }
+  .finding h3 { margin: 0 0 6px; font-size: 14.5px; font-weight: 600; }
+  .evidence { font-family: var(--mono); font-size: 12.5px; background: #0a0e13; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; margin: 6px 0; direction: ltr; text-align: left; }
+  .finding p { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); }
+  .finding p b { color: var(--text); font-weight: 600; }
+  .empty { color: var(--muted); text-align: center; padding: 40px 12px; font-size: 14px; }
+  .empty .big { font-size: 34px; margin-bottom: 8px; }
+
+  .note { margin-top: 14px; font-size: 13px; color: var(--muted); border: 1px dashed var(--border); border-radius: 10px; padding: 10px 14px; background: var(--panel); }
+  .note code { font-family: var(--mono); background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; }
+  .issue-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+  .issue-row input {
+    min-height: 44px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--panel-2); color: var(--text); font: inherit; font-size: 14px; flex: 1; min-width: 220px;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  footer { border-top: 1px solid var(--border); background: var(--panel); margin-top: auto; }
+  footer .container { display: flex; justify-content: space-between; gap: 12px; padding: 16px 20px; flex-wrap: wrap; color: var(--muted); font-size: 13px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="container hdr">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">ر</span>
+      <span>RAAST Playground <small>— RTL audit, zero install</small></span>
+    </div>
+    <div class="hdr-actions">
+      <a class="btn" href="https://github.com/mhmdsdqi87-cloud/TEKA_raast" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn" href="https://github.com/mhmdsdqi87-cloud/TEKA_raast/blob/main/docs/cli-reference.md" target="_blank" rel="noopener">CLI docs</a>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <p class="lede">
+    Paste HTML/CSS below and audit it instantly. This page runs the <b>client-side port of all 17
+    RAAST doctor rules</b> with the same IDs and profile-driven gating as the CLI — for Persian
+    (<code>fa</code>), Arabic (<code>ar</code>), Hebrew (<code>he</code>) and the LTR host Spanish
+    (<code>es</code>). <b>Nothing is uploaded</b> — parsing and rules run entirely in your browser.
+  </p>
+
+  <div class="controls">
+    <label for="profile">Language profile</label>
+    <select id="profile">
+      <option value="fa" selected>fa — Persian / فارسی (RTL)</option>
+      <option value="ar">ar — Arabic / العربية (RTL)</option>
+      <option value="he">he — Hebrew / עברית (RTL)</option>
+      <option value="es">es — Spanish / Español (LTR host)</option>
+    </select>
+    <button class="btn" type="button" id="demo-broken">Load broken fa demo</button>
+    <button class="btn" type="button" id="demo-he">he demo</button>
+    <button class="btn" type="button" id="demo-es">es demo</button>
+    <button class="btn" type="button" id="demo-clean">Clean fa demo</button>
+    <button class="btn primary" type="button" id="run">Audit</button>
+  </div>
+
+  <div class="grid">
+    <section class="panel" aria-label="Source editor">
+      <div class="panel-h"><h2>Source</h2><span class="conf" id="src-size">0 lines</span></div>
+      <textarea id="editor" spellcheck="false" aria-label="HTML source to audit"></textarea>
+    </section>
+
+    <section class="panel" aria-label="Audit report">
+      <div class="panel-h">
+        <h2>Findings</h2>
+        <div class="summary" id="summary" aria-live="polite"></div>
+      </div>
+      <div id="report">
+        <div class="empty"><div class="big">ر</div>Paste source and press <b>Audit</b>, or load a demo.</div>
+      </div>
+      <div class="issue-row" style="padding: 12px 14px; border-top: 1px solid var(--border);">
+        <button class="btn" type="button" id="copy-md">Copy report (Markdown)</button>
+        <button class="btn" type="button" id="dl-json">Download JSON</button>
+        <input id="repo-slug" type="text" placeholder="owner/repo for issue export" aria-label="GitHub repository slug for issue export">
+        <button class="btn" type="button" id="open-issue">Open issue</button>
+      </div>
+    </section>
+  </div>
+
+  <p class="note">
+    <b>About accuracy:</b> markup/CSS/Tailwind checks are deterministic; prose rules (digits,
+    punctuation, ZWNJ compounds, isolation) run as heuristics with <b>medium confidence</b> and are
+    marked as review items — exactly like the CLI. The CLI adds project-wide scanning, config
+    files, safe auto-fix (<code>raast fix</code>) and CI gates: <code>pip install raast</code>.
+    Rule IDs match the CLI (<code>RTL001</code>–<code>RTL017</code>) so findings transfer 1:1.
+  </p>
+</main>
+
+<footer>
+  <div class="container">
+    <span>RAAST — open-source RTL engineering. MIT licensed.</span>
+    <span><a href="https://github.com/mhmdsdqi87-cloud/TEKA_raast" target="_blank" rel="noopener">mhmdsdqi87-cloud/TEKA_raast</a></span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+/* ---------- language profiles (mirrors raast/profiles/*.json) ---------- */
+const PROFILES = {
+  fa: { dir: "rtl", script: "arabic", numerals: "fa-digits", latinPunct: "invalid", zwnj: true,
+        letterSpacing: "P0", label: "Persian" },
+  ar: { dir: "rtl", script: "arabic", numerals: "arabic-indic", latinPunct: "invalid", zwnj: false,
+        letterSpacing: "P0", label: "Arabic" },
+  he: { dir: "rtl", script: "hebrew", numerals: "western", latinPunct: "valid", zwnj: false,
+        letterSpacing: "P1", label: "Hebrew" },
+  es: { dir: "ltr", script: "latin", host: true, numerals: "western", latinPunct: "valid", zwnj: false,
+        letterSpacing: "off", label: "Spanish (LTR host)" },
+};
+
+const RTL_RE   = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+const RTL_SRC  = "[\\u0590-\\u05FF\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF\\uFB50-\\uFDFF\\uFE70-\\uFEFF]";
+const ARABIC_RE= /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+const HEBREW_RE= /[\u0590-\u05FF]/;
+const LATIN_RE = /[A-Za-z\u00C0-\u024F]/;
+
+/* Persian verb stems + prefixes for RTL011 — exact port of the CLI's DEFAULT_VERB_STEMS
+   and _build_prefix_re (raast/normalizer.py) */
+const FA_STEMS = ["شود","شده","شوند","باشد","باشند","بود","هست","هستند",
+  "رود","رفت","رفته","روند","رویم","روم","برود",
+  "آید","آمد","آمده","آیند",
+  "دهد","داد","داده","دهند","دهم","دهید",
+  "برد","برند","ببر","بریم",
+  "گیرد","گرفت","گرفته","گیرند","گیریم",
+  "کند","کرد","کرده","کنند","کنیم","کن","کنید",
+  "خواهد","خواهم","خواهیم","خواهند","خواست",
+  "تواند","توانست","توانم",
+  "آورد","آورده","آورند",
+  "گفت","گوید","گفته","گویند",
+  "بیند","دید","دیده",
+  "یابد","یافت","یافته",
+  "رسد","رسید","رسیده",
+  "داند","دانست","دانند",
+  "پردازد","پرداخت","پرداخته",
+  "سازد","ساخت","ساخته","سازند",
+  "نویسد","نوشت","نوشته",
+  "خواند","خوانده",
+  "دارد","داشت","دارند","دانم","دانی","دانید",
+  "افزاید","افزود","افزوده",
+  "بماند","ماند","مانده",
+  "گردد","گردید","گردیده"];
+const FA_PREFIXES = ["می","نمی","بی","هم","باز","نا","فرا"];
+/* CLI atom regex (RTL012) — shared with RTL010 suppression, like the CLI */
+const ATOM_RE = /(?<![\w>])([\w.+-]+@[\w-]+\.\w+|https?:\/\/\S+|\+\d[\d\s-]{6,}\d|\$\d+(?:\.\d+)?)/g;
+
+/* ---------- finding list ---------- */
+let findings = [];
+function add(id, sev, conf, title, evidence, why, fix) {
+  findings.push({ rule: id, severity: sev, confidence: conf, title, evidence: String(evidence).slice(0, 140), why, fix });
+}
+
+/* ---------- main audit ---------- */
+function audit(src, profileCode) {
+  findings = [];
+  const p = PROFILES[profileCode];
+  const doc = new DOMParser().parseFromString(src, "text/html");
+  const htmlEl = doc.documentElement;
+  const bodyText = (doc.body ? doc.body.textContent : "") || "";
+  const hasRTL = RTL_RE.test(bodyText);
+
+  /* RTL013: dir="ltr" on RTL-script-only content */
+  if (htmlEl && htmlEl.getAttribute("dir") === "ltr" && hasRTL && !p.host) {
+    add("RTL013", "P0", "high",
+      'dir="ltr" on <html> while the page contains RTL-script text',
+      '<html dir="ltr">',
+      "Forcing LTR on the root breaks the RTL reading order of the entire page.",
+      'Set dir="rtl" on <html> (or remove the dir="ltr" override).');
+  }
+  doc.querySelectorAll('[dir="ltr"]').forEach(el => {
+    const own = directText(el);
+    if (own && RTL_RE.test(own) && !/[A-Za-z0-9]/.test(own)) {
+      add("RTL013", "P0", "high",
+        'dir="ltr" on an element whose content is RTL-script-only',
+        outerSnippet(el),
+        "The element's text is exclusively RTL script, but it is forced LTR — words reorder incorrectly.",
+        'Remove dir="ltr" here (or replace with dir="rtl").');
+    }
+  });
+
+  /* RTL006: missing dir on <html> (RTL hosts only — never suggested on es) */
+  if (!p.host && htmlEl && !htmlEl.hasAttribute("dir") && hasRTL) {
+    add("RTL006", "P0", "high",
+      "Missing dir attribute on <html>",
+      '<html lang="..."> — no dir',
+      "Without an explicit direction, bidi resolution and CSS logical properties behave inconsistently.",
+      'Set dir="rtl" on <html>.');
+  }
+
+  /* RTL014: missing lang on <html> (all profiles) */
+  if (htmlEl && !htmlEl.hasAttribute("lang")) {
+    add("RTL014", "P1", "high",
+      "Missing lang attribute on <html>",
+      "<html> — no lang",
+      "Screen readers pick the wrong voice, hyphenation degrades, translation tools misfire.",
+      'Set lang="' + profileCode + '" on <html>.');
+  }
+
+  /* CSS rules — evidence-gated on RTL script presence, like the CLI */
+  if (hasRTL) {
+    const styleBlocks = Array.from(doc.querySelectorAll("style")).map(s => s.textContent || "").join("\n");
+    parseCssBlocks(styleBlocks).forEach(block => {
+      for (const d of block.decls) {
+        const prop = d.prop.toLowerCase(), val = d.value.toLowerCase();
+        if (prop === "margin-left" || prop === "margin-right") {
+          add("RTL001", "P1", "high", "Physical margin property: " + prop,
+            block.sel + " { " + d.prop + ": " + d.value + " }",
+            "In RTL layouts the start edge is the right side; physical margins put the spacing on the wrong edge.",
+            "Use margin-inline-start / margin-inline-end.");
+        }
+        if (prop === "padding-left" || prop === "padding-right") {
+          add("RTL002", "P1", "high", "Physical padding property: " + prop,
+            block.sel + " { " + d.prop + ": " + d.value + " }",
+            "Physical padding sides do not flip in RTL and crowd the wrong edge.",
+            "Use padding-inline-start / padding-inline-end.");
+        }
+        if ((prop === "left" || prop === "right") && val !== "auto") {
+          add("RTL003", "P2", "medium", "Physical positioning: " + prop,
+            block.sel + " { " + prop + ": " + d.value + " }",
+            "Absolute positioning with physical sides points the wrong way in RTL. Sometimes intentional (decor) — review.",
+            "Prefer inset-inline-start / inset-inline-end.");
+        }
+        if (prop === "text-align" && (val === "left" || val === "right")) {
+          add("RTL004", "P1", "high", "Physical text-align: " + val,
+            block.sel + " { text-align: " + val + " }",
+            "text-align: left pins Arabic-script copy to the wrong edge and breaks the reading flow.",
+            "Use text-align: start / end (or drop the declaration).");
+        }
+      }
+      /* RTL005 — letter-spacing, profile-driven severity */
+      if (p.letterSpacing !== "off") {
+        const ls = block.decls.find(d => d.prop.toLowerCase() === "letter-spacing");
+        if (ls && !/^0+(\.0*)?(px|em|rem|%)?$/.test(ls.value.trim())) {
+          const scriptRE = p.script === "hebrew" ? HEBREW_RE : ARABIC_RE;
+          const targets = matchSelector(doc, block.sel);
+          const hits = targets.some(el => scriptRE.test(el.textContent || ""));
+          if (hits) {
+            const why = p.script === "hebrew"
+              ? "Hebrew letters are separate glyphs, so letter-spacing does not shatter words — but it breaks nikud placement and looks unprofessional. Discouraged (P1)."
+              : "Arabic-script letters are joined; letter-spacing breaks the cursive connections and words become unreadable — م د ی ر ی ت.";
+            const fix = p.script === "hebrew"
+              ? "Remove letter-spacing; rely on font metrics."
+              : "Remove letter-spacing. Word spacing is controlled with word-spacing, never letter-spacing.";
+            add("RTL005", p.letterSpacing, "high",
+              "letter-spacing on " + p.label + " text",
+              block.sel + " { letter-spacing: " + ls.value + " }", why, fix);
+          }
+        }
+      }
+    });
+
+    /* inline style attributes */
+    doc.querySelectorAll("[style]").forEach(el => {
+      const st = el.getAttribute("style") || "";
+      for (const m of st.matchAll(/(margin|padding)-(left|right)\s*:/gi)) {
+        add(m[1] === "margin" ? "RTL001" : "RTL002", "P1", "high",
+          "Inline physical " + m[1] + " property",
+          'style="' + m[0] + '…" on <' + el.tagName.toLowerCase() + ">",
+          "Physical sides do not flip in RTL.",
+          "Use " + m[1] + "-inline-start / -inline-end.");
+      }
+      const ta = st.match(/text-align\s*:\s*(left|right)/i);
+      if (ta) add("RTL004", "P1", "high", "Inline physical text-align: " + ta[1],
+        'style="' + ta[0] + '" on <' + el.tagName.toLowerCase() + ">",
+        "Pins RTL copy to the wrong edge.", "Use text-align: start / end.");
+    });
+
+    /* Tailwind rules */
+    doc.querySelectorAll("[class]").forEach(el => {
+      const cls = (el.getAttribute("class") || "").split(/\s+/);
+      const physical = cls.filter(c => /^(m|p)(l|r)-\S+$/.test(c) || /^text-(left|right)$/.test(c) || /^(left|right)-\S+$/.test(c));
+      if (physical.length) {
+        add("RTL008", "P1", "high", "Tailwind physical utilities",
+          'class="' + physical.join(" ") + '" on <' + el.tagName.toLowerCase() + ">",
+          "ml-/mr-/pl-/pr-/text-left/text-right/left-/right- utilities are physical and don't flip in RTL.",
+          "Use ms-/me-/ps-/pe-/text-start/text-end.");
+      }
+      const tx = cls.some(c => /^translate-x-/.test(c));
+      const rtlTwin = cls.some(c => /^rtl:/.test(c));
+      if (tx && !rtlTwin) {
+        add("RTL007", "P2", "medium", "translate-x without an rtl: twin",
+          'class="' + cls.filter(c => /^translate-x-/.test(c)).join(" ") + '"',
+          "Positive translate-x moves right in LTR but reads as the wrong direction in RTL.",
+          "Add an rtl: variant (e.g. rtl:-translate-x-4) or use logical motion.");
+      }
+    });
+  }
+
+  /* prose rules on text nodes (pre/code/script/style protected — matches the CLI's
+     _strip_markup_for_prose: only human-visible text is prose; tags/attributes never fire) */
+  const textWalker = doc.createTreeWalker(doc.body || doc, NodeFilter.SHOW_TEXT, {
+    acceptNode(n) {
+      let el = n.parentElement;
+      while (el) {
+        const tag = el.tagName;
+        if (tag === "PRE" || tag === "CODE" || tag === "SCRIPT" || tag === "STYLE") return NodeFilter.FILTER_REJECT;
+        el = el.parentElement;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const texts = [];
+  while (textWalker.nextNode()) texts.push(textWalker.currentNode);
+
+  const isolatedFrom = (n, wantDir) => {
+    let el = n.parentElement;
+    while (el) {
+      if (el.tagName === "BDI") return true;
+      const d = el.getAttribute ? el.getAttribute("dir") : null;
+      if (d === "auto") return true;
+      if (d === wantDir) return true;
+      if (d === "ltr" || d === "rtl") return false;
+      el = el.parentElement;
+    }
+    return false;
+  };
+
+  /* CLI parity: for LTR hosts the engine masks isolated RTL regions before prose
+     analysis, so its own recommendations never re-flag */
+  for (const node of texts) {
+    const t = node.textContent || "";
+    if (!t.trim()) continue;
+
+    const scriptRE = p.script === "hebrew" ? HEBREW_RE : ARABIC_RE;
+
+    if (!p.host && scriptRE.test(t)) {
+      /* LTR atoms first — RTL012 findings + suppression zones for 009/010/011 (CLI order) */
+      const atomSpans = [];
+      ATOM_RE.lastIndex = 0;
+      for (const m of t.matchAll(ATOM_RE)) {
+        atomSpans.push([m.index, m.index + m[0].length]);
+        if (!isolatedFrom(node, "ltr"))
+          add("RTL012", "P2", "medium", "un-isolated LTR atom: " + m[1].slice(0, 32) + "…",
+            "…" + m[1] + "…",
+            "URLs/emails/phones/currency inside RTL prose reorder without isolation (bidi mirroring defects).",
+            'wrap in <bdi>…</bdi> or <span dir="ltr">…</span>');
+      }
+      const inAtom = pos => atomSpans.some(sp => pos >= sp[0] && pos < sp[1]);
+
+      /* RTL011 — broken ZWNJ compounds (fa only; port of the CLI's detect_broken_zwnj) */
+      if (profileCode === "fa") {
+        const prefixRe = new RegExp("(?<![\\u0600-\\u06FF])(" + FA_PREFIXES.join("|") + ")[ ]+(" + FA_STEMS.join("|") + ")(?![\\u0600-\\u06FF])", "gu");
+        for (const m of t.matchAll(prefixRe)) {
+          if (inAtom(m.index)) continue;
+          add("RTL011", "P1", "high", "broken ZWNJ compound: «" + m[0] + "»",
+            "…" + m[0] + "…",
+            "Affix written with a space instead of U+200C — the most visible Persian orthography defect.",
+            "Half-space join: " + m[1] + "‌" + m[2]);
+        }
+        for (const m of t.matchAll(/([\u0600-\u06FF]{2,})[ ]+(ها|های)(?=[\s،؛؟!.]|$)/gu)) {
+          if (inAtom(m.index)) continue;
+          add("RTL011", "P1", "high", "broken ZWNJ plural: «" + m[0] + "»",
+            "…" + m[0] + "…",
+            "The plural suffix attaches with a half-space (U+200C).",
+            "Half-space join: " + m[1] + "‌" + m[2]);
+        }
+        for (const m of t.matchAll(/([\u0600-\u06FF]{2,})[ ]+(تر|ترین)(?=[\s،؛؟!.]|$)/gu)) {
+          if (inAtom(m.index)) continue;
+          add("RTL011", "P1", "high", "broken ZWNJ comparative: «" + m[0] + "»",
+            "…" + m[0] + "…",
+            "The comparative suffix attaches with a half-space (U+200C).",
+            "Half-space join: " + m[1] + "‌" + m[2]);
+        }
+      }
+
+      /* RTL009 — Latin comma/semicolon/question in Arabic prose (Latin "!" is
+         legitimate in Persian/Arabic — the CLI excludes it, so do we) */
+      if (p.latinPunct === "invalid") {
+        for (const m of t.matchAll(/(?<=[\u0600-\u06FF])\s*[,;?](?=[\u0600-\u06FF\s]|$)/gu)) {
+          if (inAtom(m.index)) continue;
+          add("RTL009", "P2", "high", "Latin punctuation `" + m[0].trim() + "` in " + p.label + " prose",
+            "…" + t.slice(Math.max(0, m.index - 20), m.index + 20).trim() + "…",
+            profileCode === "fa"
+              ? "Persian prose uses ، ؟ ؛ — Latin marks read as machine-generated output."
+              : "Arabic prose uses ، ؟ ؛ — Latin marks read as machine-generated output.",
+            "Replace with the script's own mark.");
+        }
+      }
+
+      /* RTL010 — Western digits, suppressed for he/es profiles and inside atoms */
+      if (p.numerals !== "western") {
+        for (const m of t.matchAll(/[0-9]+/g)) {
+          if (inAtom(m.index)) continue;
+          const beforeOk = m.index === 0 || ARABIC_RE.test(t[m.index - 1]) || /\s/.test(t[m.index - 1]);
+          const afterOk = m.index + m[0].length >= t.length || ARABIC_RE.test(t[m.index + m[0].length]) || /\s/.test(t[m.index + m[0].length]);
+          if (!beforeOk || !afterOk) continue;
+          add("RTL010", "P2", "medium", "Western digits `" + m[0] + "` in " + p.label + " prose",
+            "…" + t.slice(Math.max(0, m.index - 20), m.index + m[0].length + 20).trim() + "…",
+            profileCode === "fa"
+              ? "Persian copy uses Persian digits ۰-۹; Western digits read as foreign artifacts."
+              : "Arabic copy uses Arabic-Indic digits ٠-٩.",
+            "Convert display digits (keep code/API values untouched).");
+        }
+      }
+    }
+
+    if (p.host && !isolatedFrom(node, "rtl")) {
+      /* RTL015 — un-isolated RTL runs (multi-word, port of the CLI's _RTL_RUN_RE);
+         fires on any un-isolated RTL run, pure-RTL nodes included, like the CLI */
+      if (RTL_RE.test(t)) {
+      const runRe = new RegExp("(?:" + RTL_SRC + ")+(?:\\s+(?:" + RTL_SRC + ")+)*", "g");
+      for (const m of t.matchAll(runRe)) {
+        add("RTL015", "P1", "medium", "un-isolated RTL atom: " + m[0].slice(0, 32) + "…",
+          "…" + m[0] + "…",
+          "Arabic/Hebrew runs inside LTR prose visually reorder the surrounding punctuation and numbers; isolate the run to pin its direction.",
+          'wrap in <bdi>…</bdi> or <span dir="rtl">…</span>');
+      }
+      }
+      /* RTL017 — RAE inverted marks, per-question head logic (CLI port) */
+      if (LATIN_RE.test(t)) {
+      for (const m of t.matchAll(/\?(?!\?)/g)) {
+        const head = t.slice(0, m.index);
+        if (head.includes("¿") || !/[A-Za-zÁÉÍÓÚÑáéíóúñü]/.test(head)) continue;
+        add("RTL017", "P2", "medium", "question ends with '?' but has no opening inverted mark",
+          "…" + head.trim().slice(-50) + "?…",
+          "RAE requires the opening inverted question mark; its absence is the most visible machine-generated-Spanish defect.",
+          "add the opening inverted mark at the start of the question");
+      }
+      for (const m of t.matchAll(/!(?!!)/g)) {
+        const head = t.slice(0, m.index);
+        if (head.includes("¡") || !/[A-Za-zÁÉÍÓÚÑáéíóúñü]/.test(head)) continue;
+        add("RTL017", "P2", "medium", "exclamation ends with '!' but has no opening inverted mark",
+          "…" + head.trim().slice(-50) + "!…",
+          "RAE requires the opening inverted exclamation mark on Spanish exclamations.",
+          "add the opening inverted mark at the start of the exclamation");
+      }
+      }
+    }
+  }
+
+  /* RTL016 — RTL-script-only element without dir in LTR doc (es host).
+     CLI parity: the element's OWN dir attribute only; direct text children only;
+     inner text must be RTL-script-only without Latin letters/digits. */
+  if (p.host && htmlEl && (htmlEl.getAttribute("dir") || "ltr") !== "rtl") {
+    const SKIP_TAGS = new Set(["html", "head", "body", "script", "style", "bdi", "br", "img", "input", "meta", "link"]);
+    doc.querySelectorAll("*").forEach(el => {
+      if (SKIP_TAGS.has(el.tagName.toLowerCase())) return;
+      const inner = directText(el).trim();
+      if (!inner || !RTL_RE.test(inner) || /[A-Za-z0-9]/.test(inner)) return;
+      if (el.getAttribute("dir")) return;
+      add("RTL016", "P1", "medium", "<" + el.tagName.toLowerCase() + "> carries only RTL-script text without a direction attribute",
+        "<" + el.tagName.toLowerCase() + "> " + inner.slice(0, 40) + "…",
+        "In an LTR host document an unmarked RTL run visually reorders the surrounding punctuation and numbers.",
+        'wrap the RTL run in <bdi>…</bdi> or set dir="rtl" on the element');
+    });
+  }
+
+  return findings;
+}
+
+/* ---------- CSS block parser (minimal, deterministic) ---------- */
+function parseCssBlocks(cssText) {
+  const blocks = [];
+  const re = /([^{}\/]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = re.exec(cssText))) {
+    const sel = m[1].split("{")[0].trim();
+    const decls = [];
+    for (const line of m[2].split(";")) {
+      const i = line.indexOf(":");
+      if (i > 0) decls.push({ prop: line.slice(0, i).trim(), value: line.slice(i + 1).trim() });
+    }
+    if (sel && decls.length) blocks.push({ sel, decls });
+  }
+  return blocks;
+}
+
+function matchSelector(doc, sel) {
+  const out = [];
+  for (const part of sel.split(/[,\s>+~]+/).map(x => x.trim()).filter(Boolean)) {
+    try { doc.querySelectorAll(part).forEach(el => out.push(el)); } catch (e) { /* unsupported selector */ }
+    const cls = part.match(/\.([\w-]+)/);
+    if (cls) { try { doc.querySelectorAll("." + cls[1]).forEach(el => out.push(el)); } catch (e) {} }
+  }
+  return out.length ? out : Array.from(doc.querySelectorAll("body *"));
+}
+
+function directText(el) {
+  let s = "";
+  for (const n of el.childNodes) if (n.nodeType === 3) s += n.textContent;
+  return s;
+}
+
+function outerSnippet(el) {
+  const s = "<" + el.tagName.toLowerCase() +
+    Array.from(el.attributes || []).map(a => " " + a.name + '="' + a.value + '"').join("") + ">" +
+    (el.textContent || "").trim().slice(0, 40);
+  return s + "…";
+}
+
+/* ---------- demos ---------- */
+const DEMOS = {
+  broken: '<!doctype html>\n<html lang="fa">\n<head>\n  <meta charset="utf-8">\n  <title>Team platform</title>\n  <style>\n    .card { margin-left: 16px; padding-right: 8px; text-align: left; }\n    .hero-title { letter-spacing: 0.05em; }\n    .anchor { left: 0; }\n  </style>\n</head>\n<body>\n  <main>\n    <h1 class="hero-title">پلتفرم مدیریت تیم</h1>\n    <p class="card">این ابزار کارهای تیم را مرتب می کند , ساده و سریع ! قیمت 99000 تومان است.</p>\n    <a href="https://example.co/fa" class="translate-x-2">مستندات</a>\n    <pre>npm install raast</pre>\n  </main>\n</body>\n</html>',
+  he: '<!doctype html>\n<html lang="he">\n<head>\n  <meta charset="utf-8">\n  <style>\n    .hero { letter-spacing: 0.06em; margin-left: 24px; }\n  </style>\n</head>\n<body>\n  <main>\n    <h1 class="hero">ברוכים הבאים לפלטפורמה</h1>\n    <p>מחיר: $99 בלבד</p>\n  </main>\n</body>\n</html>',
+  es: '<!doctype html>\n<html lang="es">\n<head><meta charset="utf-8"><style>.price { text-align: left; margin-left: 12px; }</style></head>\n<body>\n  <main>\n    <h1>Bienvenidos al centro de servicios</h1>\n    <p>Como estamos hoy? Todo el equipo habla español.</p>\n    <p class="price">مرحبا بكم في الخدمات</p>\n  </main>\n</body>\n</html>',
+  clean: '<!doctype html>\n<html lang="fa" dir="rtl">\n<head>\n  <meta charset="utf-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1">\n  <style>\n    .card { margin-inline-start: 16px; padding-inline-end: 8px; text-align: start; }\n  </style>\n</head>\n<body>\n  <main>\n    <h1>پلتفرم مدیریت تیم</h1>\n    <p class="card">این ابزار کارهای تیم را مرتب می‌کند، ساده و سریع! قیمت ۹۹۰۰۰ تومان است.</p>\n    <p><bdi>https://example.co/fa</bdi> را ببینید.</p>\n  </main>\n</body>\n</html>',
+};
+
+/* ---------- UI wiring ---------- */
+const $ = id => document.getElementById(id);
+const editor = $("editor"), profileSel = $("profile"), reportEl = $("report"), summaryEl = $("summary");
+let lastFindings = [];
+
+function render() {
+  lastFindings = findings;
+  const n = s => findings.filter(f => f.severity === s).length;
+  const zero = findings.length === 0;
+  summaryEl.innerHTML =
+    '<span class="count c-p0"><b>' + n("P0") + '</b> P0</span>' +
+    '<span class="count c-p1"><b>' + n("P1") + '</b> P1</span>' +
+    '<span class="count c-p2"><b>' + n("P2") + '</b> P2</span>' +
+    (zero ? '<span class="count c-ok"><b>0</b> findings — clean</span>' : "");
+  reportEl.innerHTML = "";
+  if (zero) {
+    reportEl.innerHTML = '<div class="empty"><div class="big">✓</div><b>No findings at this profile.</b><br>Prose heuristics can still miss cases — for CI-grade results use the CLI.</div>';
+    return;
+  }
+  const order = { P0: 0, P1: 1, P2: 2 };
+  const sorted = [...findings].sort((a, b) => order[a.severity] - order[b.severity]);
+  for (const f of sorted) {
+    const div = document.createElement("article");
+    div.className = "finding f-" + f.severity.toLowerCase();
+    div.innerHTML =
+      '<div class="finding-head"><span class="rid">' + f.rule + '</span>' +
+      '<span class="sev sev-' + f.severity.toLowerCase() + '">' + f.severity + '</span>' +
+      '<span class="conf">confidence: ' + f.confidence + '</span></div>' +
+      "<h3></h3>" +
+      '<div class="evidence"></div>' +
+      "<p><b>Why:</b> " + escapeHtml(f.why) + "</p>" +
+      "<p><b>Fix:</b> " + escapeHtml(f.fix) + "</p>";
+    div.querySelector("h3").textContent = f.title;
+    div.querySelector(".evidence").textContent = f.evidence;
+    reportEl.appendChild(div);
+  }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function runAudit() {
+  const src = editor.value;
+  if (!src.trim()) { reportEl.innerHTML = '<div class="empty">Paste some HTML first.</div>'; summaryEl.innerHTML = ""; return; }
+  findings = [];
+  try {
+    audit(src, profileSel.value);
+  } catch (err) {
+    reportEl.innerHTML = '<div class="empty">Audit error: ' + escapeHtml(err.message) + '</div>';
+    summaryEl.innerHTML = "";
+    return;
+  }
+  render();
+}
+
+function markdownReport() {
+  const lines = ["# RAAST playground report", "",
+    "- Profile: `" + profileSel.value + "` (" + PROFILES[profileSel.value].label + ")",
+    "- Findings: " + findings.length + " (P0: " + findings.filter(f => f.severity === "P0").length +
+      ", P1: " + findings.filter(f => f.severity === "P1").length +
+      ", P2: " + findings.filter(f => f.severity === "P2").length + ")", ""];
+  const order = { P0: 0, P1: 1, P2: 2 };
+  for (const f of [...findings].sort((a, b) => order[a.severity] - order[b.severity])) {
+    lines.push("## [" + f.severity + "] " + f.rule + " — " + f.title, "",
+      "- Evidence: `" + f.evidence + "`",
+      "- Confidence: " + f.confidence,
+      "- Why: " + f.why,
+      "- Fix: " + f.fix, "");
+  }
+  lines.push("---", "Generated by the RAAST Playground (client-side port of `raast doctor`).");
+  return lines.join("\n");
+}
+
+$("run").addEventListener("click", runAudit);
+editor.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runAudit(); });
+profileSel.addEventListener("change", () => { if (lastFindings.length) runAudit(); });
+$("demo-broken").addEventListener("click", () => { editor.value = DEMOS.broken; profileSel.value = "fa"; runAudit(); });
+$("demo-he").addEventListener("click", () => { editor.value = DEMOS.he; profileSel.value = "he"; runAudit(); });
+$("demo-es").addEventListener("click", () => { editor.value = DEMOS.es; profileSel.value = "es"; runAudit(); });
+$("demo-clean").addEventListener("click", () => { editor.value = DEMOS.clean; profileSel.value = "fa"; runAudit(); });
+editor.addEventListener("input", () => { $("src-size").textContent = editor.value.split("\n").length + " lines"; });
+
+$("copy-md").addEventListener("click", async () => {
+  if (!findings.length) return;
+  try {
+    await navigator.clipboard.writeText(markdownReport());
+    $("copy-md").textContent = "Copied!";
+    setTimeout(() => { $("copy-md").textContent = "Copy report (Markdown)"; }, 1500);
+  } catch (e) { $("copy-md").textContent = "Clipboard blocked"; }
+});
+$("dl-json").addEventListener("click", () => {
+  if (!findings.length) return;
+  const blob = new Blob([JSON.stringify({ tool: "raast-playground", profile: profileSel.value, findings }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "raast-report.json"; a.click();
+});
+$("open-issue").addEventListener("click", () => {
+  const slug = $("repo-slug").value.trim();
+  if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(slug)) { $("repo-slug").focus(); return; }
+  const url = "https://github.com/" + slug + "/issues/new?title=" +
+    encodeURIComponent("RAAST report: " + findings.filter(f => f.severity === "P0").length + " P0, " +
+      findings.filter(f => f.severity === "P1").length + " P1, " +
+      findings.filter(f => f.severity === "P2").length + " P2") +
+    "&body=" + encodeURIComponent(markdownReport());
+  window.open(url, "_blank", "noopener");
+});
+
+/* load the broken demo on first visit so the tool shows its value immediately */
+editor.value = DEMOS.broken;
+$("src-size").textContent = editor.value.split("\n").length + " lines";
+runAudit();
+</script>
+</body>
+</html>
