@@ -12,6 +12,7 @@ Packaging-integrity release: the artifact a user installs now works everywhere, 
 
 ### Added
 - **CI `packaging-smoke` job**: builds sdist + wheel, installs each into a *clean venv outside the repo*, runs `raast doctor` from `/tmp` — fails if profiles are not found. Prevents the class of bug that editable-install CI cannot see.
+- **Release workflow**: on `v*` tags — builds wheel+sdist, smoke-tests the wheel in a clean venv, attaches artifacts to the GitHub Release (`pip install raast` from Releases works from v0.1.2).
 - **`tests/test_raast.py::TestPackaging`**: profiles live inside the package, parse cleanly, expose digits/punctuation for fa and ar.
 - Real assertions for punctuation normalization (previously a tautology comparing `normalize()` to itself).
 

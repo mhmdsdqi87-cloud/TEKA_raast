@@ -53,7 +53,9 @@ Languages: **fa** and **ar** profiles today; **he** and **ur** are designed-in v
 ### Pillar 2 — RAAST Doctor CLI (the engineering layer)
 
 ```bash
-pip install -e .        # Python 3.11+, zero dependencies
+pip install raast            # from GitHub Releases wheel (v0.1.2+)
+# or from source:
+pip install -e .             # Python 3.11+, zero dependencies
 raast doctor ./your-project
 ```
 
@@ -117,7 +119,7 @@ No secrets required. Annotations appear on the PR; the gate is your severity cho
 ```bash
 git clone https://github.com/mhmdsdqi87-cloud/TEKA_raast.git
 cp -r TEKA_raast/skills/* ~/.claude/skills/     # skills for Claude Code
-cd TEKA_raast && pip install -e .               # the CLI (optional)
+cd TEKA_raast && pip install .                  # the CLI (real install — wheel ships profiles)
 raast doctor benchmarks/reference --fail-on P0  # sanity check → exit 0
 ```
 

@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build sdist and wheel
+        run: |
+          pip install --quiet build
+          python3 -m build
+      - name: Smoke-test wheel in clean venv (profiles must load)
+        run: |
+          python3 -m venv /tmp/release-venv
+          /tmp/release-venv/bin/pip install --quiet dist/raast-*.whl
+          mkdir -p /tmp/probe
+          printf '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"></head><body><main><p>سلام</p></main></body></html>' > /tmp/probe/index.html
+          cd /tmp
+          /tmp/release-venv/bin/raast --version
+          /tmp/release-venv/bin/raast doctor /tmp/probe --fail-on P0 --format json > /dev/null
+          echo "release artifact verified"
+      - name: Create GitHub Release with artifacts
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/raast-*.whl
+            dist/raast-*.tar.gz
+          generate_release_notes: true
