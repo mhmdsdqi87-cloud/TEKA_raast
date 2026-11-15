@@ -1,0 +1,18 @@
+{
+  "id": "CS-024",
+  "title": "Sticky column anchored to the physical left edge",
+  "category": "tables",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "With horizontal scroll the sticky first column anchors to the physical left edge, so under RTL it pins to the wrong side of the table.",
+  "rule_ids": [
+    "RTL003"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

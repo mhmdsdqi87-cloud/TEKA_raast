@@ -1,0 +1,18 @@
+{
+  "id": "CS-021",
+  "title": "Table header cells aligned to the physical left",
+  "category": "tables",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The order table pins header cells to the physical left, so column titles misalign with the RTL cell content underneath.",
+  "rule_ids": [
+    "RTL004"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

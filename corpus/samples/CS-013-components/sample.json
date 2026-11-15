@@ -1,0 +1,18 @@
+{
+  "id": "CS-013",
+  "title": "Card row text pinned to the physical left",
+  "category": "components",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The card row pins its copy to the physical left edge, so the Persian card text aligns away from the RTL reading start.",
+  "rule_ids": [
+    "RTL004"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

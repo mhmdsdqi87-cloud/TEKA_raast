@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- FIX: the testimonial is wrapped in a bdi element so the RTL run is isolated and the block content declares its own language -->
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historias de estudiantes</title>
+  <style>
+    .card { font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h2>Historias de estudiantes</h2>
+    <blockquote><bdi lang="ar">أحببت هذه الدورات كثيرا</bdi></blockquote>
+    <p>La estudiante resume su experiencia: <bdi>الدورات كانت مفيدة جدا.</bdi></p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- FIX: the physical label margin became margin-inline-start so the label gap follows the reading direction -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>فرم ورود</title>
+  <style>
+    .field label { margin-inline-start: 10px; }
+    .field input { display: block; }
+  </style>
+</head>
+<body>
+  <form class="field">
+    <label for="email">نشانی ایمیل</label>
+    <input id="email" type="email">
+  </form>
+</body>
+</html>

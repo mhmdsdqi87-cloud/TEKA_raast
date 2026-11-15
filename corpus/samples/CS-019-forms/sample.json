@@ -1,0 +1,18 @@
+{
+  "id": "CS-019",
+  "title": "Checkbox caption pinned to the physical left",
+  "category": "forms",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The checkbox caption is pinned to the physical left, breaking the reading flow for the Persian label that follows the control.",
+  "rule_ids": [
+    "RTL004"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

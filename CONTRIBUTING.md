@@ -9,17 +9,22 @@ git clone https://github.com/mhmdsdqi87-cloud/TEKA_raast.git
 cd TEKA_raast
 pip install -e .
 python3 -m unittest discover -s tests -v     # must be green before any PR
-cd browser && npm install && npx playwright install chromium
+python3 tools/corpus/verify.py               # 32/32 specimens must PASS
+python3 tools/compat/run_matrix.py --check   # generated docs must be fresh
+# optional, for the runtime inspector:
+pip install 'raast[runtime]' && playwright install chromium
 ```
 
 ## Repository layout
 
 ```
-raast/        CLI engine (Python, stdlib only)   tests/      unit + e2e (stdlib unittest)
-skills/       six agent skills (SKILL.md)        benchmarks/ cases + validators + reference
-browser/      Playwright suite (Node)            raast/profiles/ fa.json / ar.json
-action/       GitHub Action (composite)          docs/       all documentation
-demo/         demo artifact produced by the skills
+raast/         CLI engine (Python, stdlib only)    tests/      unit + e2e (stdlib unittest)
+skills/        six agent skills (SKILL.md)         benchmarks/ cases + validators + reference
+browser/       Playwright suite (Node)             raast/profiles/ fa / ar / he / es JSON
+corpus/        32 verified RTL bug specimens       fixtures/compat/  framework fixtures
+vscode-raast/  VS Code extension scaffold          tools/      corpus + matrix tooling
+action/        GitHub Action (composite)           docs/       all documentation
+demo/          demo artifact produced by the skills
 ```
 
 ## Ground rules
@@ -37,10 +42,20 @@ demo/         demo artifact produced by the skills
 3. Add at least 3 benchmark cases using the new profile.
 4. Open the PR titled `profiles: add <lang>` — a maintainer will pair with you on review.
 
+## Adding a corpus specimen
+
+The corpus ([corpus/](corpus/README.md)) is the project's evidence base. To add a specimen:
+
+1. Copy an existing sample dir under `corpus/samples/CS-<NNN>-<category>/` and edit `broken.html` (one defect), `fixed.html` (the corrected twin) and `sample.json` (claim exactly the rule IDs that should fire).
+2. Run `python3 tools/corpus/verify.py` — your specimen FAILS until the claimed rules actually fire on `broken.html` and `fixed.html` scans clean. Never adjust `rule_ids` to match a bad specimen; fix the specimen.
+3. Run `python3 tools/corpus/evidence.py --only CS-<NNN>` to render before/after screenshots (requires playwright).
+4. Run `python3 tools/corpus/build_index.py` to refresh the index table.
+5. Specimens reproduced from real websites must cite the source URL and license in `sample.json.source`; unverified reproductions stay labeled `lab-verified`.
+
 ## Pull requests
 
 - One logical change per PR; include: what/why, test evidence (paste real command output), docs updates.
-- CI must pass: unit tests, benchmark self-validation (condition C), and the repo's own doctor scan (P0-free).
+- CI must pass: unit tests, benchmark self-validation (condition C), corpus verification, compatibility-matrix freshness, i18n-gate detection check, and the repo's own doctor scan (P0-free).
 - Descriptions in English; Persian is welcome in comments where it clarifies content.
 
 ## Reporting bugs

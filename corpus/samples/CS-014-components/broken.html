@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- DEFECT: the dropdown panel offset is a physical margin on the left, opening the menu away from its trigger under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>منوی حساب</title>
+  <style>
+    .dropdown-panel { margin-left: 8px; border: 1px solid #ccc; }
+    .dropdown-panel a { display: block; }
+  </style>
+</head>
+<body>
+  <nav class="dropdown-panel">
+    <a href="#profile">حساب کاربری</a>
+    <a href="#orders">سفارش‌های من</a>
+    <a href="#logout">خروج</a>
+  </nav>
+</body>
+</html>

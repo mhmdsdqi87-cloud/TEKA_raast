@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- DEFECT: the carousel next control is anchored to the physical right edge and its glyph points right, both wrong under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>اسلایدر محصولات</title>
+  <style>
+    .carousel { position: relative; }
+    .carousel-next { position: absolute; right: 16px; top: 42%; }
+  </style>
+</head>
+<body>
+  <div class="carousel">
+    <button class="carousel-next" type="button">بعدی →</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "id": "CS-007",
+  "title": "Arabic-only quotation forced with dir=ltr",
+  "category": "bidi",
+  "language": "ar",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The quotation contains only Arabic text but is forced with dir=ltr, so the browser lays the inline content out in the wrong base direction.",
+  "rule_ids": [
+    "RTL013"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

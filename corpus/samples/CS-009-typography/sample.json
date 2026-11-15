@@ -1,0 +1,18 @@
+{
+  "id": "CS-009",
+  "title": "Persian price written with Western digits",
+  "category": "typography",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The course price uses Western digits inside Persian prose; the fa profile expects Persian digits in running text.",
+  "rule_ids": [
+    "RTL010"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

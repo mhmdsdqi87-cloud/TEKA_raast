@@ -1,0 +1,18 @@
+{
+  "id": "CS-012",
+  "title": "Spanish question missing the opening inverted mark",
+  "category": "typography",
+  "language": "es",
+  "direction": "ltr",
+  "viewport": "1280x800",
+  "symptom": "The FAQ question ends with a plain question mark but never opens with the inverted mark the RAE requires for Spanish questions.",
+  "rule_ids": [
+    "RTL017"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

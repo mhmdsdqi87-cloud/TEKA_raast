@@ -1,0 +1,18 @@
+{
+  "id": "CS-023",
+  "title": "Orders table offset with a physical left margin",
+  "category": "tables",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The whole orders table is offset with a physical margin on the left, so the table drifts away from the RTL content edge.",
+  "rule_ids": [
+    "RTL001"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

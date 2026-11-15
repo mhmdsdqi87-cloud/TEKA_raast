@@ -1,0 +1,18 @@
+{
+  "id": "CS-030",
+  "title": "Off-canvas drawer slides the wrong way under RTL",
+  "category": "responsive",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The off-canvas cart drawer positions itself with a Tailwind translate-x utility, which never mirrors; under RTL the drawer slides out the wrong side.",
+  "rule_ids": [
+    "RTL007"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

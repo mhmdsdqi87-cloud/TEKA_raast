@@ -1,0 +1,18 @@
+{
+  "id": "CS-025",
+  "title": "Carousel next arrow anchored to the physical right",
+  "category": "icons",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The next-slide control uses a right-pointing glyph anchored to the physical right edge; in RTL the next slide lives toward the inline end, so the control sits and points the wrong way.",
+  "rule_ids": [
+    "RTL003"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

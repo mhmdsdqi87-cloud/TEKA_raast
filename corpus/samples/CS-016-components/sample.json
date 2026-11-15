@@ -1,0 +1,18 @@
+{
+  "id": "CS-016",
+  "title": "Menu notification dot anchored with a physical inset",
+  "category": "components",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The notification dot is anchored with a physical left inset, so under RTL it detaches from the label corner it is supposed to mark.",
+  "rule_ids": [
+    "RTL003"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

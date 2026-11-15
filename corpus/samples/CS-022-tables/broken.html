@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- DEFECT: the amount cell insets its content with physical padding on the left, so numbers drift off the column edge under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>ستون مبلغ</title>
+  <style>
+    td.amount { padding-left: 18px; font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+  <table>
+    <tr><th>مبلغ فاکتور</th></tr>
+    <tr><td class="amount">۱٬۲۵۰٬۰۰۰ تومان</td></tr>
+  </table>
+</body>
+</html>

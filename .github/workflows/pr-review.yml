@@ -1,0 +1,78 @@
+# RAAST PR Review — diff-scoped RTL review as a GitHub Action.
+#
+# What it does on every pull request:
+#   1. Checks out the full history (merge-base needs it).
+#   2. Runs `python3 -m raast.review` against the PR base branch: RAAST
+#      rules run on changed files, but only findings on lines changed by
+#      the PR are reported (pre-existing debt stays silent).
+#   3. Emits GitHub annotations (::error / ::warning) and posts ONE review
+#      comment per PR — repeated pushes UPDATE that comment in place
+#      (matched by the `<!-- raast-review -->` marker) instead of spamming.
+#
+# Merge-blocking policy: this workflow does NOT block merges by itself.
+# It reports, it does not gate. To make review merge-blocking, either:
+#   - add the "RAAST PR Review" check as a required status check in the
+#     repository's branch protection rules (the job exits 1 when findings
+#     meet the --fail-on threshold), or
+#   - raise the gate via --fail-on (P0|P1|P2|off).
+# See docs/pr-review.md for details.
+
+name: "RAAST PR Review"
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out repository (full history needed for merge-base)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install RAAST
+        run: pip install .
+
+      - name: Review changed lines
+        id: review
+        run: |
+          set +e
+          python3 -m raast.review --base "origin/${{ github.base_ref }}" --path . --fail-on P1 --comment-out /tmp/raast-comment.md --format github
+          code=$?
+          echo "exitcode=$code" >> "$GITHUB_OUTPUT"
+          exit $code
+
+      # Post/update the single PR comment. Runs when the review finished
+      # with exit code 0 (clean) or 1 (findings) but never on 2 (engine
+      # error — there is no trustworthy comment to post).
+      - name: Post or update review comment
+        if: always() && steps.review.outputs.exitcode != '2'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MARKER="<!-- raast-review -->"
+          COMMENT_FILE=/tmp/raast-comment.md
+          ISSUE_NUMBER=${{ github.event.pull_request.number }}
+          REPO=${{ github.repository }}
+          if [ ! -f "$COMMENT_FILE" ]; then
+            echo "no comment file produced; skipping post"
+            ls -la /tmp/ || true
+            exit 0
+          fi
+          ls -la "$COMMENT_FILE"
+          existing=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER/comments" --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" | head -1)
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/$REPO/issues/$ISSUE_NUMBER/comments/$existing" -F body=@"$COMMENT_FILE" >/dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$ISSUE_NUMBER/comments" -F body=@"$COMMENT_FILE" >/dev/null
+          fi

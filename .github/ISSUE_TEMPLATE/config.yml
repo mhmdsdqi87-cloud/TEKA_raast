@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and usage help
+    url: https://github.com/mhmdsdqi87-cloud/TEKA_raast/discussions
+    about: "Not sure whether something is a bug? Ask here first — docs/troubleshooting.md covers the common cases."
+  - name: Documentation
+    url: https://github.com/mhmdsdqi87-cloud/TEKA_raast/tree/main/docs
+    about: "CLI reference, runtime inspector, PR review, auto-fix policy, i18n gate, benchmark methodology."

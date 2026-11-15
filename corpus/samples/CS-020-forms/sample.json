@@ -1,0 +1,18 @@
+{
+  "id": "CS-020",
+  "title": "Helper text inset with physical padding",
+  "category": "forms",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The helper text under the input is inset with physical padding on the left, so it no longer lines up with the field edge under RTL.",
+  "rule_ids": [
+    "RTL002"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

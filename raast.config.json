@@ -16,7 +16,10 @@
     "assets/**",
     "browser/**",
     "tests/**",
-    "playground/**"
+    "playground/**",
+    "corpus/**",
+    "fixtures/**",
+    "vscode-raast/**"
   ],
   "severity_overrides": {},
   "rules": {},

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!-- Deliberate fixture for the compat matrix (Bootstrap 5.3 stack).
+     Bootstrap's rtl: build is fine: ms-2 is the logical margin utility and
+     must stay silent. The defect is the inline physical margin declaration
+     on the second div, which the lexical scan catches even inside a
+     Bootstrap app — inline physical styles are the residual defect source.
+     Persian copy provides the RTL-script evidence that arms the scan. -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="bootstrap.rtl.min.css">
+</head>
+<body>
+  <!-- correct: Bootstrap logical utility — must stay silent -->
+  <div class="ms-2">داشبورد فروش</div>
+  <!-- defect: inline physical margin — does not flip under RTL -->
+  <div style="margin-left:12px">خلاصه سفارش‌ها</div>
+  <p>مشتریان امروز پیگیری شدند</p>
+</body>
+</html>

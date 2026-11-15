@@ -1,0 +1,19 @@
+{
+  "id": "CS-015",
+  "title": "Tab bar physical padding plus missing lang declaration",
+  "category": "components",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The tab bar insets each tab with physical padding on both sides, and the document declares a direction but never declares its language for screen readers.",
+  "rule_ids": [
+    "RTL002",
+    "RTL014"
+  ],
+  "expected_findings": 3,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

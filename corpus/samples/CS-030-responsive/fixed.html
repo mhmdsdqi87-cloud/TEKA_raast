@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- FIX: the translate-x utility was replaced with explicit per-direction transforms so the drawer always slides from the correct edge -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <style>
+    .drawer { position: fixed; top: 0; bottom: 0; width: 320px; transition: transform .3s; transform: translateX(100%); }
+    [dir="rtl"] .drawer { transform: translateX(-100%); }
+  </style>
+</head>
+<body>
+  <aside id="cart" class="drawer">
+    <h2>سبد خرید</h2>
+    <p>اقلام انتخاب‌شده اینجا نمایش داده خواهند شد.</p>
+  </aside>
+</body>
+</html>

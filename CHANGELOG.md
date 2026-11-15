@@ -2,6 +2,32 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.4.0] — 2026-11-15
+
+The verification release: RAAST now observes real browser behavior (Runtime Inspector), reviews pull requests line-by-line (PR Reviewer), repairs code under an explicit three-tier safety policy (Auto-Fix 2.0), backs its claims with a machine-verified bug corpus, extends quality checks from RTL pages to translation files (Language Quality Gate), and documents framework compatibility from real runs instead of manual claims.
+
+### Added
+- **RAAST Runtime Inspector** ([`raast/runtime.py`](raast/runtime.py), [docs/runtime-inspector.md](docs/runtime-inspector.md)) — Playwright renders your page at the chosen viewports, collects per-element geometry, then flips the document direction and measures again: asymmetric mirroring, horizontal overflow, clipped text, unflipped directional icons and un-isolated mixed-direction text are reported with a stable selector, screenshot evidence and a suggested fix (rules `RT001`–`RT006`). Ships as the optional dependency group `runtime`: `pip install 'raast[runtime]' && playwright install chromium`.
+- **RAAST PR Reviewer** ([`raast/review.py`](raast/review.py) + [`.github/workflows/pr-review.yml`](.github/workflows/pr-review.yml), [docs/pr-review.md](docs/pr-review.md)) — diff-scoped review: only lines changed in the PR are scanned (`git merge-base` diff + `-U0` range parsing in `raast/diffscope.py`), findings are posted as ONE idempotent comment (marker-based update, never comment spam) with severity, file · line, issue and suggested fix, and an optional severity gate for merge blocking.
+- **Auto-Fix 2.0** ([`raast/fixer.py`](raast/fixer.py), [docs/auto-fix.md](docs/auto-fix.md)) — every rule is classified into three tiers: **safe** (mechanical, always applied), **suggested** (context-sensitive, stays opt-in behind the existing language gates), **manual** (never auto-applied). `raast fix --tier all|safe`; every apply records a machine-readable fix journal (`.raast-backup/journal.json`) and `raast revert --yes` restores byte-identical originals from that journal.
+- **RAAST Bug Corpus** ([`corpus/`](corpus/README.md), tooling in [`tools/corpus/`](tools/corpus/)) — 32 reproducible RTL defect specimens across 8 categories (css-direction, bidi, typography, components, forms, tables, icons, responsive), each with `broken.html`, `fixed.html`, machine-verified rule hits (`tools/corpus/verify.py` — 32/32 PASS, fixed pages must scan clean) and Chromium-rendered before/after screenshots (`tools/corpus/evidence.py`, 64 images). Every specimen is labeled `lab-verified`; the corpus policy separates lab reproductions from real-world reports and ships none of the latter yet.
+- **Language Quality Gate** ([`raast/i18n.py`](raast/i18n.py), [docs/i18n-gate.md](docs/i18n-gate.md)) — scans locale files for missing keys, empty values, placeholder mismatches (`{name}`, `{{name}}`, `%s`, `%1$s`), untranslated strings, length anomalies, Western digits / Latin punctuation in Arabic-script prose, un-isolated Latin runs in RTL values, Arabic Yeh/Kaf in Persian text, and opt-in Hebrew niqqud (rules `LQG001`–`LQG009`). CI gate via `--max-errors`.
+- **Compatibility Matrix** ([`fixtures/compat/`](fixtures/compat/manifest.json), [`tools/compat/run_matrix.py`](tools/compat/run_matrix.py), [docs/compatibility-matrix.md](docs/compatibility-matrix.md)) — 8 framework fixtures (vanilla CSS, CSS Modules, Tailwind, Bootstrap, React JSX, Next styled-jsx, Vue SFC, Spanish LTR host) scanned by the real engine; the matrix doc is generated, deterministic, and CI-checked for staleness (`run_matrix.py --check`).
+- **VS Code extension scaffold** ([`vscode-raast/`](vscode-raast/README.md)) — runs the installed CLI on save and publishes findings as Problems-panel diagnostics (P0 → Error, P1 → Warning, P2 → Information) with quick fixes for safe-tier rules; build/publish instructions included.
+- **New console scripts**: `raast-inspect`, `raast-review`, `raast-i18n`. The core `raast` CLI is unchanged and still zero-dependency.
+
+### Changed
+- CI self-test job now also validates the corpus (rule-hit verification), the compatibility matrix freshness, and i18n-gate detection on the planted-error locale fixtures.
+- `raast.__version__` reconciled with `pyproject.toml` (0.4.0 everywhere).
+
+### Verification (all run locally before push)
+- `python3 -m unittest discover -s tests` → 80/80 OK
+- `python3 tools/corpus/verify.py` → 32/32 specimens PASS, every fixed page scans clean
+- `python3 tools/compat/run_matrix.py --check` → fresh, 8/8 fixtures passing (engine 0.4.0)
+- i18n gate on fixture corpora → all 8 planted error classes detected (9 findings), clean locales exit 0
+- Wheel installed into a clean venv outside the repo → all four console scripts respond; `raast-inspect` without playwright prints the exact install hint and exits 2
+- Runtime Inspector rendered real corpus pages in headless Chromium: broken specimens fire RT rules with report.json + report.md + per-pass screenshots; a logical-property clean page exits 0
+
 ## [0.3.0] — 2026-11-15
 
 Distribution release: RAAST becomes auditable without an install (browser playground on GitHub Pages) and speaks the native instruction language of every major AI coding agent.

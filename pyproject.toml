@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "raast"
-version = "0.3.0"
+version = "0.4.0"
 description = "RTL engineering diagnostics for AI-powered development — Persian, Arabic, Hebrew + Spanish LTR host."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -25,9 +25,15 @@ dependencies = []
 
 [project.optional-dependencies]
 dev = []
+# Browser-backed runtime inspection (screenshots, LTR/RTL mirror diff).
+# Install with: pip install 'raast[runtime]' && playwright install chromium
+runtime = ["playwright>=1.40"]
 
 [project.scripts]
 raast = "raast.cli:main"
+raast-review = "raast.review:main"
+raast-i18n = "raast.i18n:main"
+raast-inspect = "raast.runtime:main"
 
 [tool.setuptools.packages.find]
 include = ["raast*"]

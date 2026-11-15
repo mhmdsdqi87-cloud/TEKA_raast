@@ -1,0 +1,87 @@
+name: "1 · Bug report"
+description: "A false positive, false negative, or crash in the RAAST engine or one of its tools."
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for a evidence-first bug report. Reproduction is what makes RTL engineering fixable — please include the exact command and the smallest input that shows the problem.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Which part of RAAST?"
+      options:
+        - "raast doctor / fix / revert (static CLI)"
+        - "raast-review (PR review)"
+        - "raast-i18n (language quality gate)"
+        - "raast-inspect (runtime / browser inspection)"
+        - "GitHub Action (action/)"
+        - "Skills (SKILL.md content)"
+        - "Playground"
+        - "VS Code extension"
+        - "Other / not sure"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: "Kind of bug"
+      options:
+        - "False positive (flagged, but the code is correct)"
+        - "False negative (buggy code, not flagged)"
+        - "Wrong severity or wrong suggested fix"
+        - "Crash / error / bad exit code"
+        - "Wrong output (report, diff, comment format)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: profile
+    attributes:
+      label: "Language profile"
+      options:
+        - "fa (Persian)"
+        - "ar (Arabic)"
+        - "he (Hebrew)"
+        - "es (Spanish LTR host)"
+        - "Not profile-specific"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: "RAAST version"
+      description: "Output of `raast --version` (or the commit SHA if running from source)."
+      placeholder: "raast 0.4.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: "Reproduction"
+      description: "The exact command you ran, and the smallest file/URL that shows the problem. Code blocks, please — not screenshots of code."
+      placeholder: |
+        $ raast doctor ./page.html --language fa --format json
+        <html lang="fa" dir="rtl"> ... </html>
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected behavior"
+      description: "What should have happened instead? If a finding is wrong, say what the correct diagnosis (or silence) would be."
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: "Screenshots or context"
+      description: "For rendered-output bugs, a screenshot of the browser behavior helps (raast-inspect already produces before/after screenshots you can attach)."
+    validations:
+      required: false

@@ -1,0 +1,18 @@
+{
+  "id": "CS-029",
+  "title": "Sidebar margins collapse on the physical left at phone widths",
+  "category": "responsive",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "375x667",
+  "symptom": "The sidebar spacing is physical; at phone widths the media query re-sets the margin on the physical left only, so the layout collapses unevenly under RTL.",
+  "rule_ids": [
+    "RTL001"
+  ],
+  "expected_findings": 2,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

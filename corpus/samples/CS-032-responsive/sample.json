@@ -1,0 +1,19 @@
+{
+  "id": "CS-032",
+  "title": "Arabic testimonial un-isolated in the Spanish mobile layout",
+  "category": "responsive",
+  "language": "es",
+  "direction": "ltr",
+  "viewport": "375x667",
+  "symptom": "The Arabic testimonial block and the summary sentence sit bare and unmarked inside the Spanish mobile card; the RTL runs reorder against the LTR sentence punctuation.",
+  "rule_ids": [
+    "RTL015",
+    "RTL016"
+  ],
+  "expected_findings": 3,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

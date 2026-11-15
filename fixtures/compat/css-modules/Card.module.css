@@ -1,0 +1,25 @@
+/* Deliberate fixture: CSS Modules card for the compat matrix (Arabic content).
+   The engine scans module files like plain CSS — class-name hashing is not
+   modeled. Block 1 carries the physical padding defect (RTL002); the Arabic
+   badge string doubles as the RTL-script evidence that arms the CSS rules.
+   Block 2 uses the logical twin and must stay silent. */
+
+.card {
+  border: 1px solid #ddd;
+}
+
+/* defect block — RTL002 */
+.card__actions {
+  padding-right: 1rem;
+}
+
+/* evidence string rendered by the module */
+.badge::before {
+  content: "جديد";
+}
+
+/* correct block — logical properties, must stay silent */
+.card__body {
+  padding-inline-start: 1rem;
+  text-align: start;
+}

@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- DEFECT: the sticky first column anchors to the physical left edge, so under horizontal scroll in RTL it pins to the wrong side -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>ستون چسبان</title>
+  <style>
+    .scroll-wrap { overflow-x: auto; }
+    .sticky-col { position: sticky; left: 0; background: #fafafa; }
+  </style>
+</head>
+<body>
+  <div class="scroll-wrap">
+    <table>
+      <tr><th class="sticky-col">کالا</th><th>انبار</th><th>موجودی</th></tr>
+      <tr><td class="sticky-col">کفش ورزشی</td><td>مرکزی</td><td>بالا</td></tr>
+    </table>
+  </div>
+</body>
+</html>

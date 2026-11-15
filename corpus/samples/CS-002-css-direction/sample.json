@@ -1,0 +1,18 @@
+{
+  "id": "CS-002",
+  "title": "Product card inner spacing hugs the physical right edge",
+  "category": "css-direction",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The card's inner padding stays glued to the physical right edge, so under RTL the Persian text sits tight against the wrong border.",
+  "rule_ids": [
+    "RTL002"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

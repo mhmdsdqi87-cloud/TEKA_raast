@@ -1,0 +1,18 @@
+{
+  "id": "CS-031",
+  "title": "Table action cell forces horizontal overflow at phone widths",
+  "category": "responsive",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "375x667",
+  "symptom": "The action cell keeps its content on one line with physical padding on the left; at phone widths the RTL table overflows horizontally with the padding adding to the wrong edge.",
+  "rule_ids": [
+    "RTL002"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

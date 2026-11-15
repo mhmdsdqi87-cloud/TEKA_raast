@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- FIX: both physical margins became margin-inline-start so the desktop offset and the mobile collapse mirror with direction -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>نمایش موبایل</title>
+  <style>
+    .sidebar { margin-inline-start: 24px; width: 260px; }
+    @media (max-width: 480px) {
+      .sidebar { margin-inline-start: 12px; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>فهرست محصولات</h2>
+    <p>دسته‌بندی‌ها در این ستون نمایش داده می‌شوند.</p>
+  </aside>
+</body>
+</html>

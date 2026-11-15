@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "about": "Acerca de",
+    "pricing": "Precios",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "Crea interfaces bilingües con confianza",
+    "subtitle": "RAAST audita tus archivos de locale antes de publicarlos",
+    "cta": "Empieza ahora"
+  },
+  "checkout": {
+    "greeting": "Hola {name}, tienes {count} artículos",
+    "total": "Importe total: %s",
+    "coupon": "Aplica el cupón %1$s para %2$d de descuento",
+    "empty_cart": "Tu carrito está vacío"
+  },
+  "brand": {
+    "url": "https://example.com/pricing"
+  },
+  "status": {
+    "ok": "OK",
+    "loading": "Cargando…",
+    "error": "Pago fallido",
+    "saved": "Cambios guardados"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Tema"
+  },
+  "badge": {
+    "new": "Nuevo",
+    "beta": "Fase beta"
+  },
+  "footer": {
+    "links": ["Documentación", "Blog", "Cambios"]
+  },
+  "support": "Soporte 24/7",
+  "save": "Guardar",
+  "price": "Quedan 5 artículos",
+  "plan": {
+    "pro": "Plan Pro — quedan %d días"
+  }
+}

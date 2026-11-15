@@ -1,0 +1,18 @@
+{
+  "id": "CS-006",
+  "title": "Support phone number reorders inside Persian sentence",
+  "category": "bidi",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The phone number is a bare LTR digit run between Persian words; without an isolating wrapper the number reads back-to-front against the sentence flow.",
+  "rule_ids": [
+    "RTL012"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

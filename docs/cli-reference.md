@@ -55,18 +55,28 @@ raast audit [path]
 ## raast fix
 
 ```
-raast fix [path] [--apply] [--diff] [--zwnj] [--zwnj-digits] [--zwnj-punct] [--config <file>]
+raast fix [path] [--apply] [--diff] [--tier safe|all] [--zwnj] [--zwnj-digits] [--zwnj-punct] [--config <file>]
 ```
 
-Safe fixes only — high-confidence, reversible transformations:
+Auto-fix with a three-tier safety policy (full policy: docs/auto-fix.md):
 
-- physical declarations → logical (`margin-left` → `margin-inline-start`, `text-align: left` → `start`)
-- removal of non-zero `letter-spacing` on Arabic-script files (P0)
-- Tailwind class renames (`ml-4` → `ms-4`, `text-left` → `text-start`)
-- `--zwnj`: safe U+200C joins per the normalization decision table
-- `--zwnj-digits` / `--zwnj-punct`: language-gated extras (fa only; disabled for ar automatically)
+- **safe tier** (default, `--tier safe`) — mechanical, reversible transformations applied automatically:
+  - physical declarations → logical (`margin-left` → `margin-inline-start`, `text-align: left` → `start`)
+  - removal of non-zero `letter-spacing` on Arabic-script files
+  - Tailwind class renames (`ml-4` → `ms-4`, `text-left` → `text-start`)
+  - `--zwnj`: safe U+200C joins per the normalization decision table
+- **suggested tier** (included only with `--tier all`, still opt-in per flag) — context-sensitive conversions: `--zwnj-digits` / `--zwnj-punct` (language-gated, fa only; disabled for ar automatically)
+- **manual tier** — never auto-applied. Positioning semantics, `dir` placement, icon intent, i18n decisions need human judgment; these findings are listed as review items instead.
 
-Dry-run is the default and prints unified diffs. `--apply` writes backups to `.raast-backup/` (excluded from future scans). Ambiguous code is never rewritten.
+Dry-run is the default and prints unified diffs. `--apply` writes backups to `.raast-backup/` (excluded from future scans) and records a machine-readable journal (`.raast-backup/journal.json`: timestamp, file, rules applied, fix count). A tier breakdown is printed with every run.
+
+## raast revert
+
+```
+raast revert [path] [--yes]
+```
+
+Restores every file recorded in the fix journal to its pre-fix content (byte-identical), removes the consumed backups and clears the journal. Without `--yes` it prints the plan first (interactive confirmation only in a TTY). If backups exist without a usable journal, revert refuses honestly rather than guessing.
 
 ## raast report
 
@@ -83,6 +93,33 @@ raast benchmark --candidate <dir> [--cases <dir>] [--condition C-reference] [--j
 ```
 
 Validates HTML artifacts against the 24-case suite. The runner only reports what actually passes — it cannot fabricate results. Condition semantics in docs/benchmark-methodology.md.
+
+## raast-review — diff-scoped PR review
+
+```
+raast-review --base origin/main [--path .] [--config <file>]
+             [--fail-on P0|P1|P2|off] [--comment-out FILE] [--format markdown|github]
+```
+
+Scans ONLY the lines changed between the merge base and HEAD (rules RTL001–RTL017), so legacy issues outside the diff never appear. `--format github` emits Actions annotations; `--comment-out` writes a marker-based markdown comment body that the bundled workflow (`.github/workflows/pr-review.yml`) posts/updates idempotently on the PR. Exit codes: 0 clean, 1 findings ≥ threshold, 2 engine error. Full anatomy and limitations: docs/pr-review.md.
+
+## raast-i18n — language quality gate
+
+```
+raast-i18n scan --locales <dir> [--source en] [--targets fa,ar,he,es]
+                [--format text|json|markdown] [--max-errors N] [--hebrew-diacritics]
+```
+
+Scans locale JSON files for translation-quality defects (rules LQG001–LQG009): missing keys, empty values, placeholder mismatches, untranslated strings, length anomalies, Western digits / Latin punctuation in Arabic-script prose, un-isolated Latin runs in RTL values, Arabic Yeh/Kaf in Persian strings, opt-in niqqud. `--max-errors N` gates the exit code on P0+P1 counts. Full check table: docs/i18n-gate.md.
+
+## raast-inspect — runtime (browser) inspection
+
+```
+raast-inspect inspect (--url URL | --file FILE) --out DIR
+                  [--viewport WxH ...] [--wait MS] [--max-elements N] [--skip-mirror]
+```
+
+Requires the optional dependency group: `pip install 'raast[runtime]' && playwright install chromium`. Renders the page in headless Chromium, collects per-element geometry, then flips the document direction and measures again. Reports rendered-only defects (rules RT001–RT006): horizontal overflow, page-level overflow, clipped text, asymmetric mirroring, unflipped directional icons, un-isolated mixed-direction text — each with a selector, severity, suggested fix and before/after screenshots in `--out` (report.json, report.md, PNGs). Complements `raast doctor`; it does not replace static analysis. Details: docs/runtime-inspector.md.
 
 ## Configuration — raast.config.json
 

@@ -1,0 +1,18 @@
+{
+  "id": "CS-010",
+  "title": "Persian affix compounds broken by spaces instead of ZWNJ",
+  "category": "typography",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The affix compounds are typed with spaces instead of the zero-width non-joiner; the correct orthography joins them with U+200C so they render as one word.",
+  "rule_ids": [
+    "RTL011"
+  ],
+  "expected_findings": 3,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

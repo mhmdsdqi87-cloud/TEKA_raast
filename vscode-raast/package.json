@@ -1,0 +1,143 @@
+{
+  "name": "raast-vscode",
+  "displayName": "RAAST — RTL Doctor",
+  "description": "Runs the installed RAAST CLI and surfaces RTL findings (P0/P1/P2) as editor diagnostics, with quick fixes for the safe-tier rules.",
+  "version": "0.1.0",
+  "publisher": "mhmdsdqi87-cloud",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mhmdsdqi87-cloud/TEKA_raast"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "rtl",
+    "persian",
+    "farsi",
+    "arabic",
+    "hebrew",
+    "bidi",
+    "i18n",
+    "lint"
+  ],
+  "activationEvents": [
+    "onCommand:raast.scanFile",
+    "onCommand:raast.scanWorkspace"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "RAAST",
+      "properties": {
+        "raast.executablePath": {
+          "type": "string",
+          "default": "raast",
+          "description": "Path to the RAAST CLI executable. Leave as `raast` when the command is on PATH (pip install raast)."
+        },
+        "raast.language": {
+          "type": "string",
+          "default": "fa",
+          "enum": [
+            "fa",
+            "ar",
+            "he",
+            "es"
+          ],
+          "description": "Language profile passed to `raast doctor --language`."
+        },
+        "raast.failOn": {
+          "type": "string",
+          "default": "P1",
+          "enum": [
+            "P0",
+            "P1",
+            "P2"
+          ],
+          "enumDescriptions": [
+            "P0 only — surface critical findings",
+            "P0 and P1 — surface critical and major findings (default)",
+            "P0, P1 and P2 — surface every finding"
+          ],
+          "description": "Minimum severity surfaced as diagnostics: findings at this severity or higher are shown."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "raast.scanFile",
+        "title": "RAAST: Scan Current File"
+      },
+      {
+        "command": "raast.scanWorkspace",
+        "title": "RAAST: Scan Workspace"
+      }
+    ],
+    "languages": [
+      {
+        "id": "html",
+        "extensions": [
+          ".html",
+          ".htm"
+        ]
+      },
+      {
+        "id": "css",
+        "extensions": [
+          ".css"
+        ]
+      },
+      {
+        "id": "scss",
+        "extensions": [
+          ".scss",
+          ".sass"
+        ]
+      },
+      {
+        "id": "javascript",
+        "extensions": [
+          ".js",
+          ".mjs",
+          ".cjs"
+        ]
+      },
+      {
+        "id": "typescript",
+        "extensions": [
+          ".ts"
+        ]
+      },
+      {
+        "id": "javascriptreact",
+        "extensions": [
+          ".jsx"
+        ]
+      },
+      {
+        "id": "typescriptreact",
+        "extensions": [
+          ".tsx"
+        ]
+      },
+      {
+        "id": "vue",
+        "extensions": [
+          ".vue"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "node --check extension.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0"
+  }
+}

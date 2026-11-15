@@ -1,0 +1,30 @@
+/* Deliberate fixture for the compat matrix (vanilla CSS stack).
+   Block 1 is the classic defect pair: a physical margin declaration plus a
+   physical text alignment — neither flips under dir="rtl". The Persian
+   content string below doubles as the RTL-script evidence the engine
+   requires before CSS rules fire. Block 2 uses logical properties only. */
+
+.hero-title {
+  font-family: "Vazirmatn", sans-serif;
+}
+
+/* defect block — RTL001 + RTL004 */
+.hero-lead {
+  margin-left: 16px;
+  text-align: left;
+}
+
+/* evidence string: a real Persian UI label rendered via CSS content */
+.btn::after {
+  content: "ادامه";
+}
+
+/* correct block — logical properties, must stay silent */
+.hero-actions {
+  margin-inline-start: 16px;
+  text-align: start;
+}
+
+.note {
+  padding-inline-start: 8px;
+}

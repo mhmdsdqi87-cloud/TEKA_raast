@@ -1,0 +1,18 @@
+{
+  "id": "CS-017",
+  "title": "Form label offset with a physical left margin",
+  "category": "forms",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "Each field label carries a physical margin on the left, pushing Persian labels away from their inputs on the wrong side.",
+  "rule_ids": [
+    "RTL001"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

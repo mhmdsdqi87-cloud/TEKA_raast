@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- FIX: the physical gap became margin-inline-start so the icon-to-label spacing stays between icon and label in both directions -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>منوی آیکن‌دار</title>
+  <style>
+    .menu-item .label { margin-inline-start: 8px; }
+    .menu-item { display: flex; align-items: center; }
+  </style>
+</head>
+<body>
+  <div class="menu-item"><span aria-hidden="true">⌂</span><span class="label">پروفایل</span></div>
+  <div class="menu-item"><span aria-hidden="true">⚙</span><span class="label">تنظیمات</span></div>
+</body>
+</html>

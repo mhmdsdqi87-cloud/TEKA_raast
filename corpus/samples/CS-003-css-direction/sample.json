@@ -1,0 +1,18 @@
+{
+  "id": "CS-003",
+  "title": "Discount badge anchored to the physical left edge",
+  "category": "css-direction",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The absolutely-positioned badge stays pinned to the physical left corner, detaching it from the card's inline-start corner under RTL.",
+  "rule_ids": [
+    "RTL003"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

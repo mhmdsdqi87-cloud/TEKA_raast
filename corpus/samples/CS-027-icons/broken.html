@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- DEFECT: the accordion count chip is inset with physical padding on the right and the chevron glyph never flips under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>آکاردئون دوره‌ها</title>
+  <style>
+    .accordion-head { display: flex; align-items: center; }
+    .count-chip { padding-right: 10px; background: #eee; }
+  </style>
+</head>
+<body>
+  <div class="accordion-head">
+    <span class="count-chip">دوازده</span>
+    <span class="chevron" aria-hidden="true">&gt;</span>
+  </div>
+</body>
+</html>

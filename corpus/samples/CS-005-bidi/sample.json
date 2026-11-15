@@ -1,0 +1,18 @@
+{
+  "id": "CS-005",
+  "title": "Support email un-isolated inside Persian prose",
+  "category": "bidi",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The bare Latin email sits mid-sentence without bidi isolation; the atom can jump to the wrong side of the sentence around Persian words.",
+  "rule_ids": [
+    "RTL012"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

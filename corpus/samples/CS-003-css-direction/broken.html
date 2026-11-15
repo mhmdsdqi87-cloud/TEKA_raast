@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- DEFECT: the discount badge is absolutely positioned off the physical left edge, detaching it from the card corner under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>بنر تخفیف</title>
+  <style>
+    .promo { position: relative; }
+    .badge { position: absolute; left: 8px; top: 8px; background: #c00; }
+  </style>
+</head>
+<body>
+  <div class="promo">
+    <span class="badge">تخفیف ویژه</span>
+    <p>این تخفیف فقط تا پایان هفته اعتبار دارد.</p>
+  </div>
+</body>
+</html>

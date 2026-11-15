@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "pricing": "Pricing",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Build bilingual interfaces with confidence",
+    "subtitle": "RAAST audits your locale files before they ship",
+    "cta": "Get started"
+  },
+  "checkout": {
+    "greeting": "Hello {name}, you have {count} items",
+    "total": "Total: %s",
+    "coupon": "Apply coupon %1$s for %2$d off",
+    "empty_cart": "Your cart is empty"
+  },
+  "brand": {
+    "url": "https://example.com/pricing"
+  },
+  "status": {
+    "ok": "OK",
+    "loading": "Loading…",
+    "error": "Payment failed",
+    "saved": "Changes saved"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme"
+  },
+  "badge": {
+    "new": "New",
+    "beta": "Beta"
+  },
+  "footer": {
+    "links": ["Docs", "Blog", "Changelog"]
+  },
+  "support": "Support 24/7",
+  "save": "Save",
+  "price": "5 items left",
+  "plan": {
+    "pro": "Pro plan — %d days left"
+  }
+}

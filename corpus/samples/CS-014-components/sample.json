@@ -1,0 +1,18 @@
+{
+  "id": "CS-014",
+  "title": "Dropdown panel offset on the physical left",
+  "category": "components",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The dropdown panel opens with a physical margin on the left, so under RTL the menu shifts away from its trigger on the wrong side.",
+  "rule_ids": [
+    "RTL001"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

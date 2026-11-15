@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- DEFECT: the whole orders table is offset with a physical margin on the left, so the table drifts away from the RTL content edge -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>جدول سفارش</title>
+  <style>
+    .orders-table { margin-left: 40px; width: 100%; }
+  </style>
+</head>
+<body>
+  <table class="orders-table">
+    <tr><th>شناسه</th><th>وضعیت</th></tr>
+    <tr><td>تحویل داده شده</td><td>موفق</td></tr>
+  </table>
+</body>
+</html>

@@ -8,7 +8,7 @@
 
 Open-source RTL engineering for AI-powered development — Persian, Arabic & Hebrew first, with Spanish as the first LTR host.
 
-[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Tests](https://img.shields.io/badge/unit_tests-80_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
+[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Runtime rules](https://img.shields.io/badge/runtime_rules-6-34D399)](#real-browser-inspection-runtime-inspector) [![Corpus](https://img.shields.io/badge/bug_corpus-32_verified-34D399)](#the-bug-corpus--evidence-first) [![i18n](https://img.shields.io/badge/i18n_gate-9_checks-34D399)](#language-quality-gate--beyond-rtl-pages) [![Tests](https://img.shields.io/badge/unit_tests-80_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
 
 `rtl` · `persian` · `farsi` · `arabic` · `hebrew` · `espanol` · `bidi` · `typography` · `i18n` · `l10n` · `internationalization` · `claude-code` · `claude-skills` · `ai-agents` · `developer-tools` · `linting` · `accessibility` · `right-to-left` · `urdu` · `localization` · `nextjs` · `tailwind`
 
@@ -136,6 +136,58 @@ Direction, horizontal overflow, computed line-height, tap-target sizes, alt/labe
 
 No secrets required. Annotations appear on the PR; the gate is your severity choice. Full example: [`.github/workflows/raast.yml`](.github/workflows/raast.yml).
 
+## Real browser inspection (Runtime Inspector)
+
+Static analysis cannot see rendered geometry. The Runtime Inspector renders your page in headless Chromium, collects per-element geometry, **flips the document direction and measures again** — elements that fail to mirror, overflow, clip text, keep unflipped arrows, or mix scripts without bidi isolation are reported with a stable selector, screenshots and a suggested fix (`RT001`–`RT006`):
+
+```bash
+pip install 'raast[runtime]' && playwright install chromium
+raast-inspect inspect --url https://your-page.example --out report \
+    --viewport 375x667 --viewport 1280x800
+```
+
+Output per run: `report.md`, `report.json`, and before/after-mirror screenshots. Every finding carries severity, the element selector, and the fix. Full rule table and honest limitations: [docs/runtime-inspector.md](docs/runtime-inspector.md).
+
+## PR review that only reports what changed
+
+The bundled [`pr-review` workflow](.github/workflows/pr-review.yml) scans **only the lines changed in a pull request** (merge-base diff ranges), so adopting RAAST in a legacy codebase never produces a wall of pre-existing issues. A PR adding `margin-left: 20px; text-align: left;` gets one comment:
+
+> **RAAST RTL Review**
+> P1 — RTL001 · `src/components/Card.css` · line 2 — physical margin declaration
+> **Suggested fix:** `margin-inline-start: 20px`
+
+The comment updates in place on every push (marker-based, no spam), and findings gate the exit code at your chosen severity — add the workflow as a required status check to block merges. Anatomy and setup: [docs/pr-review.md](docs/pr-review.md).
+
+## Auto-Fix 2.0 — three tiers, fully reversible
+
+| Tier | Behavior | Example |
+|---|---|---|
+| **Safe** | applied automatically | `margin-left: 16px` → `margin-inline-start: 16px` |
+| **Suggested** | opt-in (`--tier all` + language flags) | Western digits → Persian digits in fa prose |
+| **Manual** | listed, never rewritten | positioning semantics, `dir` placement, icon intent |
+
+Every apply writes backups plus a machine-readable fix journal; `raast revert --yes` restores byte-identical originals. Policy and rationale: [docs/auto-fix.md](docs/auto-fix.md).
+
+## The bug corpus — evidence-first
+
+32 reproducible RTL defect specimens across 8 categories (css-direction, bidi, typography, components, forms, tables, icons, responsive) — each with `broken.html`, `fixed.html`, a **machine-verified rule-hit check** (`tools/corpus/verify.py`, 32/32 PASS; every fixed page must scan clean) and Chromium-rendered before/after screenshots. Every specimen is labeled `lab-verified`; the corpus policy separates lab reproductions from real-world reports, and none of the latter ship yet. Browse: [corpus/](corpus/README.md).
+
+## Language quality gate — beyond RTL pages
+
+```bash
+raast-i18n scan --locales ./locales --source en --max-errors 0
+```
+
+Scans locale files for missing keys, empty values, placeholder mismatches (`{name}`, `{{name}}`, `%s`, `%1$s`), untranslated strings, length anomalies, Western digits / Latin punctuation in Arabic-script prose, un-isolated Latin runs in RTL values, Arabic Yeh/Kaf in Persian text, and opt-in Hebrew niqqud (rules `LQG001`–`LQG009`). Exit-code gates CI. Check table: [docs/i18n-gate.md](docs/i18n-gate.md).
+
+## Compatibility matrix — generated, not claimed
+
+Eight framework fixtures (vanilla CSS, CSS Modules, Tailwind, Bootstrap, React JSX, Next styled-jsx, Vue SFC, Spanish LTR host) are scanned by the real engine; [docs/compatibility-matrix.md](docs/compatibility-matrix.md) is **generated from those runs** and CI fails if the doc is stale (`tools/compat/run_matrix.py --check`). Per-stack limitations are stated on the matrix itself.
+
+## VS Code
+
+[`vscode-raast/`](vscode-raast/README.md) runs the installed CLI on save and publishes findings in the Problems panel (P0 → Error, P1 → Warning, P2 → Information) with quick fixes for safe-tier rules. Scaffold with build instructions; requires `pip install raast`.
+
 ## Works with your agent
 
 The same RTL contract, in each tool's native instruction format — copy one file:
@@ -169,6 +221,9 @@ Ran 80 tests in 0.5s — OK
 $ raast benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference
 passed 24/24, failed 0, skipped 0
 
+$ python3 tools/corpus/verify.py
+32/32 specimens PASS, 0 FAIL
+
 $ raast profiles
 available language profiles:
   ar   العربية    Arabic       (rtl)
@@ -190,6 +245,9 @@ The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (poss
 | [CLI reference](docs/cli-reference.md) | [Troubleshooting](docs/troubleshooting.md) |
 | [Benchmark methodology](docs/benchmark-methodology.md) | [Benchmark results](docs/benchmark-results.md) |
 | [Architecture audit](docs/architecture-audit.md) | [Compatibility](docs/compatibility.md) |
+| [Compatibility matrix](docs/compatibility-matrix.md) | [Runtime Inspector](docs/runtime-inspector.md) |
+| [PR review](docs/pr-review.md) | [Auto-fix policy](docs/auto-fix.md) |
+| [i18n gate](docs/i18n-gate.md) | [Bug corpus](corpus/README.md) |
 | [Roadmap](docs/implementation-roadmap.md) | [Release checklist](docs/release-checklist.md) |
 
 ## What RAAST is not
@@ -202,8 +260,8 @@ The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (poss
 
 - **v0.2** ✅ **shipped** — Hebrew profile (full rules), Spanish LTR host profile (RTL015–017), packaging hardening (`py.typed`, zip-safe profile loading, graceful `ProfileError`, `raast profiles` command), 80-test suite
 - **v0.3** ✅ **shipped** — RAAST Playground (browser audit, all 17 rules client-side, GitHub Pages); agent integration files for Codex CLI (`AGENTS.md`), GitHub Copilot (`.github/copilot-instructions.md`) and Cursor (`.cursor/rules/*.mdc`)
-- **v0.4** — Claude Code plugin manifest + marketplace flow; HTML report viewer; VS Code extension reusing the CLI engine; a published, reproducible A/B benchmark demo
-- **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories
+- **v0.4** ✅ **shipped** — Runtime Inspector (Playwright LTR/RTL mirror diff, RT001–006); diff-scoped PR reviewer with idempotent PR comments; Auto-Fix 2.0 (safe/suggested/manual tiers + fix journal + `raast revert`); 32-specimen bug corpus with machine-verified evidence; Language Quality Gate (LQG001–009); generated compatibility matrix; VS Code extension scaffold
+- **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories; `.po`/`.arb` locale formats for the i18n gate; camelCase CSS-in-JS coverage (the lexical engine currently matches kebab-case only — documented on the compatibility matrix); Claude Code plugin manifest + marketplace flow
 
 ## Contributing
 

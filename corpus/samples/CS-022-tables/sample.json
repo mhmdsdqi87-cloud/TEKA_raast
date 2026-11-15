@@ -1,0 +1,18 @@
+{
+  "id": "CS-022",
+  "title": "Amount cell padding on the physical left",
+  "category": "tables",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The amount cell insets its content with physical padding on the left, so the number drifts off the column edge under RTL.",
+  "rule_ids": [
+    "RTL002"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

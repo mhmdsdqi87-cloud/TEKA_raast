@@ -1,0 +1,18 @@
+{
+  "id": "CS-028",
+  "title": "Media caption pinned to the physical right",
+  "category": "icons",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The media caption pins to the physical right edge; reused in an LTR locale the caption silently misaligns because the alignment never tracks direction.",
+  "rule_ids": [
+    "RTL004"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

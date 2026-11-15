@@ -1,0 +1,3 @@
+# Locale fixtures
+
+These JSON files are deliberate error fixtures for the RAAST Language Quality Gate, not a translation of the product: `en.json` is the 25-key reference corpus, `fa.json` plants exactly one instance of each finding LQG001-LQG008 (plus correct Persian keys such as `nav.home` and `nav.about` so a scan is not all-red), and `es.json` is a complete, mostly-clean Spanish set with exactly one planted LQG004. They exist so every example in `docs/i18n-gate.md` can be reproduced verbatim with `python3 -m raast.i18n scan --locales tests/fixtures/locales` and so manual verification of the gate runs against stable input; do not copy them into a real product as translations.

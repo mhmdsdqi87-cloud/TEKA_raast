@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- DEFECT: the media caption pins to the physical right edge; reused in an LTR locale the caption silently misaligns -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>پخش ویدیو</title>
+  <style>
+    .media-caption { text-align: right; }
+  </style>
+</head>
+<body>
+  <figure>
+    <div class="media" aria-hidden="true">▶</div>
+    <figcaption class="media-caption">ویدیوی معرفی محصول</figcaption>
+  </figure>
+</body>
+</html>

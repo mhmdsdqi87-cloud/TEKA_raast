@@ -1,0 +1,18 @@
+{
+  "id": "CS-001",
+  "title": "Checkout hero offset uses a physical left margin",
+  "category": "css-direction",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "Under RTL the hero block still shifts away from the physical left edge, so the offset lands on the wrong side of the reading flow.",
+  "rule_ids": [
+    "RTL001"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

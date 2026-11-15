@@ -14,7 +14,7 @@ from . import __version__
 from .benchmark import benchmark_markdown, run_benchmark
 from .config import ConfigError, load_config
 from .detect import detect
-from .fixer import fix_file
+from .fixer import BACKUP_DIRNAME, fix_file, journal_load, revert_all, tier_for
 from .profiles import ProfileError, available_profiles, load_profile
 from .report import Report
 from .rules import Finding, RuleContext, run_rules, SEVERITY_ORDER
@@ -154,8 +154,12 @@ def cmd_fix(args) -> int:
     groups, _count = _scan(root, ctx)
     changed_files = 0
     total_fixes = 0
+    total_findings = sum(len(fs) for (_p, _r, _c, fs) in groups)
+    tiers_total: dict[str, int] = {"safe": 0, "suggested": 0}
+    addressed_rules: set[str] = set()
     backups = []
     dry_run = not args.apply
+    tier = getattr(args, "tier", "safe")
     for path, rel, content, findings in groups:
         result = fix_file(
             path, rel, findings,
@@ -163,7 +167,11 @@ def cmd_fix(args) -> int:
             lang=ctx.config["language"],
             zwnj_digits=args.zwnj_digits,
             zwnj_punct=args.zwnj_punct,
+            tier=tier,
         )
+        for t, n in result.tiers.items():
+            tiers_total[t] = tiers_total.get(t, 0) + n
+        addressed_rules.update(result.rules_applied)
         if not result.changed:
             continue
         changed_files += 1
@@ -178,8 +186,70 @@ def cmd_fix(args) -> int:
             backups.append(backup)
             print(f"fixed {rel} ({result.fix_count} change(s)) — backup: {backup}")
     print(f"\n{'DRY RUN — ' if dry_run else ''}{total_fixes} fix(es) across {changed_files} file(s)")
+    if total_fixes:
+        manual_count = sum(
+            1 for (_p, _r, _c, fs) in groups for f in fs if tier_for(f.rule) == "manual"
+        )
+        print(
+            f"tier breakdown: safe={tiers_total.get('safe', 0)} "
+            f"suggested={tiers_total.get('suggested', 0)} "
+            f"manual(review-only)={manual_count}"
+        )
+    if total_findings:
+        skipped = sum(1 for (_p, _r, _c, fs) in groups for f in fs if f.rule not in addressed_rules)
+        if skipped:
+            print(
+                f"{skipped} finding(s) not auto-applied (manual review or opt-in gates) — "
+                "use 'raast fix --tier all --zwnj ...' to include suggested fixes"
+            )
     if dry_run and changed_files:
         print("re-run with --apply to write changes (backups land in .raast-backup/)")
+    return 0
+
+
+def _backup_files_present(root: Path) -> bool:
+    backup_root = root / BACKUP_DIRNAME
+    if not backup_root.is_dir():
+        return False
+    return any(p.is_file() and p.name != "journal.json" for p in backup_root.rglob("*"))
+
+
+def cmd_revert(args) -> int:
+    """Undo applied fixes by restoring the backups recorded in the journal."""
+    root = Path(args.path).resolve()
+    journal = journal_load(root)
+    if not journal:
+        if _backup_files_present(root):
+            print(
+                f"cannot revert: {root / BACKUP_DIRNAME} contains backup copies but no usable "
+                f"journal ({BACKUP_DIRNAME}/journal.json is missing, empty or corrupt)"
+            )
+            print(
+                "the journal is the only source of truth for which backup belongs to which "
+                "file, so nothing can be restored safely; nothing was changed"
+            )
+            return 1
+        print(f"nothing to revert: no journal and no backups under {root / BACKUP_DIRNAME}")
+        return 0
+    print(f"revert plan — {len(journal)} journal entr(y/ies) under {root / BACKUP_DIRNAME}:")
+    for entry in journal:
+        print(f"  restore {entry.get('file')}  <-  {entry.get('backup')}")
+    if not args.yes:
+        if sys.stdin.isatty():
+            try:
+                answer = input("apply revert? [y/N] ")
+            except EOFError:
+                answer = ""
+            if answer.strip().lower() not in ("y", "yes"):
+                print("aborted — nothing was changed")
+                return 0
+        else:
+            print("re-run with --yes to apply")
+            return 0
+    restored_count, restored = revert_all(root)
+    for rel in restored:
+        print(f"restored {rel}")
+    print(f"{restored_count} file(s) restored; journal cleared")
     return 0
 
 
@@ -265,11 +335,21 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("path", nargs="?", default=".")
     sp.add_argument("--apply", action="store_true", help="write changes (backups in .raast-backup/)")
     sp.add_argument("--diff", action="store_true", help="show diffs even when applying")
+    sp.add_argument("--tier", choices=["safe", "all"], default="safe",
+                    help="fix tier policy: 'safe' applies only safe-tier fixes; "
+                         "'all' also includes suggested-tier fixes, which stay gated by "
+                         "--zwnj/--zwnj-digits/--zwnj-punct. Manual-tier findings are "
+                         "never auto-applied (review-only). Default: safe")
     sp.add_argument("--zwnj", action="store_true", help="also apply safe ZWNJ joins")
-    sp.add_argument("--zwnj-digits", action="store_true", help="also convert digits (fa only)")
-    sp.add_argument("--zwnj-punct", action="store_true", help="also convert Latin punctuation in prose")
+    sp.add_argument("--zwnj-digits", action="store_true", help="also convert digits (fa only; needs --tier all)")
+    sp.add_argument("--zwnj-punct", action="store_true", help="also convert Latin punctuation in prose (needs --tier all)")
     sp.add_argument("--config", default=None)
     sp.set_defaults(func=cmd_fix)
+
+    sp = sub.add_parser("revert", help="restore backups recorded in the fix journal")
+    sp.add_argument("path", nargs="?", default=".")
+    sp.add_argument("--yes", action="store_true", help="apply without confirmation prompt")
+    sp.set_defaults(func=cmd_revert)
 
     sp = sub.add_parser("report", help="write a markdown diagnostics report")
     sp.add_argument("path", nargs="?", default=".")

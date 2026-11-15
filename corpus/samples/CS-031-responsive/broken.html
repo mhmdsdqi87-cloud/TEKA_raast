@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- DEFECT: the action cell keeps its content on one line with physical padding on the left; at phone widths the RTL table overflows horizontally -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>جدول موبایل</title>
+  <style>
+    .cell-actions { padding-left: 12px; white-space: nowrap; }
+    .table-wrap { overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <div class="table-wrap">
+    <table>
+      <tr><th>اقدام</th></tr>
+      <tr><td class="cell-actions">مشاهده رسید و پیگیری مرسوله</td></tr>
+    </table>
+  </div>
+</body>
+</html>

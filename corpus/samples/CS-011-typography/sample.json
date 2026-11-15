@@ -1,0 +1,18 @@
+{
+  "id": "CS-011",
+  "title": "Letter spacing applied to an Arabic heading",
+  "category": "typography",
+  "language": "ar",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "Non-zero letter spacing inserts gaps between joined Arabic glyphs; the cursive headline visually shatters into separated letters.",
+  "rule_ids": [
+    "RTL005"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

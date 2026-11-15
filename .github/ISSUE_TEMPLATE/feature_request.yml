@@ -1,0 +1,48 @@
+name: "2 · Feature request"
+description: "A new rule, profile, corpus specimen, or capability — with the evidence that motivates it."
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: "What would you like to add?"
+      options:
+        - "New static rule (RTL001–RTL017 family)"
+        - "New runtime check (RT001–RT006 family)"
+        - "New i18n check (LQG001–LQG009 family)"
+        - "New language profile (ur, ps, sd, ...)"
+        - "New corpus specimen"
+        - "Framework support in the compatibility matrix"
+        - "CLI / report / workflow improvement"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: "The RTL / i18n defect it would catch"
+      description: "Describe the real-world mistake — the code pattern and how it misrenders. A minimal broken snippet is worth more than a long description."
+      placeholder: |
+        `.menu { left: 0 }` on a fixed sidebar → stays on the physical left under RTL,
+        overlapping the scrollbar-side content.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Proposed behavior"
+      description: "Rule ID placement, expected severity (P0/P1/P2), suggested fix text, and which language profiles it applies to."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: gates
+    attributes:
+      label: "Design gates"
+      options:
+        - label: "I checked the false-positive policy: this rule should stay evidence-gated (only fire with RTL-script evidence) unless there is a strong reason"
+          required: false
+        - label: "I can contribute a corpus specimen (broken.html + fixed.html) or a failing example"
+          required: false

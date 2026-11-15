@@ -1,0 +1,18 @@
+{
+  "id": "CS-004",
+  "title": "Persian landing page without the dir attribute",
+  "category": "css-direction",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The page declares lang but never sets the direction attribute, so browsers, scrollbars and form controls all render the document LTR.",
+  "rule_ids": [
+    "RTL006"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

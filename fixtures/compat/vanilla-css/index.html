@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- Deliberate fixture for the compat matrix (vanilla CSS stack).
+     Defects live ONLY in styles.css. This file keeps proper document meta
+     (lang plus dir on the root element) so the matrix isolates the CSS rules
+     and no meta findings appear. NOTE: the meta rule scans raw content, so
+     even the literal root-tag name inside this comment would match it. The
+     "correct" section below uses logical properties only and must add zero
+     findings; the Persian copy also arms the evidence gate. -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>فروشگاه نور</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="hero">
+    <h1 class="hero-title">فروشگاه نور</h1>
+    <p class="hero-lead">هر هفته محصولات تازه با ارسال سریع به خانه شما می‌رسد</p>
+    <!-- correct section: logical properties only — must stay silent -->
+    <section class="hero-actions">
+      <a class="btn" href="#products">مشاهده محصولات</a>
+      <p class="note">پشتیبانی پاسخگوی شماست</p>
+    </section>
+  </main>
+</body>
+</html>

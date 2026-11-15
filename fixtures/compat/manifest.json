@@ -1,0 +1,58 @@
+[
+  {
+    "name": "vanilla-css",
+    "path": "fixtures/compat/vanilla-css",
+    "language": "fa",
+    "expect_rules": ["RTL001", "RTL004"],
+    "notes": "Plain CSS is the classic defect source: physical margin plus physical alignment scanned lexically; the correct block with logical properties stays silent. The Persian content string in the stylesheet arms the evidence gate."
+  },
+  {
+    "name": "css-modules",
+    "path": "fixtures/compat/css-modules",
+    "language": "ar",
+    "expect_rules": ["RTL002"],
+    "notes": "Module CSS scanned like plain CSS; class-name hashing and bundler mapping are not modeled. Arabic copy arms the gate; the logical padding twin stays silent."
+  },
+  {
+    "name": "tailwind",
+    "path": "fixtures/compat/tailwind",
+    "language": "fa",
+    "expect_rules": ["RTL008", "RTL007"],
+    "notes": "Physical utilities detected lexically from class attributes; JIT output not required. Logical twins (ms/text-start) stay silent; translate is reported review-only."
+  },
+  {
+    "name": "bootstrap",
+    "path": "fixtures/compat/bootstrap",
+    "language": "fa",
+    "expect_rules": ["RTL001"],
+    "notes": "Bootstrap 5.3 rtl: build is fine — the logical margin utility ms-2 stays silent; inline physical styles remain the residual defect source and are caught lexically."
+  },
+  {
+    "name": "react-jsx",
+    "path": "fixtures/compat/react-jsx",
+    "language": "fa",
+    "expect_rules": ["RTL001"],
+    "notes": "Kebab-case declarations inside CSS-in-JS template literals are scanned like stylesheets. Honest gap: camelCase style objects (marginLeft: 8) are NOT matched by the current engine — kebab-case property names only; a dedicated JSX style-object rule is future work."
+  },
+  {
+    "name": "next-jsx",
+    "path": "fixtures/compat/next-jsx",
+    "language": "fa",
+    "expect_rules": ["RTL004"],
+    "notes": "styled-jsx style blocks scanned like plain CSS; runtime styling and CSS resolution are not evaluated. dir on the wrapper is honored implicitly by the correct twin staying silent."
+  },
+  {
+    "name": "vue",
+    "path": "fixtures/compat/vue",
+    "language": "fa",
+    "expect_rules": ["RTL002"],
+    "notes": "SFC style blocks scanned; template directives and compiler output are not parsed. The logical padding twin stays silent."
+  },
+  {
+    "name": "es-host",
+    "path": "fixtures/compat/es-host",
+    "language": "es",
+    "expect_rules": ["RTL015", "RTL016"],
+    "notes": "LTR host profile: the direction rules flip — RTL runs inside Spanish prose must be isolated (RTL015) and RTL-only elements need dir (RTL016). The bdi-isolated paragraph stays silent, which is the engine's own recommendation pattern."
+  }
+]

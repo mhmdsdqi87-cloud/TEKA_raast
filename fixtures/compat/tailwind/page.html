@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!-- Deliberate fixture for the compat matrix (Tailwind stack).
+     Class list 1 mixes physical spacing/alignment utilities (RTL008, three
+     tokens) plus an unmirrored translate utility (RTL007). Class list 2 uses
+     the logical twins and must add no findings. Persian copy doubles as the
+     RTL-script evidence that gates the Tailwind rules. Utilities are matched
+     lexically from class attributes — no JIT build output is required. -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>پنل مدیریت</title>
+</head>
+<body>
+  <!-- defect block: physical utilities + unmirrored translate -->
+  <section class="ml-4 text-left pr-2">
+    <h1 class="translate-x-4">پنل مدیریت فروشگاه</h1>
+    <p>گزارش فروش این هفته آماده بررسی است</p>
+  </section>
+  <!-- correct block: logical utilities only — must stay silent -->
+  <section class="ms-4 text-start">
+    <p>نمودارها با نگاه دقیق طراحی شده‌اند</p>
+  </section>
+</body>
+</html>

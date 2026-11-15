@@ -1,0 +1,18 @@
+{
+  "id": "CS-008",
+  "title": "Arabic organization name un-isolated in Spanish prose",
+  "category": "bidi",
+  "language": "es",
+  "direction": "ltr",
+  "viewport": "1280x800",
+  "symptom": "The Arabic-run organization name ends the Spanish sentence bare; without isolation the sentence-final period attaches to the wrong side of the RTL run.",
+  "rule_ids": [
+    "RTL015"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

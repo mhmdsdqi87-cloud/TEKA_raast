@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- DEFECT: the helper text under the input is inset with physical padding on the left, so it no longer lines up with the field edge under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>راهنمای فیلد</title>
+  <style>
+    .field-hint { padding-left: 26px; color: #666; }
+  </style>
+</head>
+<body>
+  <label for="code">کد امنیتی</label>
+  <input id="code" type="text">
+  <p class="field-hint">این کد را از پیامک دریافت می‌کنید.</p>
+</body>
+</html>

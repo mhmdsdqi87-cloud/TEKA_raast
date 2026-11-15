@@ -1,0 +1,18 @@
+{
+  "id": "CS-027",
+  "title": "Accordion chip spacing plus non-flipping chevron",
+  "category": "icons",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The accordion header uses a chevron glyph that never flips and a count chip inset with physical padding, so the header reads wrong under RTL; the engine pins the physical chip padding.",
+  "rule_ids": [
+    "RTL002"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

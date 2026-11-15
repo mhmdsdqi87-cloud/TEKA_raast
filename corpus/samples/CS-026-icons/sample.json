@@ -1,0 +1,18 @@
+{
+  "id": "CS-026",
+  "title": "Icon-to-label gap as a physical margin",
+  "category": "icons",
+  "language": "fa",
+  "direction": "rtl",
+  "viewport": "1280x800",
+  "symptom": "The gap between each menu icon and its label is a physical margin on the left, so under RTL the spacing lands on the outer side of the label.",
+  "rule_ids": [
+    "RTL001"
+  ],
+  "expected_findings": 1,
+  "evidence": {
+    "before": "evidence/before.png",
+    "after": "evidence/after.png"
+  },
+  "status": "lab-verified"
+}

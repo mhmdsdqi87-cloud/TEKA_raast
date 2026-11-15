@@ -35,6 +35,24 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Benchmark self-validation (condition C)
         run: python3 -m raast.cli benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference
+      - name: Bug corpus verification (every claimed rule must actually fire)
+        run: python3 tools/corpus/verify.py
+      - name: Compatibility matrix is fresh (regenerate → no diff)
+        run: python3 tools/compat/run_matrix.py --check
+      - name: i18n gate detection check (fixtures are deliberate error corpora)
+        run: |
+          python3 -m raast.i18n scan --locales tests/fixtures/locales --source en --format json > /tmp/i18n-report.json || true
+          python3 - <<'EOF'
+          import json, sys
+          r = json.load(open("/tmp/i18n-report.json"))
+          rules = {f["rule"] for f in r["findings"]}
+          expected = {"LQG001", "LQG002", "LQG003", "LQG004", "LQG005", "LQG006", "LQG007", "LQG008"}
+          missing = expected - rules
+          if missing:
+              print("i18n gate failed to detect planted error classes:", sorted(missing))
+              sys.exit(1)
+          print(f"i18n gate detected all {len(expected)} planted error classes ({len(r['findings'])} findings)")
+          EOF
 
   # Packaging smoke test: the wheel a real user installs MUST work outside the
   # repo (profiles shipped as package-data). Regression guard for the

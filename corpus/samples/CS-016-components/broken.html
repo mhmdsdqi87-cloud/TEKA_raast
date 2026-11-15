@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- DEFECT: the menu notification dot is anchored with a physical left inset, detaching it from the label corner under RTL -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>اعلان منو</title>
+  <style>
+    .menu-item { position: relative; }
+    .menu-dot { position: absolute; left: 14px; top: 6px; width: 8px; height: 8px; }
+  </style>
+</head>
+<body>
+  <div class="menu-item">
+    <span class="menu-dot"></span>
+    <span>اعلان‌ها</span>
+  </div>
+</body>
+</html>

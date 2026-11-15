@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- DEFECT: the off-canvas drawer uses a Tailwind translate-x utility; under RTL it slides the wrong way because translate-x never mirrors -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <style>
+    .drawer { position: fixed; top: 0; bottom: 0; width: 320px; transition: transform .3s; }
+  </style>
+</head>
+<body>
+  <aside id="cart" class="drawer translate-x-full">
+    <h2>سبد خرید</h2>
+    <p>اقلام انتخاب‌شده اینجا نمایش داده خواهند شد.</p>
+  </aside>
+</body>
+</html>

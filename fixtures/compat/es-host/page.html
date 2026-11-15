@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<!-- Deliberate fixture for the compat matrix (Spanish LTR host).
+     The bare Arabic run in the first paragraph is un-isolated (RTL015) and
+     the term element carries only Arabic text without a direction attribute
+     (RTL016). The corrected paragraph wraps its Arabic run in <bdi> and must
+     stay silent: isolated runs are the engine's own recommendation. -->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Servicios en árabe</title>
+</head>
+<body>
+  <!-- defect: bare RTL run inside Spanish prose -->
+  <p>El folleto dice مرحبا بكم y sigue con más instrucciones</p>
+  <!-- defect: element carrying only RTL text without dir -->
+  <p class="term">الكلمة العربية</p>
+  <!-- correct: isolated with bdi — must stay silent -->
+  <p>El término <bdi>مرحبا</bdi> aparece en la primera lección</p>
+</body>
+</html>
