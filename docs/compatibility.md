@@ -41,8 +41,8 @@ Honest status of where RAAST works. "Verified" means actually executed in the st
 
 | Language | Status | Profile |
 |---|---|---|
-| Persian (fa) | Verified — rules and normalizer wired to profile | `profiles/fa.json` |
-| Arabic (ar) | Verified — profile loaded, prose rules use it | `profiles/ar.json` |
+| Persian (fa) | Verified — rules and normalizer wired to profile | `raast/profiles/fa.json` |
+| Arabic (ar) | Verified — profile loaded, prose rules use it | `raast/profiles/ar.json` |
 | Hebrew (he) | Planned | profile schema supports it; content needs a native-speaker reviewer |
 | Urdu (ur) | Planned | same |
 

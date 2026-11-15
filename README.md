@@ -48,7 +48,7 @@ Six focused skills, plain Markdown, zero config — validated against the [Agent
 | [`jalali-dates`](skills/jalali-dates/SKILL.md) | `Intl` fa-IR one-liners, conversion-vs-formatting distinction, relative time, storage conventions, SSR hydration |
 | [`rtl-audit`](skills/rtl-audit/SKILL.md) | 20-point review checklist, P0/P1/P2 severities, findings mapped to CLI rule IDs |
 
-Languages: **fa** and **ar** profiles today; **he** and **ur** are designed-in via [`profiles/`](profiles/) and need native-speaker reviewers (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+Languages: **fa** and **ar** profiles today; **he** and **ur** are designed-in via [`raast/profiles/`](raast/profiles/) and need native-speaker reviewers (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 
 ### Pillar 2 — RAAST Doctor CLI (the engineering layer)
 

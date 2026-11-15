@@ -35,3 +35,40 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Benchmark self-validation (condition C)
         run: python3 -m raast.cli benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference
+
+  # Packaging smoke test: the wheel a real user installs MUST work outside the
+  # repo (profiles shipped as package-data). Regression guard for the
+  # "profile not found" bug — editable installs hide it, this job cannot.
+  packaging-smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Build sdist and wheel
+        run: |
+          pip install --quiet build
+          python3 -m build
+      - name: Install wheel into clean venv (outside repo)
+        run: |
+          python3 -m venv /tmp/wheel-venv
+          /tmp/wheel-venv/bin/pip install --quiet dist/raast-*.whl
+      - name: Install sdist into clean venv (outside repo)
+        run: |
+          python3 -m venv /tmp/sdist-venv
+          /tmp/sdist-venv/bin/pip install --quiet dist/raast-*.tar.gz
+      - name: CLI must find profiles from OUTSIDE the repo
+        run: |
+          # Minimal clean RTL page: zero findings expected, so exit code
+          # isolates "profile loading" from "severity gate".
+          mkdir -p /tmp/probe
+          printf '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><main><h1>سلام دنیا</h1><p>این یک صفحه آزمایشی است.</p></main></body></html>' > /tmp/probe/index.html
+          cd /tmp
+          echo "== wheel =="
+          /tmp/wheel-venv/bin/raast --version
+          /tmp/wheel-venv/bin/raast doctor /tmp/probe --fail-on P0 --format json > /dev/null
+          echo "== sdist =="
+          /tmp/sdist-venv/bin/raast --version
+          /tmp/sdist-venv/bin/raast doctor /tmp/probe --fail-on P0 --format json > /dev/null
+          echo "packaging OK — profiles found, doctor exits 0"

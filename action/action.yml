@@ -49,12 +49,15 @@ runs:
         RAAST_INPUT_REPORT: ${{ inputs.report-output }}
       run: |
         set +e
+        # Use the installed `raast` console script — NOT `python3 -m raast.cli` —
+        # so we always test the pip-installed package (no CWD shadowing), which
+        # is exactly what users get.
         ARGS="$RAAST_INPUT_PATH --language $RAAST_INPUT_LANGUAGE --fail-on $RAAST_INPUT_FAIL_ON"
         if [ -n "$RAAST_INPUT_CONFIG" ]; then ARGS="$ARGS --config $RAAST_INPUT_CONFIG"; fi
         if [ -n "$RAAST_INPUT_REPORT" ]; then
-          python3 -m raast.cli report $RAAST_INPUT_PATH --output "$RAAST_INPUT_REPORT"
+          raast report $RAAST_INPUT_PATH --output "$RAAST_INPUT_REPORT"
         fi
-        python3 -m raast.cli doctor $ARGS --format github
+        raast doctor $ARGS --format github
         CODE=$?
         echo "exitcode=$CODE" >> "$GITHUB_OUTPUT"
         exit $CODE

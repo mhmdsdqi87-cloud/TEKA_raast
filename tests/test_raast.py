@@ -84,7 +84,13 @@ class TestNormalizer(unittest.TestCase):
         self.assertEqual(normalize("٩٩٠٠٠", lang="ar", digits=True), "٩٩٠٠٠")
 
     def test_punct(self):
-        self.assertEqual(normalize("سریع !", punct=True), "سریع؟".replace("؟", "؟") if False else normalize("سریع !", punct=True))
+        # Latin punctuation adjacent to Persian letters converts per PUNCT_SUBS;
+        # Persian text must use ، ؟ ؛ (U+060C / U+061F / U+061B)
+        self.assertEqual(normalize("سلام , دنیا", punct=True), "سلام، دنیا")
+        self.assertEqual(normalize("آیا این درست است ?", punct=True), "آیا این درست است؟")
+        self.assertEqual(normalize("یعنی این ; پایان", punct=True), "یعنی این؛ پایان")
+        # Latin punctuation next to Latin words must stay untouched
+        self.assertEqual(normalize("wait, what? ok; done", punct=True), "wait, what? ok; done")
 
     def test_detect_broken_zwnj_lines(self):
         hits = detect_broken_zwnj("می رود و خانه ها")
@@ -320,6 +326,35 @@ class TestBenchmarkValidators(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             res = run_case(self._case([{"type": "viewport_meta"}], files="**/*.html"), Path(td))
             self.assertEqual(res["status"], "skipped")
+
+
+class TestPackaging(unittest.TestCase):
+    """Profiles must ship INSIDE the package — the wheel a user installs has no
+    repo-root profiles/ dir. Regression guard for 'profile not found'."""
+
+    def test_profiles_live_inside_package(self):
+        import raast.profiles as profiles_mod
+        pkg_dir = Path(profiles_mod.__file__).resolve().parent
+        self.assertEqual(profiles_mod.PROFILES_DIR, pkg_dir / "profiles")
+
+    def test_profile_files_exist_in_package(self):
+        for lang in ("fa", "ar"):
+            p = Path(load_profile.__globals__["PROFILES_DIR"]) / f"{lang}.json"
+            self.assertTrue(p.exists(), f"{lang}.json missing from package data: {p}")
+
+    def test_profiles_parse_and_are_complete(self):
+        for lang in ("fa", "ar"):
+            profile = load_profile(lang)
+            self.assertIsInstance(profile, dict)
+            numerals = profile.get("numerals")
+            self.assertTrue(numerals and numerals.get("display"), f"{lang}: numerals missing")
+            punct = profile.get("punctuation")
+            self.assertTrue(punct and punct.get("comma") and punct.get("question"),
+                            f"{lang}: punctuation missing")
+            self.assertEqual(profile.get("direction"), "rtl")
+
+    def test_available_profiles(self):
+        self.assertEqual(available_profiles(), ["ar", "fa"])
 
 
 class TestEndToEndCLI(unittest.TestCase):

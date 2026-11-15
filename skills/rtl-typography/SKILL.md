@@ -142,7 +142,7 @@ They are different languages with different conventions. Confirm which one befor
 - Punctuation overlap but tone/idiom differ
 - A Persian-only font on an Arabic page shows wrong letter forms for ک/ی and vice versa
 
-The machine-readable conventions (digit ranges, separators, punctuation, affix lists) live in `profiles/fa.json` and `profiles/ar.json` — the same files the `raast` CLI consumes, so prose rules and automated checks never drift apart.
+The machine-readable conventions (digit ranges, separators, punctuation, affix lists) live in `raast/profiles/fa.json` and `raast/profiles/ar.json` — the same files the `raast` CLI consumes, so prose rules and automated checks never drift apart.
 
 ## 9. Copy, paste, selection & rendering
 

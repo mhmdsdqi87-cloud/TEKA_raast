@@ -1,0 +1,6 @@
+# Ensure language profiles ship in the sdist as well as the wheel.
+recursive-include raast/profiles *.json
+include raast/py.typed
+include README.md
+include LICENSE
+include CHANGELOG.md

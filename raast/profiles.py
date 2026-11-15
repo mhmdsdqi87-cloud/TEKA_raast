@@ -1,14 +1,18 @@
 """Language profiles — machine-readable RTL conventions.
 
-Single source of truth shared with the skills prose: profiles/fa.json and
-profiles/ar.json drive the prose rules so text rules and documentation never
+Single source of truth shared with the skills prose: raast/profiles/fa.json and
+raast/profiles/ar.json drive the prose rules so text rules and documentation never
 drift apart. Future languages (he, ur) plug in by adding a profile file.
+
+Profiles ship INSIDE the raast package (declared as package-data in
+pyproject.toml) so that `pip install raast` works everywhere — repo source,
+wheel, and sdist installs all resolve the same path.
 """
 
 import json
 from pathlib import Path
 
-PROFILES_DIR = Path(__file__).resolve().parent.parent / "profiles"
+PROFILES_DIR = Path(__file__).resolve().parent / "profiles"
 
 PROFILE_CACHE: dict = {}
 

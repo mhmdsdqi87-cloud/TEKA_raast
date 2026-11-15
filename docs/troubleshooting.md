@@ -21,7 +21,7 @@
 
 **Skill not triggering in Claude Code** — check `~/.claude/skills/<name>/SKILL.md` exists with YAML frontmatter (`name` + `description`). Only one level of nesting is used by this repo.
 
-**Skill applies Persian rules to Arabic content** — the skills ask the agent to confirm fa vs ar first; if it guessed wrong, say "use the Arabic profile" — `profiles/ar.json` conventions (Arabic-Indic digits, no ZWNJ affix joining) are documented in rtl-typography §8.
+**Skill applies Persian rules to Arabic content** — the skills ask the agent to confirm fa vs ar first; if it guessed wrong, say "use the Arabic profile" — `raast/profiles/ar.json` conventions (Arabic-Indic digits, no ZWNJ affix joining) are documented in rtl-typography §8.
 
 ## Browser suite
 

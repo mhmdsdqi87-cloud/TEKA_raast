@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "raast"
-version = "0.1.1"
+version = "0.1.2"
 description = "RTL engineering diagnostics for AI-powered development — Persian/Arabic first."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -33,4 +33,4 @@ raast = "raast.cli:main"
 include = ["raast*"]
 
 [tool.setuptools.package-data]
-raast = ["py.typed"]
+raast = ["py.typed", "profiles/*.json"]

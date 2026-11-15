@@ -17,7 +17,7 @@ cd browser && npm install && npx playwright install chromium
 ```
 raast/        CLI engine (Python, stdlib only)   tests/      unit + e2e (stdlib unittest)
 skills/       six agent skills (SKILL.md)        benchmarks/ cases + validators + reference
-browser/      Playwright suite (Node)            profiles/   fa.json / ar.json
+browser/      Playwright suite (Node)            raast/profiles/ fa.json / ar.json
 action/       GitHub Action (composite)          docs/       all documentation
 demo/         demo artifact produced by the skills
 ```
@@ -32,7 +32,7 @@ demo/         demo artifact produced by the skills
 
 ## Adding a language profile (native speakers especially welcome)
 
-1. Copy `profiles/fa.json` → `profiles/he.json` (or ur) and fill every field; do not guess — mark fields you are unsure about with `"$review": true`.
+1. Copy `raast/profiles/fa.json` → `raast/profiles/he.json` (or ur) and fill every field; do not guess — mark fields you are unsure about with `"$review": true`.
 2. Add prose rules wiring in `raast/rules` behind the profile (no hard-coded language checks).
 3. Add at least 3 benchmark cases using the new profile.
 4. Open the PR titled `profiles: add <lang>` — a maintainer will pair with you on review.

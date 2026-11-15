@@ -52,7 +52,7 @@ ZWNJ inventory in skill prose: rtl-typography 26, rtl-bidi 4, rtl-landing 1, jal
             ┌───────────────▼────────────────────────────┐
             │        raast CLI  (diagnostics engine)     │
             │  detect → rules → report / safe-fix        │
-            │  profiles/fa.json · profiles/ar.json       │
+            │  raast/profiles/fa.json · raast/profiles/ar.json       │
             └───────┬────────────────────┬───────────────┘
                     │                    │
      ┌──────────────▼─────┐    ┌─────────▼──────────────┐

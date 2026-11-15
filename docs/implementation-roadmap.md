@@ -47,7 +47,7 @@ Status legend: **done** (implemented + verified) · **partial** (implemented, ga
 - Design documented in roadmap §v0.4; deliberately not scaffolded before the diagnostics engine accumulates real-world usage. The engine (Python) would be consumed via the CLI as language server exec — no logic duplication planned.
 
 ## Phase J — Language profiles — done for fa/ar
-- `profiles/fa.json`, `profiles/ar.json`: digits, separators, punctuation, affixes, fonts, date locale
+- `raast/profiles/fa.json`, `raast/profiles/ar.json`: digits, separators, punctuation, affixes, fonts, date locale
 - Contributor path for native reviewers documented in CONTRIBUTING.md
 
 ## Phase K — Docs & release prep — done

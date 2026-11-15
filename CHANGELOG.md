@@ -2,6 +2,25 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.1.2] — 2026-11-15
+
+Packaging-integrity release: the artifact a user installs now works everywhere, not just inside the source repo.
+
+### Fixed
+- **Profiles missing from wheel/sdist (P0)**: `profiles/` lived outside the `raast` package and `PROFILES_DIR` pointed at `<site-packages>/profiles/`. Any real `pip install` (wheel or sdist) crashed every command with `FileNotFoundError: unknown language profile: 'fa'`. CI never caught it because `pip install -e .` (editable) reads straight from the repo, and the action ran `python3 -m raast.cli` from inside the raast source checkout — CWD shadowing imported the source tree instead of the installed package. Profiles now ship as package data (`raast/profiles/`), declared in `[tool.setuptools.package-data]` + `MANIFEST.in`; `PROFILES_DIR` resolves via `__file__` inside the package.
+- **Composite action ran the shadowed CLI**: `python3 -m raast.cli` replaced with the installed `raast` console script — always exercises the exact artifact users get, never CWD shadowing.
+
+### Added
+- **CI `packaging-smoke` job**: builds sdist + wheel, installs each into a *clean venv outside the repo*, runs `raast doctor` from `/tmp` — fails if profiles are not found. Prevents the class of bug that editable-install CI cannot see.
+- **`tests/test_raast.py::TestPackaging`**: profiles live inside the package, parse cleanly, expose digits/punctuation for fa and ar.
+- Real assertions for punctuation normalization (previously a tautology comparing `normalize()` to itself).
+
+### Verification (all run locally before push)
+- `python3 -m unittest discover -s tests` → 55/55 OK
+- `python3 -m build` → wheel + sdist; both installed into clean venvs; `raast doctor <dir outside repo>` exits 0 with profiles found
+- `python3 -m raast.cli benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference` → 24/24 passed
+- `python3 -m raast.cli doctor . --fail-on P0 --format github` → 0 findings, exit 0
+
 ## [0.1.1] — 2026-11-14
 
 CI-green release: the repository's own GitHub Action now passes on every push.
