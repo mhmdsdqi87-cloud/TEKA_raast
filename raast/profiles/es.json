@@ -1,0 +1,77 @@
+{
+  "$comment": "RAAST Spanish (es) LTR host profile. Spanish is the first left-to-right host: the page runs LTR while embedding Arabic/Hebrew content (refugee services, heritage sites, i18n demos). The engine flips: instead of isolating LTR atoms inside RTL prose, it requires RTL runs inside Spanish prose to be isolated, checks inverted marks, and never suggests dir=rtl on <html>.",
+  "code": "es",
+  "name": "Spanish",
+  "name_native": "Español",
+  "direction": "ltr",
+  "script": "latin",
+  "host_profile": true,
+  "bcp47": ["es", "es-ES", "es-MX", "es-AR", "es-419"],
+  "numerals": {
+    "display": "0–9 (Western)",
+    "western_digits_in_prose": "valid_in_prose",
+    "decimal_separator": ",",
+    "decimal_separator_codepoint": "U+002C",
+    "thousands_separator": ".",
+    "thousands_separator_codepoint": "U+002E",
+    "thousands_separator_note": "es-ES uses period thousands (1.234.567) or thin space; most LatAm locales invert separators (1,234,567.89). Pick per project locale and stay consistent.",
+    "percent": "%",
+    "percent_codepoint": "U+0025",
+    "percent_placement": "es-ES: space before (25 %); LatAm: attached (25%) — follow project locale"
+  },
+  "punctuation": {
+    "comma": ",",
+    "comma_codepoint": "U+002C",
+    "question": "?",
+    "question_codepoint": "U+003F",
+    "exclamation": "!",
+    "exclamation_codepoint": "U+0021",
+    "inverted_marks": "required",
+    "inverted_question": "¿",
+    "inverted_question_codepoint": "U+00BF",
+    "inverted_exclamation": "¡",
+    "inverted_exclamation_codepoint": "U+00A1",
+    "inverted_marks_note": "RAE requires opening ¿ and ¡ on questions and exclamations in prose. Missing inverted marks are the most visible machine-generated-Spanish defect.",
+    "quotes": ["«", "»"],
+    "quotes_note": "RAE prefers «comillas angulares» in prose; curly quotes are acceptable in UI copy.",
+    "ellipsis": "…",
+    "latin_comma_question_semicolon": "valid_in_prose"
+  },
+  "letters": {
+    "script_note": "Latin alphabet with ñ and accented vowels (á é í ó ú ü) — any shipped font must cover Latin-1 plus ¿ ¡ « » or glyphs fall back inconsistently.",
+    "zwnj": "not_used_in_es",
+    "zwnj_affixes_prefix": [],
+    "zwnj_affixes_suffix": [],
+    "possessive_suffixes_no_zwnj": []
+  },
+  "typography": {
+    "body_line_height_min": 1.5,
+    "recommended_line_height": 1.6,
+    "heading_line_height": 1.3,
+    "letter_spacing": "allowed",
+    "recommended_fonts": ["Inter", "Source Sans 3", "Lato", "Open Sans", "Noto Sans"],
+    "display_fonts": ["Inter", "Source Sans 3"]
+  },
+  "dates": {
+    "calendar": "gregorian",
+    "locale": "es-ES",
+    "intl_tag": "es-ES",
+    "format": "dd/mm/yyyy",
+    "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    "weekdays_monday_first": ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"],
+    "weekend_days": ["sábado", "domingo"],
+    "relative_time_locale": "es"
+  },
+  "currency": {
+    "name": "euro",
+    "code": "EUR",
+    "symbol": "€",
+    "placement": "after amount, non-breaking space per RAE: 25 €"
+  },
+  "bidi_marks": {
+    "rtl_page_default_dir": "ltr",
+    "isolate_atom_markup": "<bdi> or <span dir=\"rtl\">",
+    "notes": "LTR host: Arabic/Hebrew names, quotes and snippets inside Spanish prose MUST be wrapped in <bdi> or dir=\"rtl\" — bare RTL runs visually reorder surrounding punctuation and numbers (the #1 bidi defect in es pages serving RTL content)."
+  },
+  "extra_verb_stems": []
+}

@@ -12,7 +12,7 @@ inputs:
     required: false
     default: "."
   language:
-    description: "Primary RTL language profile (fa or ar)"
+    description: "Primary language profile (fa, ar, he or es)"
     required: false
     default: "fa"
   fail-on:

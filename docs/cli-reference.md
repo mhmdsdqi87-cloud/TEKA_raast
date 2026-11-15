@@ -4,10 +4,18 @@ Zero-dependency Python CLI (3.11+). Install: `pip install -e .` from the repo ro
 
 Global: `raast --version`
 
+## raast profiles
+
+```
+raast profiles
+```
+
+Lists the language profiles that ship with the installed CLI — native name, English name, direction (`rtl`/`ltr`). The first command to run when a profile question comes up; profiles are package data, so this works from any wheel install without a repo checkout.
+
 ## raast init
 
 ```
-raast init [path] [--language fa|ar] [--force]
+raast init [path] [--language fa|ar|he|es] [--force]
 ```
 
 Writes `raast.config.json` with detected defaults. Refuses to overwrite without `--force`.
@@ -24,14 +32,17 @@ Evidence-based framework detection (JSON). Claims a framework only on real evide
 
 ```
 raast doctor [path] [--format text|json|markdown|github]
-             [--fail-on P0|P1|P2] [--config <file>]
+             [--fail-on P0|P1|P2] [--language fa|ar|he|es] [--config <file>]
 ```
 
 Static diagnostics. `path` may be a directory or a single file.
 
 - `--format github` emits `::error`/`::warning` annotations for Actions.
 - `--fail-on P0` exits 1 when P0 findings exist (default comes from config `fail_on`).
-- Exit codes: 0 clean, 1 findings >= threshold, 2 config error.
+- `--language` overrides the profile from config (`fa`, `ar`, `he`, `es`).
+- Exit codes: 0 clean, 1 findings >= threshold, 2 config/profile error.
+
+Language behavior is profile-driven: `fa`/`ar` enforce their own digits and punctuation in prose, `he` keeps Western digits and Latin punctuation valid while flagging discouraged letter-spacing at P1, and `es` (LTR host) flips the engine — RTL runs inside Spanish prose must be isolated (RTL015), RTL-run elements need `dir` (RTL016), and RAE inverted marks ¿ ¡ are checked (RTL017).
 
 ## raast audit
 
@@ -89,4 +100,4 @@ Validates HTML artifacts against the 24-case suite. The runner only reports what
 }
 ```
 
-Validation is strict: unknown keys, bad rule ids, bad severities and unknown rule options raise a `ConfigError` (exit code 2). `"force": true` scans a rule even in files without Arabic-script evidence (off by default to keep false positives near zero).
+Validation is strict: unknown keys, bad rule ids, bad severities, unknown rule options and unknown languages raise an error (exit code 2, with the list of available languages). `"force": true` scans a rule even in files without RTL-script evidence (off by default to keep false positives near zero).

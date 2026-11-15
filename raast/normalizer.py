@@ -47,7 +47,11 @@ DEFAULT_VERB_STEMS = [
 AR_YEH_KAF = str.maketrans({"ي": "ی", "ك": "ک", "ھ": "ه"})
 AR_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩", "۰۱۲۳۴۵۶۷۸۹")
 
-ARABIC_RE = re.compile(r"[\u0600-\u06FF]")
+ARABIC_RE = re.compile(r"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]")
+HEBREW_RE = re.compile(r"[\u0590-\u05FF]")
+# Evidence of RTL-script text in a file — Arabic OR Hebrew. Gates the CSS /
+# Tailwind / HTML rules so mixed projects never false-positive on pure LTR files.
+RTL_SCRIPT_RE = re.compile(r"[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]")
 CODE_FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
 INLINE_CODE_RE = re.compile(r"`[^`]*`")
 URL_EMAIL_RE = re.compile(r"(https?://\S+|[\w.+-]+@[\w-]+\.[\w.]+)")

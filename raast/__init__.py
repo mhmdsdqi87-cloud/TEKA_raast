@@ -3,4 +3,4 @@
 Zero-dependency core: everything below runs on the Python standard library.
 """
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"

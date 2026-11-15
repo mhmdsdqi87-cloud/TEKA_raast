@@ -15,10 +15,12 @@ from .benchmark import benchmark_markdown, run_benchmark
 from .config import ConfigError, load_config
 from .detect import detect
 from .fixer import fix_file
-from .profiles import load_profile
+from .profiles import ProfileError, available_profiles, load_profile
 from .report import Report
 from .rules import Finding, RuleContext, run_rules, SEVERITY_ORDER
 from .scanner import iter_files
+
+LANGUAGES = ["fa", "ar", "he", "es"]
 
 
 def _build_context(root: Path, config_path: Path | None, language: str | None = None) -> tuple[RuleContext, str | None]:
@@ -80,6 +82,19 @@ def cmd_init(args) -> int:
     return 0
 
 
+def cmd_profiles(args) -> int:
+    print("available language profiles:")
+    for code in available_profiles():
+        try:
+            p = load_profile(code)
+            direction = p.get("direction", "?")
+            print(f"  {code:<4} {p.get('name_native', ''):<10} {p.get('name', ''):<12} ({direction})")
+        except ProfileError as e:
+            print(f"  {code:<4} UNREADABLE: {e}")
+            return 2
+    return 0
+
+
 def cmd_detect(args) -> int:
     det = detect(Path(args.path).resolve())
     print(json.dumps(det, indent=2))
@@ -101,8 +116,8 @@ def cmd_doctor(args) -> int:
     try:
         ctx, source = _build_context(root, Path(args.config) if args.config else None,
                                      language=getattr(args, "language", None))
-    except ConfigError as e:
-        print(f"config error: {e}", file=sys.stderr)
+    except (ConfigError, ProfileError) as e:
+        print(f"error: {e}", file=sys.stderr)
         return 2
     report, _ = _collect_report(root, ctx, source, with_frameworks=True)
     print(_fmt_report(report, args.format))
@@ -133,8 +148,8 @@ def cmd_fix(args) -> int:
     root = Path(args.path).resolve()
     try:
         ctx, source = _build_context(root, Path(args.config) if args.config else None)
-    except ConfigError as e:
-        print(f"config error: {e}", file=sys.stderr)
+    except (ConfigError, ProfileError) as e:
+        print(f"error: {e}", file=sys.stderr)
         return 2
     groups, _count = _scan(root, ctx)
     changed_files = 0
@@ -172,8 +187,8 @@ def cmd_report(args) -> int:
     root = Path(args.path).resolve()
     try:
         ctx, source = _build_context(root, Path(args.config) if args.config else None)
-    except ConfigError as e:
-        print(f"config error: {e}", file=sys.stderr)
+    except (ConfigError, ProfileError) as e:
+        print(f"error: {e}", file=sys.stderr)
         return 2
     report, _ = _collect_report(root, ctx, source, with_frameworks=True)
     out = Path(args.output)
@@ -211,14 +226,17 @@ def cmd_benchmark(args) -> int:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="raast",
-        description="RAAST — RTL engineering diagnostics (Persian/Arabic first).",
+        description="RAAST — RTL engineering diagnostics (Persian, Arabic, Hebrew + Spanish LTR host).",
     )
     p.add_argument("--version", action="version", version=f"raast {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
+    sp = sub.add_parser("profiles", help="list available language profiles")
+    sp.set_defaults(func=cmd_profiles)
+
     sp = sub.add_parser("init", help="write a raast.config.json with detected defaults")
     sp.add_argument("path", nargs="?", default=".")
-    sp.add_argument("--language", default="fa", choices=["fa", "ar"])
+    sp.add_argument("--language", default="fa", choices=LANGUAGES)
     sp.add_argument("--force", action="store_true")
     sp.set_defaults(func=cmd_init)
 
@@ -230,7 +248,7 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("path", nargs="?", default=".")
     sp.add_argument("--format", choices=["text", "json", "markdown", "github"], default="text")
     sp.add_argument("--fail-on", choices=["P0", "P1", "P2"], default=None)
-    sp.add_argument("--language", choices=["fa", "ar"], default=None,
+    sp.add_argument("--language", choices=LANGUAGES, default=None,
                     help="override config language profile")
     sp.add_argument("--config", default=None)
     sp.set_defaults(func=cmd_doctor)
@@ -238,7 +256,7 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("audit", help="doctor (markdown) + manual review checklist")
     sp.add_argument("path", nargs="?", default=".")
     sp.add_argument("--fail-on", choices=["P0", "P1", "P2"], default=None)
-    sp.add_argument("--language", choices=["fa", "ar"], default=None,
+    sp.add_argument("--language", choices=LANGUAGES, default=None,
                     help="override config language profile")
     sp.add_argument("--config", default=None)
     sp.set_defaults(func=cmd_audit)

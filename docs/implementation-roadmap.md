@@ -17,8 +17,8 @@ Status legend: **done** (implemented + verified) · **partial** (implemented, ga
 - ZWNJ normalizer: engine moved to CLI (`raast/normalizer.py`); skill script kept as standalone entry point; **unit tests added** (Unicode edge cases, code-block protection, exclusions)
 
 ## Phase C/D — CLI — done
-- `raast` CLI (stdlib only): `doctor`, `fix`, `report`, `detect`, `init`, `benchmark`, `--version`
-- 14 static rules with IDs `RTL001`–`RTL014`, confidence levels, P0/P1/P2 severities
+- `raast` CLI (stdlib only): `doctor`, `fix`, `report`, `detect`, `init`, `profiles`, `benchmark`, `--version`
+- 17 static rules with IDs `RTL001`–`RTL017`, confidence levels, P0/P1/P2 severities
 - `raast.config.json` with schema validation; include/exclude, severity overrides, language profile
 - Outputs: human, JSON, Markdown, GitHub Actions annotations
 - Safe autofix: dry-run default, unified diff preview, explicit `--apply`

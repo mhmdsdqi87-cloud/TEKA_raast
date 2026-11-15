@@ -4,11 +4,13 @@
   "name": "Arabic",
   "name_native": "العربية",
   "direction": "rtl",
+  "script": "arabic",
   "bcp47": ["ar", "ar-SA", "ar-EG", "ar-AE"],
   "numerals": {
     "display": "٠١٢٣٤٥٦٧٨٩",
     "unicode_range": [5792, 5801],
     "unicode_range_note": "U+0660-U+0669 (Arabic-Indic digits). Some regional conventions use Western digits; keep profile override per project when needed.",
+    "western_digits_in_prose": "invalid_in_prose",
     "persian_0_9": "invalid_in_ar",
     "decimal_separator": "٫",
     "decimal_separator_codepoint": "U+066B",

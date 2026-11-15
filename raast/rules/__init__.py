@@ -5,23 +5,36 @@ Rule inventory (IDs shared with skills/rtl-audit):
   RTL002  physical padding-left/right          P1  fixable
   RTL003  physical left:/right: positioning    P2  review-only
   RTL004  text-align: left|right               P1  fixable
-  RTL005  letter-spacing on Arabic-script      P0  fixable
-  RTL006  missing dir on <html>                P0  review-only
+  RTL005  letter-spacing on RTL script         P0* fixable    (*profile-driven:
+         P0 on Arabic script (fa/ar), P1 on Hebrew (he), off for LTR hosts)
+  RTL006  missing dir on <html>                P0  review-only (RTL hosts)
   RTL007  Tailwind translate-x-*               P2  review-only
   RTL008  Tailwind physical utilities          P1  fixable
   RTL009  Latin punctuation in Arabic prose    P2  opt-in fix
-  RTL010  Western digits in Arabic prose       P2  config-gated
-  RTL011  broken ZWNJ compounds                P1  fixable (--zwnj)
-  RTL012  un-isolated LTR atoms in prose       P2  review-only
-  RTL013  dir="ltr" on Arabic-only element     P0  review-only
-  RTL014  missing lang on <html>               P1  review-only
+  RTL010  Western digits in Arabic prose       P2  config-gated (fa/ar only;
+         Western digits are VALID in Hebrew/Spanish prose)
+  RTL011  broken ZWNJ compounds                P1  fixable (--zwnj, fa only)
+  RTL012  un-isolated LTR atoms in prose       P2  review-only (RTL hosts)
+  RTL013  dir="ltr" on RTL-script-only element P0  review-only
+  RTL014  missing lang on <html>               P1  review-only (all profiles)
+  RTL015  un-isolated RTL atom in LTR prose    P1  review-only (es host)
+  RTL016  RTL-run element without dir in LTR doc P1 review-only (es host)
+  RTL017  missing inverted marks (¿ / ¡)       P2  review-only (es host)
 
 False-positive policy: CSS/Tailwind rules only fire when the file itself
-contains Arabic-script evidence, unless the rule is forced via config
-(`"rules": {"RTL001": {"force": true}}`). A left/right declaration in a
+contains RTL-script evidence (Arabic or Hebrew), unless the rule is forced via
+config (`"rules": {"RTL001": {"force": true}}`). A left/right declaration in a
 pure-LTR file of a mixed project is NOT reported by default. CSS/Tailwind/
 HTML-structure rules do not run on .md/.mdx at all — documents deliberately
 illustrate WRONG patterns; prose rules handle markdown instead.
+
+Profile-driven behavior (raast/profiles/*.json):
+  direction=rtl (fa/ar/he) — RTL006 wants dir="rtl", RTL010/RTL009 fire only
+  when the profile marks Western digits / Latin punctuation invalid, RTL012
+  isolates LTR atoms, RTL013 flags dir="ltr" on RTL-script-only elements.
+  direction=ltr (es host)  — RTL006 never fires (html stays LTR); RTL015
+  requires RTL runs to be isolated, RTL016 requires dir on RTL-run elements,
+  RTL017 checks RAE inverted marks; RTL005/RTL010 are inert.
 """
 from __future__ import annotations
 
@@ -29,7 +42,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..normalizer import ARABIC_RE, detect_broken_zwnj
+from ..normalizer import ARABIC_RE, HEBREW_RE, RTL_SCRIPT_RE, detect_broken_zwnj
 from ..profiles import load_profile
 
 CSS_EXT = {".css", ".scss", ".sass"}
@@ -65,6 +78,16 @@ class Finding:
 
 def _has_arabic(text: str) -> bool:
     return bool(ARABIC_RE.search(text))
+
+
+def _has_rtl_script(text: str) -> bool:
+    """Arabic OR Hebrew script evidence — gates source-code rules."""
+    return bool(RTL_SCRIPT_RE.search(text))
+
+
+_RTL_RUN_RE = re.compile(
+    r"(?:" + RTL_SCRIPT_RE.pattern + r")+(?:\s+(?:" + RTL_SCRIPT_RE.pattern + r")+)*"
+)
 
 
 def _force_enabled(config: dict, rule_id: str) -> bool:
@@ -103,7 +126,7 @@ _PHYSICAL = {
 
 
 def rule_css_physical(path: str, content: str, config: dict) -> list[Finding]:
-    if not _has_arabic(content) and not _force_enabled(config, "RTL001"):
+    if not _has_rtl_script(content) and not _force_enabled(config, "RTL001"):
         return []
     findings: list[Finding] = []
     for i, line in enumerate(content.splitlines(), 1):
@@ -132,7 +155,7 @@ def rule_css_physical(path: str, content: str, config: dict) -> list[Finding]:
 
 
 def rule_css_text_align(path: str, content: str, config: dict) -> list[Finding]:
-    if not _has_arabic(content) and not _force_enabled(config, "RTL004"):
+    if not _has_rtl_script(content) and not _force_enabled(config, "RTL004"):
         return []
     findings = []
     for i, line in enumerate(content.splitlines(), 1):
@@ -157,7 +180,7 @@ def rule_css_text_align(path: str, content: str, config: dict) -> list[Finding]:
 
 
 def rule_css_left_right(path: str, content: str, config: dict) -> list[Finding]:
-    if not _has_arabic(content) and not _force_enabled(config, "RTL003"):
+    if not _has_rtl_script(content) and not _force_enabled(config, "RTL003"):
         return []
     findings = []
     for i, line in enumerate(content.splitlines(), 1):
@@ -179,9 +202,24 @@ def rule_css_left_right(path: str, content: str, config: dict) -> list[Finding]:
     return findings
 
 
-def rule_css_letter_spacing(path: str, content: str, config: dict) -> list[Finding]:
-    if not _has_arabic(content) and not _force_enabled(config, "RTL005"):
+def rule_css_letter_spacing(path: str, content: str, config: dict,
+                            profile: dict | None = None) -> list[Finding]:
+    if profile is None:
+        profile = load_profile("fa")
+    ls_mode = profile.get("typography", {}).get("letter_spacing", "forbidden_on_arabic_script")
+    if ls_mode == "allowed":
         return []
+    if not _has_rtl_script(content) and not _force_enabled(config, "RTL005"):
+        return []
+    severity = "P0" if ls_mode == "forbidden_on_arabic_script" else "P1"
+    explanation = (
+        "Arabic-script letters are cursive and joined; non-zero letter-spacing inserts "
+        "gaps between joined glyphs and visually shatters words "
+        "(«مدیریت» renders as م د ی ر ی ت)."
+        if severity == "P0"
+        else "Hebrew word cohesion and final-form letter rhythm (ך ם ן ף ץ) break under "
+        "letter-spacing; justify with word spacing, or use size/weight for emphasis."
+    )
     findings = []
     for i, line in enumerate(content.splitlines(), 1):
         # Value token must stop before quotes/backticks — `` `letter-spacing: 0` ``
@@ -192,14 +230,10 @@ def rule_css_letter_spacing(path: str, content: str, config: dict) -> list[Findi
         if m.group(1).lower() in ("normal", "inherit", "initial", "unset", "0", "0px", "0em", "0rem"):
             continue
         findings.append(Finding(
-            rule="RTL005", severity="P0", confidence="high",
+            rule="RTL005", severity=severity, confidence="high",
             file=path, line=i, column=m.start() + 1,
             message=f"letter-spacing: {m.group(1)}",
-            explanation=(
-                "Arabic-script letters are cursive and joined; non-zero letter-spacing inserts "
-                "gaps between joined glyphs and visually shatters words "
-                "(«مدیریت» renders as م د ی ر ی ت)."
-            ),
+            explanation=explanation,
             suggested_fix="remove the declaration (use size/weight for display emphasis)",
             fixable=True,
         ))
@@ -211,16 +245,23 @@ def rule_css_letter_spacing(path: str, content: str, config: dict) -> list[Findi
 _DIR_ATTR_RE = re.compile(r"\bdir\s*=\s*[\"'](rtl|ltr|auto)[\"']", re.IGNORECASE)
 
 
-def rule_html_meta(path: str, content: str, project_lang: str) -> list[Finding]:
+def rule_html_meta(path: str, content: str, project_lang: str,
+                   profile: dict | None = None) -> list[Finding]:
     findings = []
-    if not path.endswith(".html") or not _has_arabic(content):
+    if not path.endswith(".html") or not _has_rtl_script(content):
         return findings
+    if profile is None:
+        try:
+            profile = load_profile(project_lang)
+        except Exception:
+            profile = {}
+    direction = profile.get("direction", "rtl")
     html_tag = re.search(r"<html\b([^>]*)>", content, re.IGNORECASE)
     if not html_tag:
         return findings
     attrs = html_tag.group(1)
     line_no = content[: html_tag.start()].count("\n") + 1
-    if not _DIR_ATTR_RE.search(attrs):
+    if direction == "rtl" and not _DIR_ATTR_RE.search(attrs):
         findings.append(Finding(
             rule="RTL006", severity="P0", confidence="high",
             file=path, line=line_no,
@@ -240,7 +281,11 @@ def rule_html_meta(path: str, content: str, project_lang: str) -> list[Finding]:
             column=html_tag.start() - content.rfind("\n", 0, html_tag.start()),
             message="<html> without lang attribute",
             explanation="Screen readers select the pronunciation voice from lang; absence mispronounces the page.",
-            suggested_fix=f'<html lang="{project_lang}" dir="rtl">',
+            suggested_fix=(
+                f'<html lang="{project_lang}" dir="rtl">'
+                if direction == "rtl" else
+                f'<html lang="{project_lang}">'
+            ),
             fixable=False,
         ))
     return findings
@@ -255,14 +300,49 @@ def rule_html_dir_ltr_on_arabic(path: str, content: str) -> list[Finding]:
         content, re.IGNORECASE,
     ):
         inner = m.group(3).strip()
-        if inner and ARABIC_RE.search(inner) and not re.search(r"[A-Za-z0-9]", inner):
+        if inner and RTL_SCRIPT_RE.search(inner) and not re.search(r"[A-Za-z0-9]", inner):
             line_no = content[: m.start()].count("\n") + 1
             findings.append(Finding(
                 rule="RTL013", severity="P0", confidence="medium",
                 file=path, line=line_no, column=None,
-                message=f'dir="ltr" on <{m.group(1)}> containing only Arabic-script text',
-                explanation="Forcing LTR direction on Arabic-script content misorders the inline text.",
+                message=f'dir="ltr" on <{m.group(1)}> containing only RTL-script text',
+                explanation="Forcing LTR direction on Arabic/Hebrew content misorders the inline text.",
                 suggested_fix='remove dir="ltr" or use dir="auto"',
+                fixable=False,
+            ))
+    return findings
+
+
+def rule_html_rtl_unmarked(path: str, content: str) -> list[Finding]:
+    """RTL016 — RTL-script-only element with no dir/bdi, in an LTR-host document.
+
+    A bare RTL run inside an LTR page visually reorders the surrounding
+    punctuation and numbers; the run must declare its direction.
+    """
+    findings = []
+    if not any(path.endswith(e) for e in (".html", ".vue", ".astro")):
+        return findings
+    for m in re.finditer(r"<([a-zA-Z][^\s>/]*)\b([^>]*)>([^<]*)", content, re.IGNORECASE):
+        tag = m.group(1).lower()
+        attrs, inner = m.group(2), m.group(3).strip()
+        if tag in ("html", "head", "body", "script", "style", "bdi", "br", "img", "input", "meta", "link"):
+            continue
+        if (
+            inner
+            and RTL_SCRIPT_RE.search(inner)
+            and not re.search(r"[A-Za-z0-9]", inner)
+            and not _DIR_ATTR_RE.search(attrs)
+        ):
+            line_no = content[: m.start()].count("\n") + 1
+            findings.append(Finding(
+                rule="RTL016", severity="P1", confidence="medium",
+                file=path, line=line_no, column=None,
+                message=f"<{tag}> carries only RTL-script text without a direction attribute",
+                explanation=(
+                    "In an LTR host document an unmarked RTL run visually reorders the "
+                    "surrounding punctuation and numbers (bidi mirroring defects)."
+                ),
+                suggested_fix='wrap the RTL run in <bdi>…</bdi> or set dir="rtl" on the element',
                 fixable=False,
             ))
     return findings
@@ -295,7 +375,7 @@ def _tw_fix(token: str) -> str | None:
 
 
 def rule_tailwind(path: str, content: str, config: dict) -> list[Finding]:
-    if not _has_arabic(content) and not _force_enabled(config, "RTL008"):
+    if not _has_rtl_script(content) and not _force_enabled(config, "RTL008"):
         return []
     findings: list[Finding] = []
     for i, line in enumerate(content.splitlines(), 1):
@@ -340,13 +420,17 @@ def rule_tailwind(path: str, content: str, config: dict) -> list[Finding]:
 # ---------------------------------------------------------------- prose rules
 
 
-def _strip_markup_for_prose(content: str, suffix: str) -> tuple[str, dict[int, int]]:
+def _strip_markup_for_prose(content: str, suffix: str,
+                            mask_rtl_isolates: bool = False) -> tuple[str, dict[int, int]]:
     """Reduce markup documents to visible text for prose rules, preserving line numbers.
 
     - script/style blocks are blanked out (their contents are code, not prose)
     - tags are removed per line (attributes like className digits must not trigger
-      RTL009/010/011/012 — only human-visible text is prose)
+      RTL009/010/011/012/015/017 — only human-visible text is prose)
     - for markdown/txt: fenced blocks + inline code + URLs are masked instead
+    - RTL hosts: <bdi>/dir="ltr" spans are masked (protected LTR atoms). LTR hosts
+      (es): <bdi>/dir="rtl" spans are masked as well — isolated RTL atoms are the
+      engine's OWN recommendation and must never re-flag as RTL015.
     """
     mapping: dict[int, int] = {}
     if suffix in (".md", ".mdx", ".txt"):
@@ -371,6 +455,11 @@ def _strip_markup_for_prose(content: str, suffix: str) -> tuple[str, dict[int, i
         r"<(?:span|div|p|pre|code|td|li|h[1-6])\b[^>]*\bdir\s*=\s*[\"']ltr[\"'][^>]*>.*?</(?:span|div|p|pre|code|td|li|h[1-6])\s*>",
         blank_span, text, flags=re.DOTALL | re.IGNORECASE,
     )
+    if mask_rtl_isolates:
+        text = re.sub(
+            r"<(?:span|div|p|pre|code|td|li|h[1-6])\b[^>]*\bdir\s*=\s*[\"']rtl[\"'][^>]*>.*?</(?:span|div|p|pre|code|td|li|h[1-6])\s*>",
+            blank_span, text, flags=re.DOTALL | re.IGNORECASE,
+        )
     text = re.sub(r"<[^>\n]*>", "", text)
     out_lines = []
     for orig_no, line in enumerate(text.splitlines(), 1):
@@ -386,15 +475,68 @@ def rule_prose(path: str, content: str, profile: dict, options: dict | None = No
     options = options or {}
     findings: list[Finding] = []
     lang = profile.get("code", "fa")
+    direction = profile.get("direction", "rtl")
     digits_name = profile.get("numerals", {}).get("display", "٠–٩/۰–۹")
-    masked, mapping = _strip_markup_for_prose(content, suffix)
+    digits_invalid = (
+        profile.get("numerals", {}).get("western_digits_in_prose") == "invalid_in_prose"
+    )
+    script_re = HEBREW_RE if profile.get("script") == "hebrew" else ARABIC_RE
+    masked, mapping = _strip_markup_for_prose(
+        content, suffix, mask_rtl_isolates=(direction == "ltr"),
+    )
 
     digits_ok = options.get("allow_western_digits_in_prose", False)
     punct_ok = options.get("allow_latin_punctuation_in_prose", False)
+    inverted = profile.get("punctuation", {}).get("inverted_marks") == "required"
 
     for masked_no, line in enumerate(masked.splitlines(), 1):
         orig_no = mapping[masked_no]
-        if not ARABIC_RE.search(line):
+
+        if direction == "ltr":
+            # ---- LTR host (es): RTL runs must be isolated; RAE inverted marks.
+            for m in _RTL_RUN_RE.finditer(line):
+                findings.append(Finding(
+                    rule="RTL015", severity="P1", confidence="medium",
+                    file=path, line=orig_no, column=m.start() + 1,
+                    message=f"un-isolated RTL atom: {m.group(0)[:32]}…",
+                    explanation=(
+                        "Arabic/Hebrew runs inside LTR prose visually reorder the surrounding "
+                        "punctuation and numbers; isolate the run to pin its direction."
+                    ),
+                    suggested_fix='wrap in <bdi>…</bdi> or <span dir="rtl">…</span>',
+                    fixable=False,
+                ))
+            if inverted:
+                for m in re.finditer(r"\?(?!\?)", line):
+                    head = line[: m.start()]
+                    if "¿" in head or not re.search(r"[A-Za-zÁÉÍÓÚÑáéíóúñü]", head):
+                        continue
+                    findings.append(Finding(
+                        rule="RTL017", severity="P2", confidence="medium",
+                        file=path, line=orig_no, column=m.start() + 1,
+                        message="question ends with '?' but has no opening '¿'",
+                        explanation=(
+                            "RAE requires the opening inverted question mark on Spanish questions; "
+                            "its absence is the most visible machine-generated-Spanish defect."
+                        ),
+                        suggested_fix="add '¿' at the start of the question",
+                        fixable=False,
+                    ))
+                for m in re.finditer(r"!(?!!)", line):
+                    head = line[: m.start()]
+                    if "¡" in head or not re.search(r"[A-Za-zÁÉÍÓÚÑáéíóúñü]", head):
+                        continue
+                    findings.append(Finding(
+                        rule="RTL017", severity="P2", confidence="medium",
+                        file=path, line=orig_no, column=m.start() + 1,
+                        message="exclamation ends with '!' but has no opening '¡'",
+                        explanation="RAE requires the opening inverted exclamation mark on Spanish exclamations.",
+                        suggested_fix="add '¡' at the start of the exclamation",
+                        fixable=False,
+                    ))
+            continue
+
+        if not script_re.search(line):
             continue
 
         # RTL011 — broken ZWNJ compounds
@@ -441,8 +583,9 @@ def rule_prose(path: str, content: str, profile: dict, options: dict | None = No
                     fixable=False,
                 ))
 
-        # RTL010 — Western digits in Arabic prose (suppressed inside LTR atoms)
-        if not digits_ok:
+        # RTL010 — Western digits in RTL prose (fa/ar only — Hebrew and Spanish
+        # use Western digits natively; suppressed inside LTR atoms)
+        if digits_invalid and not digits_ok:
             for m in re.finditer(r"[0-9]+", line):
                 if in_atom(m.start()):
                     continue
@@ -490,9 +633,11 @@ def run_rules(path: Path, rel: str, content: str, ctx: RuleContext) -> list[Find
         findings += rule_css_physical(rel, content, ctx.config)
         findings += rule_css_text_align(rel, content, ctx.config)
         findings += rule_css_left_right(rel, content, ctx.config)
-        findings += rule_css_letter_spacing(rel, content, ctx.config)
-        findings += rule_html_meta(rel, content, ctx.lang)
+        findings += rule_css_letter_spacing(rel, content, ctx.config, ctx.profile)
+        findings += rule_html_meta(rel, content, ctx.lang, ctx.profile)
         findings += rule_html_dir_ltr_on_arabic(rel, content)
+        if ctx.profile.get("direction", "rtl") == "ltr":
+            findings += rule_html_rtl_unmarked(rel, content)
         findings += rule_tailwind(rel, content, ctx.config)
     if suffix in PROSE_EXT:
         findings += rule_prose(rel, content, ctx.profile, ctx.config.get("rules", {}),

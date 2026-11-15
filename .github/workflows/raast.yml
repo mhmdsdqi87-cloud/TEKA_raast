@@ -72,3 +72,14 @@ jobs:
           /tmp/sdist-venv/bin/raast --version
           /tmp/sdist-venv/bin/raast doctor /tmp/probe --fail-on P0 --format json > /dev/null
           echo "packaging OK — profiles found, doctor exits 0"
+      - name: All four profiles (fa, ar, he, es) must load from OUTSIDE the repo
+        run: |
+          /tmp/wheel-venv/bin/raast profiles
+          for lang in fa ar he es; do
+            /tmp/wheel-venv/bin/raast profiles | grep -q " $lang " || { echo "missing profile: $lang"; exit 1; }
+          done
+          printf '<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><main><h1>שלום עולם</h1><p>זהו תוכן עברית לדוגמה.</p></main></body></html>' > /tmp/probe/he.html
+          /tmp/wheel-venv/bin/raast doctor /tmp/probe/he.html --language he --fail-on P0 --format json > /dev/null
+          printf '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><main><h1>Bienvenidos</h1><p>¿Cómo estamos hoy?</p><p dir="rtl">مرحبا بكم</p></main></body></html>' > /tmp/probe/es.html
+          /tmp/wheel-venv/bin/raast doctor /tmp/probe/es.html --language es --fail-on P0 --format json > /dev/null
+          echo "he + es profiles verified from the installed wheel"

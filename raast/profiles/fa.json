@@ -4,11 +4,13 @@
   "name": "Persian",
   "name_native": "فارسی",
   "direction": "rtl",
+  "script": "arabic",
   "bcp47": ["fa", "fa-IR"],
   "numerals": {
     "display": "۰۱۲۳۴۵۶۷۸۹",
     "unicode_range": [5936, 5945],
     "unicode_range_note": "U+06F0-U+06F9 (Extended Arabic-Indic / Persian digits). Western 0-9 acceptable ONLY inside isolated LTR atoms (phone, serial, code).",
+    "western_digits_in_prose": "invalid_in_prose",
     "arabic_indic_0_9": "invalid_in_fa_prose",
     "decimal_separator": "٫",
     "decimal_separator_codepoint": "U+066B",

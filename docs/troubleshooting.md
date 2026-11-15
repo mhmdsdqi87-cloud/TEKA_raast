@@ -4,6 +4,8 @@
 
 **`raast: command not found`** — run `pip install -e .` inside the repo, or invoke `python3 -m raast.cli`.
 
+**`error: unknown language profile: 'xx' — available: ...`** — the profile code in `raast.config.json` (or `--language`) is not one the installed CLI ships. Run `raast profiles` to see what your wheel carries (`fa`, `ar`, `he`, `es` as of 0.2.0). Profiles are package data — if the list is missing files your install is stale or partial; reinstall the wheel. The message never appears as a raw traceback: exit code 2 with the available-language list is the contract.
+
 **`config error: ... invalid config`** — your `raast.config.json` has an unknown key, rule id, severity, or rule option. The exact offending entry is listed in the error; the schema is documented in docs/cli-reference.md.
 
 **Doctor finds too little on a mixed-language project** — CSS/Tailwind rules only fire in files containing Arabic-script evidence (false-positive guard). Widen deliberately:

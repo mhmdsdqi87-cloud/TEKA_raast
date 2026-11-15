@@ -1,0 +1,80 @@
+{
+  "$comment": "RAAST Hebrew (he) language profile. Consumed by the raast CLI prose rules and referenced by skills/rtl-typography. Hebrew is the third major RTL script: letters are separate (not cursive), Western digits are standard in prose, and gershayim/geresh/maqaf carry the orthographic duties Persian/Arabic solve differently.",
+  "code": "he",
+  "name": "Hebrew",
+  "name_native": "עברית",
+  "direction": "rtl",
+  "script": "hebrew",
+  "bcp47": ["he", "he-IL"],
+  "numerals": {
+    "display": "0–9 (Western)",
+    "western_digits_in_prose": "valid_in_prose",
+    "unicode_range_note": "Modern Hebrew prose uses Western digits 0-9 exclusively. Arabic-Indic variants (٠-٩ / ۰-۹) are invalid in Hebrew text.",
+    "arabic_indic_0_9": "invalid_in_he",
+    "decimal_separator": ".",
+    "decimal_separator_codepoint": "U+002E",
+    "thousands_separator": ",",
+    "thousands_separator_codepoint": "U+002C",
+    "percent": "%",
+    "percent_codepoint": "U+0025",
+    "percent_placement": "after digits, no space: 25%"
+  },
+  "punctuation": {
+    "comma": ",",
+    "comma_codepoint": "U+002C",
+    "question": "?",
+    "question_codepoint": "U+003F",
+    "semicolon": ";",
+    "semicolon_codepoint": "U+003B",
+    "quotes": ["\u00ab", "\u00bb"],
+    "quotes_note": "Straight or curly Latin quotes are the modern norm; guillemets appear in translated/legacy texts.",
+    "geresh": "׳",
+    "geresh_codepoint": "U+05F3",
+    "gershayim": "״",
+    "gershayim_codepoint": "U+05F4",
+    "maqaf": "־",
+    "maqaf_codepoint": "U+05BE",
+    "usage_notes": "Standard Latin marks are valid in modern Hebrew prose. Use gershayim ״ INSIDE acronyms (e.g., רא״ם), geresh ׳ for abbreviations and foreign phonetics, and maqaf ־ for hyphenated compounds where typography allows — plain hyphen-minus is accepted on the web.",
+    "latin_comma_question_semicolon": "valid_in_prose"
+  },
+  "letters": {
+    "script_note": "Hebrew letters are separate glyphs (not cursive/joined like Arabic) — no letter joining ever occurs and no ZWNJ affix compounds exist.",
+    "zwnj": "not_used_in_he",
+    "zwnj_affixes_prefix": [],
+    "zwnj_affixes_suffix": [],
+    "possessive_suffixes_no_zwnj": [],
+    "nikud_note": "Vowel points (nikud) sit above/below the line: body line-height must leave vertical room or points clip and collide."
+  },
+  "typography": {
+    "body_line_height_min": 1.5,
+    "recommended_line_height": 1.6,
+    "heading_line_height": 1.3,
+    "letter_spacing": "discouraged_on_hebrew_script",
+    "letter_spacing_note": "Non-zero letter-spacing on Hebrew shatters word cohesion and breaks final-form letter rhythm (ך ם ן ף ץ). Justified text must use word spacing, never letter spacing.",
+    "recommended_fonts": ["Heebo", "Assistant", "Rubik", "Alef", "Secular One", "David Libre", "Frank Ruhl Libre", "Noto Sans Hebrew", "Miriam Libre"],
+    "display_fonts": ["Secular One", "Frank Ruhl Libre"]
+  },
+  "dates": {
+    "calendar": "hebrew (lunar) for cultural content; gregorian for product UI",
+    "locale": "he-IL",
+    "intl_tag": "he-IL-u-ca-hebrew",
+    "intl_tag_note": "Use ca=hebrew for Hebrew-calendar dates (holidays, memorial days); Intl falls back per platform support.",
+    "months": ["תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיון", "תמוז", "אב", "אלול"],
+    "months_note": "Leap years split אדר into אדר א׳ and אדר ב׳ — format month names through Intl, never hardcode.",
+    "weekdays_sunday_first": ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"],
+    "weekend_days": ["שבת"],
+    "relative_time_locale": "he"
+  },
+  "currency": {
+    "name": "שקל חדש",
+    "code": "ILS",
+    "symbol": "₪",
+    "placement": "after amount, non-breaking space: 25 ₪"
+  },
+  "bidi_marks": {
+    "rtl_page_default_dir": "rtl",
+    "isolate_atom_markup": "<bdi> or <span dir=\"ltr\">",
+    "notes": "Latin words, URLs, emails, phone numbers and code snippets inside Hebrew prose must be isolated; never strip U+200E/U+200F marks."
+  },
+  "extra_verb_stems": []
+}

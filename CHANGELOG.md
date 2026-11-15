@@ -2,6 +2,29 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.2.0] — 2026-11-15
+
+International release: RAAST now covers the three major RTL scripts and becomes a bidirectional tool with its first LTR host profile.
+
+### Added
+- **Hebrew profile (`he`)** — third RTL language: Western digits are VALID in prose (RTL010 suppressed), Latin punctuation valid (RTL009 suppressed), ZWNJ never applies, gershayim ״ / geresh ׳ / maqaf ־ conventions documented, nikud-aware line-height (≥ 1.5), font catalog (Heebo, Assistant, Rubik, David Libre, Frank Ruhl Libre, …), Hebrew-calendar `Intl` tag `he-IL-u-ca-hebrew`, ₪ placement. `RTL005` letter-spacing on Hebrew is **P1 discouraged** (not P0 forbidden — Hebrew letters are separate, not cursive) with a Hebrew-specific explanation.
+- **Spanish profile (`es`) — first LTR host**: the rule engine inverts. `RTL015` flags un-isolated Arabic/Hebrew runs inside Spanish prose (the #1 bidi defect in es pages serving RTL content), `RTL016` flags RTL-run elements without `dir` in LTR documents, `RTL017` checks RAE inverted marks (¿ ¡). `RTL006` never suggests `dir="rtl"` on `<html>` for LTR hosts; `<bdi>`/`dir="rtl"` regions are masked before prose analysis so the engine's own recommendations never re-flag.
+- **New CLI command `raast profiles`** — lists installed language profiles with native names and direction; the debug surface for "which languages does my wheel carry?".
+- **RTL script evidence is now Arabic OR Hebrew** — CSS/Tailwind/HTML rules gate on `RTL_SCRIPT_RE` (U+0590–05FF included), so a Hebrew project gets the same physical-property checks as fa/ar. `RTL013` extended accordingly.
+- **Profile-driven rule switching**: severity and applicability read from profile JSON (`numerals.western_digits_in_prose`, `punctuation.inverted_marks`, `typography.letter_spacing`) — adding a language no longer requires touching rule code.
+
+### Fixed (packaging hardening)
+- **`py.typed` was declared in `package-data` but did not exist** — the type-checker promise was broken and some setuptools versions fail/warn on missing package-data files. File added and regression-tested.
+- **Profile loading is now zip-safe** — anchors on `importlib.resources` first with a filesystem fallback, so installs into zipapps/PyInstaller-style bundles resolve profiles too.
+- **"Profile not found" is now graceful**: `ProfileError` (a `ValueError`) lists the available profiles instead of a raw `FileNotFoundError` traceback; `doctor`/`fix`/`report` exit 2 with an actionable message.
+
+### Verification (all run locally before push)
+- `python3 -m unittest discover -s tests` → 80/80 OK (25 new tests: Hebrew prose/CSS/Tailwind/HTML-meta, Spanish RTL015/016/017 + LTR-host invariants, packaging py.typed + 4-profile completeness, `raast profiles` e2e)
+- `python3 -m build` → wheel + sdist; both installed into clean venvs; `raast doctor --language fa|ar|he|es` all exit 0 from outside the repo; `py.typed` + 4 profile JSONs verified inside the installed wheel
+- `raast benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference` → 24/24 passed (no regression)
+- `raast doctor . --fail-on P0` → 0 findings, exit 0
+- CI `packaging-smoke` job extended: verifies all four profiles load from the installed wheel and he/es probes exit 0
+
 ## [0.1.2] — 2026-11-15
 
 Packaging-integrity release: the artifact a user installs now works everywhere, not just inside the source repo.

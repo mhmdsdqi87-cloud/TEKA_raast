@@ -29,6 +29,10 @@ CTX_FA = RuleContext(config={"language": "fa", "rules": {}, "include": [], "excl
                      profile=load_profile("fa"))
 CTX_AR = RuleContext(config={"language": "ar", "rules": {}, "include": [], "exclude": [], "fail_on": "P1"},
                      profile=load_profile("ar"))
+CTX_HE = RuleContext(config={"language": "he", "rules": {}, "include": [], "exclude": [], "fail_on": "P1"},
+                     profile=load_profile("he"))
+CTX_ES = RuleContext(config={"language": "es", "rules": {}, "include": [], "exclude": [], "fail_on": "P1"},
+                     profile=load_profile("es"))
 
 
 def _ctx(lang="fa", rules=None):
@@ -210,6 +214,114 @@ class TestRules(unittest.TestCase):
         self.assertEqual(f, [])
 
 
+class TestHebrew(unittest.TestCase):
+    """Hebrew: RTL host with Western digits and Latin punctuation VALID in prose."""
+
+    def test_western_digits_valid_in_prose(self):
+        # Hebrew prose uses Western digits natively — RTL010 must NOT fire.
+        f = rule_prose("a.md", "יש לי 5 דקות עד הפגישה", load_profile("he"))
+        self.assertNotIn("RTL010", {x.rule for x in f})
+
+    def test_latin_punctuation_valid_in_prose(self):
+        f = rule_prose("a.md", "שלום, איפה הספר? תודה; בי", load_profile("he"))
+        self.assertNotIn("RTL009", {x.rule for x in f})
+
+    def test_zwnj_never_applies(self):
+        # No ZWNJ affix compounds in Hebrew — RTL011 must never fire.
+        f = rule_prose("a.md", "הבתים הגדולים ביותר", load_profile("he"))
+        self.assertNotIn("RTL011", {x.rule for x in f})
+
+    def test_ltr_atom_isolation(self):
+        # Phones/emails inside Hebrew prose must be isolated (RTL012).
+        f = rule_prose("a.md", "התקשרו +972 2 555 1234 היום", load_profile("he"))
+        self.assertIn("RTL012", {x.rule for x in f})
+
+    def test_letter_spacing_p1_hebrew(self):
+        # Hebrew: discouraged (P1), not forbidden (P0) — profile-driven severity.
+        css = ".t { letter-spacing: .05em; } /* שלום */"
+        f = rule_css_letter_spacing("a.css", css, {}, profile=load_profile("he"))
+        self.assertEqual(f[0].severity, "P1")
+        self.assertIn("Hebrew", f[0].explanation)
+
+    def test_css_physical_fires_on_hebrew_evidence(self):
+        css = ".a { margin-left: 10px; } /* עברית */"
+        f = rule_css_physical("a.css", css, {})
+        self.assertEqual(f[0].rule, "RTL001")
+
+    def test_tailwind_fires_on_hebrew_evidence(self):
+        html = '<div class="ml-4 text-left">עברית</div>'
+        f = [x for x in rule_tailwind("a.tsx", html, CTX_HE.config) if x.fixable]
+        self.assertTrue(f)
+
+    def test_html_meta_suggests_rtl(self):
+        html = '<html lang="he"><body><p>עברית</p></body></html>'
+        f = rule_html_meta("a.html", html, "he", load_profile("he"))
+        self.assertIn("RTL006", {x.rule for x in f})
+
+    def test_dir_ltr_on_hebrew_only(self):
+        html = '<span dir="ltr">שלום חברים</span>'
+        f = run_rules(Path("a.html"), "a.html", html, CTX_HE)
+        self.assertTrue(any(x.rule == "RTL013" for x in f))
+
+
+class TestSpanish(unittest.TestCase):
+    """Spanish: first LTR host profile — RTL runs must be isolated, RAE inverted
+    marks required, dir=rtl NEVER suggested on <html>."""
+
+    def test_rtl_atom_unisolated(self):
+        f = rule_prose("a.html", "<p>Los voluntarios dijeron مرحبا بكم hoy</p>",
+                       load_profile("es"), suffix=".html")
+        self.assertIn("RTL015", {x.rule for x in f})
+
+    def test_rtl_atom_isolated_bdi_ok(self):
+        f = rule_prose("a.html", "<p>texto <bdi>مرحبا بكم</bdi> hoy</p>",
+                       load_profile("es"), suffix=".html")
+        self.assertNotIn("RTL015", {x.rule for x in f})
+
+    def test_rtl_element_without_dir(self):
+        html = '<html lang="es"><body><p>مرحبا</p></body></html>'
+        f = run_rules(Path("a.html"), "a.html", html, CTX_ES)
+        self.assertIn("RTL016", {x.rule for x in f})
+
+    def test_rtl_element_with_dir_ok(self):
+        html = '<html lang="es"><body><p dir="rtl">مرحبا</p></body></html>'
+        f = run_rules(Path("a.html"), "a.html", html, CTX_ES)
+        self.assertNotIn("RTL016", {x.rule for x in f})
+        self.assertNotIn("RTL006", {x.rule for x in f})
+
+    def test_html_missing_dir_never_suggests_rtl(self):
+        # LTR host: RTL006 must NOT fire even with RTL content present.
+        html = '<html lang="es"><body><p dir="rtl">مرحبا</p></body></html>'
+        f = rule_html_meta("a.html", html, "es", load_profile("es"))
+        self.assertNotIn("RTL006", {x.rule for x in f})
+
+    def test_missing_inverted_question_mark(self):
+        f = rule_prose("a.html", "<p>Cómo estás hoy?</p>", load_profile("es"), suffix=".html")
+        self.assertIn("RTL017", {x.rule for x in f})
+
+    def test_inverted_question_mark_ok(self):
+        f = rule_prose("a.html", "<p>¿Cómo estás hoy?</p>", load_profile("es"), suffix=".html")
+        self.assertNotIn("RTL017", {x.rule for x in f})
+
+    def test_missing_inverted_exclamation(self):
+        f = rule_prose("a.html", "<p>Qué sorprendente!</p>", load_profile("es"), suffix=".html")
+        self.assertIn("RTL017", {x.rule for x in f})
+
+    def test_western_digits_valid_in_prose(self):
+        f = rule_prose("a.html", "<p>Tenemos 25 personas مرحبا hoy</p>",
+                       load_profile("es"), suffix=".html")
+        self.assertNotIn("RTL010", {x.rule for x in f})
+
+    def test_english_only_file_quiet(self):
+        html = '<div class="ml-4 text-left">Hello world</div>'
+        f = run_rules(Path("a.html"), "a.html", html, CTX_ES)
+        self.assertEqual([x for x in f if x.rule in ("RTL006", "RTL014", "RTL015", "RTL016")], [])
+
+    def test_es_config_accepted(self):
+        cfg = validate_config({"language": "es"})
+        self.assertEqual(cfg["language"], "es")
+
+
 class TestConfig(unittest.TestCase):
     def test_valid(self):
         cfg = validate_config({"language": "ar", "fail_on": "P0"})
@@ -335,26 +447,56 @@ class TestPackaging(unittest.TestCase):
     def test_profiles_live_inside_package(self):
         import raast.profiles as profiles_mod
         pkg_dir = Path(profiles_mod.__file__).resolve().parent
-        self.assertEqual(profiles_mod.PROFILES_DIR, pkg_dir / "profiles")
+        self.assertTrue((pkg_dir / "profiles").is_dir(), "profiles/ missing from package")
+        for lang in ("fa", "ar", "he", "es"):
+            self.assertTrue(
+                (pkg_dir / "profiles" / f"{lang}.json").is_file(),
+                f"{lang}.json missing from package data",
+            )
+
+    def test_py_typed_ships(self):
+        # Declared in pyproject package-data — must exist or type-checker promise breaks.
+        import raast.profiles as profiles_mod
+        pkg_dir = Path(profiles_mod.__file__).resolve().parent
+        self.assertTrue((pkg_dir / "py.typed").is_file(), "py.typed missing from package")
 
     def test_profile_files_exist_in_package(self):
-        for lang in ("fa", "ar"):
-            p = Path(load_profile.__globals__["PROFILES_DIR"]) / f"{lang}.json"
-            self.assertTrue(p.exists(), f"{lang}.json missing from package data: {p}")
-
-    def test_profiles_parse_and_are_complete(self):
-        for lang in ("fa", "ar"):
+        for lang in ("fa", "ar", "he", "es"):
             profile = load_profile(lang)
             self.assertIsInstance(profile, dict)
+
+    def test_profiles_parse_and_are_complete(self):
+        expected_direction = {"fa": "rtl", "ar": "rtl", "he": "rtl", "es": "ltr"}
+        for lang in ("fa", "ar", "he", "es"):
+            profile = load_profile(lang)
             numerals = profile.get("numerals")
             self.assertTrue(numerals and numerals.get("display"), f"{lang}: numerals missing")
             punct = profile.get("punctuation")
             self.assertTrue(punct and punct.get("comma") and punct.get("question"),
                             f"{lang}: punctuation missing")
-            self.assertEqual(profile.get("direction"), "rtl")
+            self.assertEqual(profile.get("direction"), expected_direction[lang])
+            self.assertTrue(profile.get("script"), f"{lang}: script missing")
+            self.assertTrue(profile.get("bcp47"), f"{lang}: bcp47 missing")
 
     def test_available_profiles(self):
-        self.assertEqual(available_profiles(), ["ar", "fa"])
+        self.assertEqual(available_profiles(), ["ar", "es", "fa", "he"])
+
+    def test_unknown_profile_raises_profile_error(self):
+        from raast.profiles import ProfileError
+        with self.assertRaises(ProfileError):
+            load_profile("de")
+
+    def test_profile_error_lists_available(self):
+        from raast.profiles import ProfileError
+        with self.assertRaises(ProfileError) as cm:
+            load_profile("xx")
+        self.assertIn("fa", str(cm.exception))
+        self.assertIn("es", str(cm.exception))
+
+    def test_he_es_config_accepted(self):
+        for lang in ("he", "es"):
+            cfg = validate_config({"language": lang})
+            self.assertEqual(cfg["language"], lang)
 
 
 class TestEndToEndCLI(unittest.TestCase):
@@ -388,6 +530,17 @@ class TestEndToEndCLI(unittest.TestCase):
                 capture_output=True, text=True, cwd=REPO_ROOT,
             )
             self.assertEqual(proc.returncode, 1)
+
+    def test_profiles_command_lists_all_languages(self):
+        import subprocess
+        proc = subprocess.run(
+            [sys.executable, "-m", "raast.cli", "profiles"],
+            capture_output=True, text=True, cwd=REPO_ROOT,
+        )
+        self.assertEqual(proc.returncode, 0)
+        for lang in ("fa", "ar", "he", "es"):
+            self.assertIn(lang, proc.stdout)
+        self.assertIn("ltr", proc.stdout)  # es is the LTR host
 
     def test_fix_dry_run_does_not_write(self):
         import subprocess

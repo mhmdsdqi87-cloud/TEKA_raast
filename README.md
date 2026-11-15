@@ -6,11 +6,11 @@
 
 **Build RTL right. Everywhere.**
 
-Open-source RTL engineering for AI-powered development — Persian & Arabic first.
+Open-source RTL engineering for AI-powered development — Persian, Arabic & Hebrew first, with Spanish as the first LTR host.
 
-[![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills) [![CLI rules](https://img.shields.io/badge/doctor_rules-14-34D399)](#pillar-2--raast-doctor-cli) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark) [![Tests](https://img.shields.io/badge/unit_tests-51_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE)
+[![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Tests](https://img.shields.io/badge/unit_tests-80_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE)
 
-`rtl` · `persian` · `farsi` · `arabic` · `bidi` · `typography` · `i18n` · `l10n` · `claude-code` · `claude-skills` · `ai-agents` · `developer-tools` · `linting` · `accessibility` · `right-to-left` · `hebrew` · `urdu` · `localization` · `nextjs` · `tailwind`
+`rtl` · `persian` · `farsi` · `arabic` · `hebrew` · `espanol` · `bidi` · `typography` · `i18n` · `l10n` · `internationalization` · `claude-code` · `claude-skills` · `ai-agents` · `developer-tools` · `linting` · `accessibility` · `right-to-left` · `urdu` · `localization` · `nextjs` · `tailwind`
 
 </div>
 
@@ -48,18 +48,31 @@ Six focused skills, plain Markdown, zero config — validated against the [Agent
 | [`jalali-dates`](skills/jalali-dates/SKILL.md) | `Intl` fa-IR one-liners, conversion-vs-formatting distinction, relative time, storage conventions, SSR hydration |
 | [`rtl-audit`](skills/rtl-audit/SKILL.md) | 20-point review checklist, P0/P1/P2 severities, findings mapped to CLI rule IDs |
 
-Languages: **fa** and **ar** profiles today; **he** and **ur** are designed-in via [`raast/profiles/`](raast/profiles/) and need native-speaker reviewers (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+Languages: **fa · ar · he** (RTL) and **es** (first LTR host) ship today as machine-readable profiles in [`raast/profiles/`](raast/profiles/); **ur** is designed-in and needs a native-speaker reviewer (see [CONTRIBUTING.md](CONTRIBUTING.md)).
+
+### Language profiles
+
+| Code | Language | Direction | Distinctive rules the profile drives |
+|---|---|---|---|
+| `fa` | Persian / فارسی | RTL | ZWNJ affix compounds, Persian digits ۰-۹ mandatory, ، ؟ ؛ punctuation, Jalali dates, Toman currency |
+| `ar` | Arabic / العربية | RTL | Arabic-Indic digits ٠-٩, regional font catalog, Persian letters rejected as typos |
+| `he` | Hebrew / עברית | RTL | Western digits VALID in prose, Latin punctuation valid, gershayim ״ / geresh ׳ / maqaf ־, nikud-aware line-height, letter-spacing **discouraged** (P1, not P0) |
+| `es` | Spanish / Español | **LTR host** | Inverted rule engine: RTL runs inside Spanish prose must be isolated (`RTL015`), RTL elements need `dir` (`RTL016`), RAE inverted marks ¿ ¡ checked (`RTL017`), `dir="rtl"` never suggested on `<html>` |
+
+`raast profiles` lists what your installed CLI carries. Profiles are package data — they ship inside the wheel, no repo checkout required.
 
 ### Pillar 2 — RAAST Doctor CLI (the engineering layer)
 
 ```bash
-pip install raast            # from GitHub Releases wheel (v0.1.2+)
+pip install raast            # from GitHub Releases wheel (v0.2.0+)
 # or from source:
 pip install -e .             # Python 3.11+, zero dependencies
-raast doctor ./your-project
+raast doctor ./your-project              # Persian by default
+raast doctor ./your-project --language he
+raast doctor ./your-project --language es
 ```
 
-14 static rules (`RTL001`–`RTL014`) with severity + confidence, evidence-gated so mixed projects stay quiet (a `left:` in a pure-LTR file is *not* flagged):
+17 static rules (`RTL001`–`RTL017`) with severity + confidence, evidence-gated so mixed projects stay quiet (a `left:` in a pure-LTR file is *not* flagged):
 
 | Rule | Detects | Sev |
 |---|---|---|
@@ -73,7 +86,10 @@ raast doctor ./your-project
 | `RTL009/010` | Latin punctuation / Western digits in Arabic prose | P2 |
 | `RTL011` | broken ZWNJ compounds (`«می رود»`) | P1 |
 | `RTL012` | un-isolated LTR atoms (URL/phone/$) in RTL prose | P2 review |
-| `RTL013` | `dir="ltr"` on Arabic-only content | P0 |
+| `RTL013` | `dir="ltr"` on RTL-script-only content | P0 |
+| `RTL015` | un-isolated RTL atoms in Spanish (LTR) prose | P1 |
+| `RTL016` | RTL-run element without `dir` in an LTR document | P1 review |
+| `RTL017` | missing RAE inverted marks (¿ / ¡) in Spanish prose | P2 review |
 
 ```bash
 raast doctor . --format github      # Actions annotations
@@ -129,16 +145,23 @@ Anything that ingests Markdown can use the skills; verified environments and hon
 
 ```
 $ python3 -m unittest discover -s tests
-Ran 51 tests in 0.3s — OK
+Ran 80 tests in 0.5s — OK
 
 $ raast benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference
 passed 24/24, failed 0, skipped 0
+
+$ raast profiles
+available language profiles:
+  ar   العربية    Arabic       (rtl)
+  es   Español    Spanish      (ltr)
+  fa   فارسی      Persian      (rtl)
+  he   עברית      Hebrew       (rtl)
 
 $ raast doctor demo --fail-on P0
 Summary: 1 finding(s): 0 P0, 0 P1, 1 P2      # exit 0
 ```
 
-The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (possessive suffixes stay attached), Arabic-Indic digits blocked from conversion in `ar`, code-fence protection, config schema validation, scanner globs, and end-to-end CLI runs including the backup/restore path.
+The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (possessive suffixes stay attached), Arabic-Indic digits blocked from conversion in `ar`, Western digits staying valid in `he`/`es` prose, Hebrew `letter-spacing` downgrade to P1, Spanish RTL-run isolation and inverted-mark checks, code-fence protection, config schema validation, scanner globs, end-to-end CLI runs including the backup/restore path — plus packaging regression tests that load every profile from the installed wheel's package directory.
 
 ## Documentation
 
@@ -158,10 +181,10 @@ The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (poss
 
 ## Roadmap
 
-- **v0.2** — Claude Code plugin manifest + marketplace flow; a published, reproducible A/B benchmark demo
-- **v0.3** — agent adaptation guides (Cursor rules, Copilot instructions); HTML report viewer
-- **v0.4** — VS Code extension reusing the CLI engine (design in roadmap)
-- **v0.5** — Hebrew / Urdu profiles after native-speaker review; email-client and PDF categories
+- **v0.2** ✅ **shipped** — Hebrew profile (full rules), Spanish LTR host profile (RTL015–017), packaging hardening (`py.typed`, zip-safe profile loading, graceful `ProfileError`, `raast profiles` command), 80-test suite
+- **v0.3** — Claude Code plugin manifest + marketplace flow; agent adaptation guides (Cursor rules, Copilot instructions); HTML report viewer; a published, reproducible A/B benchmark demo
+- **v0.4** — VS Code extension reusing the CLI engine (design in roadmap); RAAST Compatibility Lab web playground
+- **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories
 
 ## Contributing
 
