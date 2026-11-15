@@ -1,6 +1,8 @@
 {
   "language": "fa",
-  "include": ["**/*.{html,css,scss,sass,vue,jsx,tsx,js,ts,mjs,astro,md,mdx,txt}"],
+  "include": [
+    "**/*.{html,css,scss,sass,vue,jsx,tsx,js,ts,mjs,astro,md,mdx,txt}"
+  ],
   "exclude": [
     "node_modules/**",
     "dist/**",
@@ -13,7 +15,8 @@
     "benchmarks/**",
     "assets/**",
     "browser/**",
-    "tests/**"
+    "tests/**",
+    "playground/**"
   ],
   "severity_overrides": {},
   "rules": {},
