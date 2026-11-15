@@ -10,7 +10,10 @@ Honest status of where RAAST works. "Verified" means actually executed in the st
 | Claude Code (plugin marketplace) | Planned | — | Requires a `.claude-plugin/plugin.json` manifest and marketplace testing; tracked in the roadmap. |
 | Claude API (Skill upload) | Planned | — | The Agent Skills spec is the same; API upload flow not yet exercised end-to-end. |
 | Generic agent / any LLM chat | Verified (manual) | Paste `SKILL.md` content into system prompt or project context | Skills are plain Markdown; any agent that ingests instructions can use them. Marked "manual" because we cannot enumerate every environment. |
-| Cursor rules / Copilot instructions | Planned | — | Mechanical adaptation is expected to work (plain Markdown) but is not yet documented per-environment. |
+| Codex CLI / agents.md tools | Format shipped | Copy [`integrations/AGENTS.md`](../integrations/AGENTS.md) → repo root `AGENTS.md` | Follows the [agents.md](https://agents.md) convention. Not runtime-tested inside every vendor product — report mismatches as issues. |
+| GitHub Copilot | Format shipped | Copy [`integrations/copilot-instructions.md`](../integrations/copilot-instructions.md) → `.github/copilot-instructions.md` | Official custom-instructions location. Same honest-status caveat. |
+| Cursor | Format shipped | Copy [`integrations/cursor-rtl.mdc`](../integrations/cursor-rtl.mdc) → `.cursor/rules/rtl.mdc` | Rules file with `globs` + `alwaysApply` per Cursor's documented format. Same honest-status caveat. |
+| Browser (no install) | **Verified** | [RAAST Playground](https://mhmdsdqi87-cloud.github.io/TEKA_raast/) | Client-side port of all 17 rules in `playground/index.html`; rule IDs and profile gating mirror the CLI. Served from the `gh-pages` branch. |
 
 ## CLI
 

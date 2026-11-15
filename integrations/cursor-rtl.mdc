@@ -1,0 +1,66 @@
+---
+description: RTL engineering rules for Persian, Arabic and Hebrew interfaces — logical properties, ZWNJ, bidi isolation, numerals, fonts, icons
+globs:
+  - "**/*.tsx"
+  - "**/*.jsx"
+  - "**/*.html"
+  - "**/*.css"
+  - "**/*.vue"
+  - "**/*.svelte"
+alwaysApply: true
+---
+
+# RTL Engineering Rules (Cursor)
+
+For UI rendering Persian (fa), Arabic (ar) or Hebrew (he). Copy this file to
+`.cursor/rules/rtl.mdc`. Copilot users: `copilot-instructions.md`; Codex CLI users:
+`AGENTS.md` — same rules, native formats.
+
+## Hard rules
+
+- RTL pages: `<html lang="fa" dir="rtl">` (or ar/he). Never `dir="ltr"` on RTL-only content.
+- LTR host pages (es/en): root stays LTR; each RTL region gets `dir="rtl"`; embedded RTL runs
+  in prose get `<bdi>`.
+- Logical CSS only: `margin-inline-start/end`, `padding-inline-start/end`,
+  `inset-inline-start/end`, `text-align: start/end`. Never `margin-left/right`,
+  `padding-left/right`, `text-align: left/right`, physical `left:/right:` in RTL contexts.
+- No `letter-spacing` on Arabic-script text — it breaks cursive joining (م د ی ر ی ت).
+  Hebrew: discouraged (nikud clipping), not forbidden.
+- Persian ZWNJ (U+200C): `می‌شود`, `خانه‌ها`, `بیشتر‌ین` — half-space, never a full space.
+  No ZWNJ in Arabic or Hebrew.
+- Isolate mixed-direction runs: URLs, emails, `$99`, phones inside RTL prose → `<bdi>` or
+  `dir="auto"`. Otherwise `$99` scrambles to `99$`.
+- Numerals by profile: fa ۰-۹ · ar ٠-٩ · he 0-9 · es 0-9. Never convert digits in code, URLs
+  or APIs.
+- Line-height ≥ 1.5 body (1.6 recommended) for Arabic script; Hebrew needs nikud headroom.
+- Fonts: fa — Vazirmatn / Sahel / IRANSansX · ar — Noto Naskh Arabic / Cairo / Tajawal ·
+  he — Heebo / Assistant / Rubik. A Latin-only stack is a defect.
+
+## Tailwind
+
+- `ms-/me-/ps-/pe-/text-start/text-end` instead of `ml-/mr-/pl-/pr-/text-left/text-right`.
+- Directional motion: `translate-x-4 rtl:-translate-x-4`.
+- Flip direction-aware icons (`rtl:-scale-x-100`): arrows, chevrons, indent, reply, exit,
+  forward. Never flip: logos, media controls, clocks, avatars, checkmarks.
+
+## Dates
+
+- fa: `new Intl.DateTimeFormat('fa-IR')` → Jalali + Persian digits.
+- he: `new Intl.DateTimeFormat('he-IL-u-ca-hebrew')` → Hebrew calendar.
+- Store ISO-8601 UTC; format at render; format server-side for SSR to avoid hydration drift.
+
+## Spanish (LTR host) specifics
+
+- RAE inverted marks ¿ ¡ mandatory on questions/exclamations.
+- «comillas angulares» in prose; embedded Arabic/Hebrew runs must be isolated (`<bdi>`).
+
+## Verify before shipping
+
+```bash
+pip install raast
+raast doctor . --language fa   # or ar / he / es
+```
+
+17 rules, severity gate P0/P1/P2, GitHub Action:
+`uses: mhmdsdqi87-cloud/TEKA_raast/action@main`.
+Full playbooks: [RAAST skills](https://github.com/mhmdsdqi87-cloud/TEKA_raast/tree/main/skills).

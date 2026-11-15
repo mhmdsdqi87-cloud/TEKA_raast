@@ -2,6 +2,18 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.3.0] — 2026-11-15
+
+Distribution release: RAAST becomes auditable without an install (browser playground on GitHub Pages) and speaks the native instruction language of every major AI coding agent.
+
+### Added
+- **RAAST Playground** ([`playground/index.html`](playground/index.html), live on GitHub Pages) — paste HTML/CSS, pick a profile (fa / ar / he / es), get findings instantly. Client-side port of **all 17 CLI rules** (`RTL001`–`RTL017`) with the same IDs, severities and profile-driven gating: `RTL005` is P0 for fa/ar and P1-discouraged for he and inert for es; `RTL006` never fires on the es LTR host; `RTL010/RTL009` are suppressed for he/es; `RTL015–017` exist only on the es host. `pre`/`code`/`script`/`style` protected like the CLI. Zero dependencies, zero network calls, nothing uploaded. Exports: Markdown copy, JSON download, prefilled GitHub-issue link.
+- **Agent integration files** ([`integrations/`](integrations/README.md)) — the same RTL contract in each tool's native format: `AGENTS.md` (Codex CLI / agents.md convention), `copilot-instructions.md` (`.github/copilot-instructions.md`), `cursor-rtl.mdc` (`.cursor/rules/rtl.mdc`, globs + alwaysApply), plus a per-tool matrix with honest verification status.
+- **README**: CI + Release + Playground badges, playground callout, "Works with your agent" table, star-history chart.
+
+### Changed
+- Roadmap re-sequenced: plugin manifest / HTML report viewer / VS Code extension move to v0.4; the browser-audit deliverable shipped early as the Playground (client-side port, CLI remains the CI-grade engine).
+
 ## [0.2.0] — 2026-11-15
 
 International release: RAAST now covers the three major RTL scripts and becomes a bidirectional tool with its first LTR host profile.

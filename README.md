@@ -8,7 +8,7 @@
 
 Open-source RTL engineering for AI-powered development — Persian, Arabic & Hebrew first, with Spanish as the first LTR host.
 
-[![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Tests](https://img.shields.io/badge/unit_tests-80_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE)
+[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Tests](https://img.shields.io/badge/unit_tests-80_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
 
 `rtl` · `persian` · `farsi` · `arabic` · `hebrew` · `espanol` · `bidi` · `typography` · `i18n` · `l10n` · `internationalization` · `claude-code` · `claude-skills` · `ai-agents` · `developer-tools` · `linting` · `accessibility` · `right-to-left` · `urdu` · `localization` · `nextjs` · `tailwind`
 
@@ -32,6 +32,12 @@ LLMs *know* some of this — but knowledge without an executable contract does n
 </div>
 
 > Real CLI output. The broken page is in [`tests/fixtures/`](tests/fixtures/) — reproduce it yourself in 10 seconds.
+
+<div align="center">
+
+**No install? <a href="https://mhmdsdqi87-cloud.github.io/TEKA_raast/">Open the RAAST Playground →</a>** — paste your HTML/CSS, pick a profile (fa / ar / he / es), get all 17 findings in your browser. Client-side only, nothing uploaded, rule IDs match the CLI 1:1.
+
+</div>
 
 ## The three pillars
 
@@ -130,6 +136,19 @@ Direction, horizontal overflow, computed line-height, tap-target sizes, alt/labe
 
 No secrets required. Annotations appear on the PR; the gate is your severity choice. Full example: [`.github/workflows/raast.yml`](.github/workflows/raast.yml).
 
+## Works with your agent
+
+The same RTL contract, in each tool's native instruction format — copy one file:
+
+| Agent | Drop-in |
+|---|---|
+| **Claude Code** | six skills → `~/.claude/skills/` (deepest playbooks) |
+| **Codex CLI** / agents.md tools | [`integrations/AGENTS.md`](integrations/AGENTS.md) → repo root |
+| **GitHub Copilot** | [`integrations/copilot-instructions.md`](integrations/copilot-instructions.md) → `.github/copilot-instructions.md` |
+| **Cursor** | [`integrations/cursor-rtl.mdc`](integrations/cursor-rtl.mdc) → `.cursor/rules/rtl.mdc` |
+
+All four carry the same 8 hard rules + Tailwind/icon policy + `Intl` dates + the verify step. Details and honest status per environment: [integrations/README.md](integrations/README.md), [docs/compatibility.md](docs/compatibility.md).
+
 ## Install & quick start
 
 ```bash
@@ -182,8 +201,8 @@ The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (poss
 ## Roadmap
 
 - **v0.2** ✅ **shipped** — Hebrew profile (full rules), Spanish LTR host profile (RTL015–017), packaging hardening (`py.typed`, zip-safe profile loading, graceful `ProfileError`, `raast profiles` command), 80-test suite
-- **v0.3** — Claude Code plugin manifest + marketplace flow; agent adaptation guides (Cursor rules, Copilot instructions); HTML report viewer; a published, reproducible A/B benchmark demo
-- **v0.4** — VS Code extension reusing the CLI engine (design in roadmap); RAAST Compatibility Lab web playground
+- **v0.3** ✅ **shipped** — RAAST Playground (browser audit, all 17 rules client-side, GitHub Pages); agent integration files for Codex CLI (`AGENTS.md`), GitHub Copilot (`.github/copilot-instructions.md`) and Cursor (`.cursor/rules/*.mdc`)
+- **v0.4** — Claude Code plugin manifest + marketplace flow; HTML report viewer; VS Code extension reusing the CLI engine; a published, reproducible A/B benchmark demo
 - **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories
 
 ## Contributing
@@ -195,5 +214,11 @@ PRs welcome — rules with false-positive tests, benchmark cases, and **language
 [MIT](LICENSE) — referenced fonts carry their own open licenses (OFL or equivalent).
 
 <div align="center">
-  <sub>raast (راست) — "right / straight / correct" in Persian. Built because Persian and Arabic users deserve interfaces that read like a native designer made them.</sub>
+  <a href="https://star-history.com/#mhmdsdqi87-cloud/TEKA_raast&Date">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=mhmdsdqi87-cloud/TEKA_raast&type=Date&theme=dark" />
+      <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=mhmdsdqi87-cloud/TEKA_raast&type=Date" width="480">
+    </picture>
+  </a>
+  <sub><br>raast (راست) — "right / straight / correct" in Persian. Built because Persian and Arabic users deserve interfaces that read like a native designer made them.</sub>
 </div>
