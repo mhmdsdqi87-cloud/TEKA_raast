@@ -180,6 +180,14 @@ raast-i18n scan --locales ./locales --source en --max-errors 0
 
 Scans locale files for missing keys, empty values, placeholder mismatches (`{name}`, `{{name}}`, `%s`, `%1$s`), untranslated strings, length anomalies, Western digits / Latin punctuation in Arabic-script prose, un-isolated Latin runs in RTL values, Arabic Yeh/Kaf in Persian text, and opt-in Hebrew niqqud (rules `LQG001`–`LQG009`). Exit-code gates CI. Check table: [docs/i18n-gate.md](docs/i18n-gate.md).
 
+## Font glyph-coverage audit — before the launch, not after
+
+```bash
+raast fonts ./public/fonts --language fa
+```
+
+Parses every shipped font's `cmap` table (`.ttf`/`.otf`/`.woff` natively, `.woff2` via optional fontTools) and verifies the glyphs the profile requires are actually there: letters incl. پ چ ژ گ ک ی, Persian digits ۰–۹, «» and ، punctuation — and **ZWNJ (U+200C)**, whose absence silently shatters compounds like «می‌شود». Missing glyphs exit `1`; unreadable files are warnings, never silent passes. Mechanical check only — aesthetics still need a native human eye ([docs/font-audit.md](docs/font-audit.md), [review program](docs/review-program.md)).
+
 ## Compatibility matrix — generated, not claimed
 
 Fourteen framework fixtures (vanilla CSS, CSS Modules, Tailwind, Bootstrap, React JSX — stylesheets *and* camelCase style objects, Next styled-jsx, Vue SFC, Astro, Svelte, Remix, Nuxt, Vite, Angular, Spanish LTR host) are scanned by the real engine; [docs/compatibility-matrix.md](docs/compatibility-matrix.md) is **generated from those runs** and CI fails if the doc is stale (`tools/compat/run_matrix.py --check`). Per-stack limitations are stated on the matrix itself.

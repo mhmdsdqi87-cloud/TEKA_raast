@@ -86,6 +86,19 @@ raast report [path] --output raast-report.md
 
 Writes the markdown report artifact.
 
+## raast fonts
+
+```
+raast fonts <path> [--language fa] [--format text|json]
+```
+
+Font glyph-coverage audit: parses the cmap table of every font file found
+under `<path>` (`.ttf`/`.otf`/`.woff` natively; `.woff2` via fontTools when
+installed) and checks it against the required letters, digits, punctuation
+and format controls of the language profile. Exit `1` when any font has a
+real glyph gap; unreadable/unsupported formats are warnings, not failures.
+Methodology and honest limits: docs/font-audit.md.
+
 ## raast benchmark
 
 ```

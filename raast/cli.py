@@ -15,6 +15,7 @@ from .benchmark import benchmark_markdown, run_benchmark
 from .config import ConfigError, load_config
 from .detect import detect
 from .fixer import BACKUP_DIRNAME, fix_file, journal_load, revert_all, tier_for
+from .fonts import audit_markdown, audit_project
 from .profiles import ProfileError, available_profiles, load_profile
 from .report import Report
 from .rules import Finding, RuleContext, run_rules, SEVERITY_ORDER
@@ -267,6 +268,19 @@ def cmd_report(args) -> int:
     return 0
 
 
+def cmd_fonts(args) -> int:
+    root = Path(args.path).resolve()
+    if not root.exists():
+        print(f"error: path does not exist: {root}", file=sys.stderr)
+        return 2
+    report = audit_project(root, args.language)
+    if args.format == "json":
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        print(audit_markdown(report))
+    return 1 if report["gaps"] else 0
+
+
 def cmd_benchmark(args) -> int:
     cases_dir = Path(args.cases).resolve()
     candidate = Path(args.candidate).resolve()
@@ -356,6 +370,13 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--output", default="raast-report.md")
     sp.add_argument("--config", default=None)
     sp.set_defaults(func=cmd_report)
+
+    sp = sub.add_parser("fonts", help="font glyph-coverage audit for the profile's script")
+    sp.add_argument("path", nargs="?", default=".")
+    sp.add_argument("--language", choices=LANGUAGES, default="fa",
+                    help="language profile whose required glyphs are checked (default fa)")
+    sp.add_argument("--format", choices=["text", "json"], default="text")
+    sp.set_defaults(func=cmd_fonts)
 
     sp = sub.add_parser("benchmark", help="validate an artifact set against benchmark cases")
     sp.add_argument("--cases", default="benchmarks/cases")
