@@ -11,6 +11,26 @@ _RESET = "\033[0m"
 _BOLD = "\033[1m"
 
 
+def _escape_property(value: str) -> str:
+    """Escape a GitHub workflow-command property value (file paths, columns).
+    Same contract as raast.review — commas/colons in a path would otherwise
+    split the property list and silently misroute the annotation."""
+    return (value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+                 .replace(":", "%3A").replace(",", "%2C"))
+
+
+def _escape_data(value: str) -> str:
+    """Escape a GitHub workflow-command MESSAGE (data) section."""
+    return value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+
+def _md_cell(text: str) -> str:
+    """Make a finding message safe inside a Markdown table cell.
+    Finding messages embed matched source text, which may contain pipes
+    that would otherwise split the table."""
+    return text.replace("|", "\\|").replace("\r\n", " ").replace("\n", " ")
+
+
 @dataclass
 class Report:
     target: str
@@ -70,8 +90,8 @@ class Report:
         for f in sorted(self.findings, key=lambda x: (SEVERITY_ORDER[x.severity], x.file, x.line)):
             loc = f"{f.file}:{f.line}" + (f":{f.column}" if f.column else "")
             lines.append(
-                f"| {f.rule} | {f.severity} | {f.confidence} | `{loc}` "
-                f"| {f.message} | {f.suggested_fix} |"
+                f"| {f.rule} | {f.severity} | {f.confidence} | `{_md_cell(loc)}` "
+                f"| {_md_cell(f.message)} | {_md_cell(f.suggested_fix)} |"
             )
         lines += [
             "",
@@ -110,10 +130,10 @@ class Report:
         lines = []
         for f in self.findings:
             cmd = "error" if f.severity == "P0" else "warning"
-            meta = f"file={f.file},line={f.line}"
+            meta = f"file={_escape_property(f.file)},line={f.line}"
             if f.column:
                 meta += f",col={f.column}"
-            msg = f"{f.rule}: {f.message} — {f.suggested_fix}"
+            msg = _escape_data(f"{f.rule}: {f.message} — {f.suggested_fix}")
             lines.append(f"::{cmd} {meta}::{msg}")
         lines.append(f"RAAST summary: {self.summary_line()}")
         return "\n".join(lines)

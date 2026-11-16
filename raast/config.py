@@ -53,7 +53,7 @@ def validate_config(data: dict, source: str = "<memory>") -> dict:
 
     unknown = set(data.keys()) - KNOWN_KEYS
     if unknown:
-        errors.append(f"unknown top-level key(s): {', '.join(sorted(unknown))}")
+        errors.append(f"unknown top-level key(s): {', '.join(sorted(str(k) for k in unknown))}")
 
     lang = data.get("language", DEFAULT_CONFIG["language"])
     if not isinstance(lang, str) or lang.lower() not in available_profiles():
@@ -67,7 +67,7 @@ def validate_config(data: dict, source: str = "<memory>") -> dict:
             errors.append(f"{key} must be a list of glob strings")
 
     fail_on = data.get("fail_on", DEFAULT_CONFIG["fail_on"])
-    if fail_on not in VALID_FAIL_ON:
+    if not isinstance(fail_on, str) or fail_on not in VALID_FAIL_ON:
         errors.append(f"fail_on must be one of {sorted(VALID_FAIL_ON)}, got {fail_on!r}")
 
     overrides = data.get("severity_overrides", {})
@@ -75,9 +75,9 @@ def validate_config(data: dict, source: str = "<memory>") -> dict:
         errors.append("severity_overrides must be an object of {ruleId: severity}")
     else:
         for rule_id, sev in overrides.items():
-            if not re.fullmatch(r"RTL\d{3}", rule_id):
+            if not isinstance(rule_id, str) or not re.fullmatch(r"RTL\d{3}", rule_id):
                 errors.append(f"severity_overrides: invalid rule id {rule_id!r}")
-            if sev not in VALID_SEVERITIES:
+            elif not isinstance(sev, str) or sev not in VALID_SEVERITIES:
                 errors.append(
                     f"severity_overrides[{rule_id}]: severity must be one of "
                     f"{sorted(VALID_SEVERITIES)}, got {sev!r}"
@@ -88,13 +88,15 @@ def validate_config(data: dict, source: str = "<memory>") -> dict:
         errors.append("rules must be an object of {ruleId: options}")
     else:
         for rule_id, opts in rules.items():
-            if not re.fullmatch(r"RTL\d{3}", rule_id):
+            if not isinstance(rule_id, str) or not re.fullmatch(r"RTL\d{3}", rule_id):
                 errors.append(f"rules: invalid rule id {rule_id!r}")
+            elif not isinstance(opts, dict):
+                errors.append(f"rules[{rule_id}]: options must be an object")
             elif rule_id in _RULE_OPTION_KEYS:
                 unknown_opts = set(opts) - _RULE_OPTION_KEYS[rule_id]
                 if unknown_opts:
                     errors.append(
-                        f"rules[{rule_id}]: unknown option(s) {sorted(unknown_opts)}; "
+                        f"rules[{rule_id}]: unknown option(s) {sorted(str(o) for o in unknown_opts)}; "
                         f"known: {sorted(_RULE_OPTION_KEYS[rule_id])}"
                     )
             else:
@@ -111,9 +113,15 @@ def validate_config(data: dict, source: str = "<memory>") -> dict:
 
 
 def load_config(path: Path | None, root: Path) -> tuple[dict, str | None]:
-    """Load raast.config.json from *path* or search *root*. Returns (config, source)."""
+    """Load raast.config.json from *path* or search *root*. Returns (config, source).
+
+    An EXPLICITLY given path that does not exist is a usage error (ConfigError) —
+    silently falling back to defaults would make a typo'd --config invisible.
+    """
     candidates = []
     if path is not None:
+        if not path.exists():
+            raise ConfigError(f"config file not found: {path}")
         candidates.append(path)
     else:
         candidates.append(root / "raast.config.json")

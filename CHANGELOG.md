@@ -2,6 +2,39 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.4.3] — 2026-11-16
+
+The zero-defect round: a full repository audit reproduced every suspected defect first, then fixed fourteen of them with hand-verified regression tests, added a fuzz/property testing layer and an adversarial fixture corpus, and established a reproducible performance baseline. No detection was weakened; the suite grew from 302 to 347 tests.
+
+### Fixed (every entry reproduced before the fix, pinned after)
+- **RTL015/RTL016 false positives inside legitimate `dir="rtl"` scopes.** Content inside a real RTL scope (e.g. a `<section dir="rtl">` on a Spanish page) was flagged as un-isolated/unmarked. The old mask matched a fixed element list and missed structural containers; scope detection is now a stack-based inherited-direction model (`raast/rules`): an element isolates content only when its dir differs from the direction it inherits, `<html>` states the baseline and never isolates, unclosed scopes protect to end-of-text, and implicitly closed tags (`</body>` ending an open `<section>`) end their scopes correctly. Caught end-to-end by the bug corpus (CS-008/012/032) after an intermediate version masked whole canonical LTR pages — that regression never shipped.
+- **Arabic orthography corruption in `normalize(lang="ar")`.** Arabic Yeh (U+064A) and Kaf (U+0643) were rewritten to the Persian shapes (U+06CC/U+06A9) unconditionally — corrupting Arabic text for anyone running `raast fix --zwnj` on an Arabic profile. Yeh/Kaf unification is now Persian-only.
+- **`raast doctor /nonexistent` exited 0** with "0 files scanned" — a typo'd path looked like a clean scan. Missing scan targets are now a usage error (exit 2) across `doctor`, `audit`, `fix` and `report`.
+- **`--config /missing.json` silently fell back to defaults.** An explicitly given config path that does not exist now raises a clean `ConfigError` instead of making the typo invisible.
+- **Invalid UTF-8 input crashed the CLI** with a raw `UnicodeDecodeError` traceback in single-file mode. Decode failures are now a clean exit-2 error naming the file; directory scans keep skipping undecodable files as before.
+- **GitHub annotation output was not escaped.** `report.to_github()` emitted unescaped property values (a comma in a path splits the property list) and unescaped `%`/newlines in the message; it now applies the same escaping contract as `raast.review`. `to_markdown()` table cells escape pipes so findings quoting source text can no longer break the table.
+- **cmap format4 parser applied `idDelta` in the `idRangeOffset != 0` branch**, contrary to the sfnt spec — a synthetic worst case could report a covered glyph as a gap. The glyphIndexArray value is now used directly (spec-correct).
+- **`glob_to_regex` hung forever on an unclosed `{` or `[`.** A corrupted `include`/`exclude` pattern in `raast.config.json` froze the CLI in an infinite loop; unbalanced delimiters are now literal characters.
+- **`validate_config` crashed (TypeError) instead of raising `ConfigError`** for unhashable `fail_on`/severity values (e.g. `"fail_on": ["P0"]`) — malformed configs must produce the documented error contract, never a traceback.
+- **Vendor-prefix property normalization round-trip divergence**: `-ms-webkit` → `MsWebkit` → `ms-webkit` (leading hyphen lost). camelCase vendor spellings now re-normalize to the same kebab form, and `-ms-*` maps to React's lowercase `ms` convention (`msTransform`), while `-webkit-*`/`-moz-*`/`-khtml-*`/`-o-*` keep the capitalized form.
+- **RTL012 flagged atoms already wrapped in bidi isolates.** Isolation written as `&#x2066;…&#x2069;` was invisible to the prose scanner (character entities were never decoded), so the exact fix RTL012 recommends was punished as a defect. Bidi-control and ZWNJ numeric entities now decode before analysis, and an atom flanked by isolate characters is recognized as isolated.
+
+### Added
+- **Fuzz/property testing layer** (`tests/test_fuzz.py`, fixed seeds): kebab/camel normalization round-trips (600 generated property names per run), `_mask`/`_unmask` Unicode round-trips, normalizer idempotency, anchored-glob sanity across 300 random patterns, unified-diff parser tolerance against token soup, config-validator error-contract property (500 random dicts — only `ConfigError` or a valid dict may escape), placeholder-masking length preservation, and Unicode-soup robustness for the prose rules. The layer paid for itself immediately: it found the glob hang, the config crash and the vendor round-trip divergence.
+- **Adversarial fixture corpus** (`fixtures/adversarial/`, 7 files + pinned expectations in `tests/test_adversarial.py`): RTL-scope nesting across structural containers, CSS-in-JS spelling torture (vendor prefixes, quoted values, single-line multi-declarations), bidi control soup (isolates, entities, ZWNJ compounds, Persian digits), malformed markup (unclosed tags, multi-line attributes), Tailwind edge tokens (arbitrary values, negatives, responsive variants, word-like hyphenations), a Hebrew/Spanish host mix, and the canonical `<html lang="es" dir="ltr">` page form — the exact shape whose absence let the scope regression reach the bug corpus first.
+- **Performance baseline harness** (`tools/perf_baseline.py`): deterministic synthetic repository (fixed seed), real scan timing with median-of-N runs, peak RSS, and a JSON baseline artifact. First recorded baseline: **801 files / ~0.22 s median (~3,600 files/s), peak RSS ~22 MB** on the dev container (`benchmarks/perf/baseline-v043.json`); the scanner now also reads each file once instead of twice (`iter_files_with_content`), halving file I/O on large repositories.
+
+### Changed
+- Exit-code contract documented and enforced: missing scan target → 2; unreadable/undecodable explicit input → 2; config/profile errors → 2 (docs/cli-reference.md).
+- `raast report --output` creates missing parent directories instead of crashing.
+- Workflow file mode normalized (the CI push trigger `branches: [main]` was verified byte-level against the remote via API sha comparison).
+
+### Verification (all run locally before push)
+- `python3 -m pytest tests/` → 347 passed, 1 skipped (Playwright self-skip guard), stable across repeated runs
+- `python3 tools/corpus/verify.py` → 32/32 specimens PASS
+- `python3 tools/compat/run_matrix.py --check` → 14/14 fixtures, doc fresh
+- Wheel + sdist built, installed into clean venvs outside the repo; `raast`, `raast-review`, `raast-i18n` entrypoints probed
+
 ## [0.4.2] — 2026-11-16
 
 The coverage release. The two most-requested detection gaps close and the compatibility matrix nearly doubles — every claim still machine-verified from real runs.

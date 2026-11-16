@@ -157,16 +157,32 @@ _VENDOR_PREFIX = re.compile(r"^(Webkit|Moz|ms|O|Khtml)(?=[A-Z])")
 _CAMEL_BOUNDARY = re.compile(r"([a-z0-9])([A-Z])")
 
 
+_CAMEL_VENDOR_PREFIX = re.compile(r"^(webkit|moz|ms|o|khtml)(?=[A-Z])", re.IGNORECASE)
+
+
 def _kebab_prop(prop: str) -> str:
     """Normalize a CSS property name (kebab- or camelCase) to kebab-case.
 
     Vendor-prefixed React names (WebkitTransition, msTransform) normalize
-    with a leading hyphen: -webkit-transition, -ms-transform.
+    with a leading hyphen: -webkit-transition, -ms-transform. The camelCase
+    vendor spellings that _camel_prop produces (MsWebkit from -ms-webkit)
+    must re-normalize to the same kebab form — kebab(camel(kebab)) is a
+    true round-trip.
     """
     m = _VENDOR_PREFIX.match(prop)
     if m:
         body = prop[m.end():]
         return f"-{m.group(1).lower()}-{_CAMEL_BOUNDARY.sub(r'\1-\2', body).lower()}"
+    # _camel_prop capitalizes the vendor segment (MsWebkit); a lowercase
+    # standard property never has a camel boundary right after a vendor-
+    # shaped head followed by an uppercase letter, so this cannot swallow
+    # ordinary names (objectFit -> 'o'+'bjectFit' has no uppercase 'F'
+    # directly after the one-letter head 'o'... 'objectFit' fails the
+    # (?=[A-Z]) probe and stays on the standard path).
+    m2 = _CAMEL_VENDOR_PREFIX.match(prop)
+    if m2 and _CAMEL_BOUNDARY.search(prop):
+        body = prop[m2.end():]
+        return f"-{m2.group(1).lower()}-{_CAMEL_BOUNDARY.sub(r'\1-\2', body).lower()}"
     return _CAMEL_BOUNDARY.sub(r"\1-\2", prop).lower()
 
 
@@ -174,12 +190,16 @@ def _camel_prop(kebab: str) -> str:
     """kebab-case -> camelCase (React style-object spelling).
 
     margin-inline-start -> marginInlineStart; -webkit-mask-composite ->
-    WebkitMaskComposite. Standard properties keep a lowercase first letter;
-    vendor-prefixed ones capitalize the vendor segment, per React convention.
+    WebkitMaskComposite. Vendor casing follows the DOM/React convention:
+    -webkit-/-moz-/-khtml-/-o- capitalize (WebkitX, MozX), but -ms- keeps
+    the lowercase spelling React itself uses (msTransform). Standard
+    properties keep a lowercase first letter.
     """
     vendor = kebab.startswith("-")
     parts = kebab.lstrip("-").split("-")
-    head = parts[0].capitalize() if vendor else parts[0]
+    head = parts[0]
+    if vendor and head != "ms":
+        head = head.capitalize()
     return head + "".join(w.capitalize() for w in parts[1:])
 
 
@@ -397,15 +417,25 @@ def rule_html_rtl_unmarked(path: str, content: str) -> list[Finding]:
     """RTL016 — RTL-script-only element with no dir/bdi, in an LTR-host document.
 
     A bare RTL run inside an LTR page visually reorders the surrounding
-    punctuation and numbers; the run must declare its direction.
+    punctuation and numbers; the run must declare its direction. Elements
+    inside a dir="rtl" ancestor scope inherit the correct direction and are
+    NOT flagged — a legitimately scoped RTL section must never produce
+    findings on its children.
     """
     findings = []
     if not any(path.endswith(e) for e in (".html", ".vue", ".astro")):
         return findings
+    rtl_scopes = _dir_scope_spans(content, "rtl")
+
+    def inside_rtl_scope(pos: int) -> bool:
+        return any(start <= pos < end for start, end in rtl_scopes)
+
     for m in re.finditer(r"<([a-zA-Z][^\s>/]*)\b([^>]*)>([^<]*)", content, re.IGNORECASE):
         tag = m.group(1).lower()
         attrs, inner = m.group(2), m.group(3).strip()
         if tag in ("html", "head", "body", "script", "style", "bdi", "br", "img", "input", "meta", "link"):
+            continue
+        if inside_rtl_scope(m.start()):
             continue
         if (
             inner
@@ -500,6 +530,100 @@ def rule_tailwind(path: str, content: str, config: dict) -> list[Finding]:
 # ---------------------------------------------------------------- prose rules
 
 
+_VOID_ELEMENTS = frozenset({
+    "area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+    "meta", "param", "source", "track", "wbr",
+})
+
+# Bidi controls + ZWNJ: numeric character references for THESE are decoded
+# before prose analysis (isolation written as &#x2066;…&#x2069; or a ZWNJ
+# written as &#x200C; is real to the browser and must be real to the engine).
+_BIDI_CONTROL_CHARS = frozenset({
+    "\u200c",  # ZWNJ
+    "\u200e", "\u200f",  # LRM, RLM
+    "\u202a", "\u202b", "\u202c", "\u202d", "\u202e",  # embedding controls
+    "\u2066", "\u2067", "\u2068", "\u2069",  # isolates
+})
+
+_TAG_TOKEN_RE = re.compile(r"<(/?)([a-zA-Z][^\s>/]*)([^>]*?)(/?)>")
+
+
+_DIR_ATTR_RE_ATTR = re.compile(r"\bdir\s*=\s*[\"'](rtl|ltr|auto)[\"']", re.IGNORECASE)
+
+
+def _dir_scope_spans(text: str, dir_value: str) -> list[tuple[int, int]]:
+    """Spans of every region ISOLATED as <dir_value> by an element's dir attr.
+
+    Isolation is an INHERITED-DIRECTION DEVIATION, not a literal attribute
+    match: an element isolates content only when its dir differs from the
+    direction it inherits. This is what makes the browser behave correctly
+    and keeps the analyzer honest:
+
+      - <span dir="ltr"> inside an RTL context  -> isolated LTR atom (masked)
+      - <html dir="ltr"> on an LTR page         -> the document baseline,
+        NOT isolation (treating it as a scope once masked the entire body of
+        every canonical es page and silenced RTL015/016/017 — bug-corpus
+        CS-008/012/032 regression)
+      - <section dir="rtl"> inside an LTR page  -> isolated RTL scope
+
+    The <html> element always establishes the baseline and never isolates.
+    Stack-based scan (handles nesting and mixed tag soup; regexes with a
+    fixed tag list missed structural containers). Unclosed scopes extend to
+    end-of-text; stray close tags are ignored.
+    """
+    spans: list[tuple[int, int]] = []
+    # stack entries: (tag, scope_start_or_None, inherited_dir_at_entry)
+    inherited: str | None = None
+    stack: list[tuple[str, int | None, str | None]] = []
+    for m in _TAG_TOKEN_RE.finditer(text):
+        closing, tag, attrs, self_close = m.group(1), m.group(2).lower(), m.group(3), m.group(4)
+        if closing:
+            if not stack:
+                continue  # stray close tag
+            # close the nearest open element with this tag name. HTML allows
+            # implicit closing (</body> ends an unclosed <section> too), so
+            # every element nested INSIDE the closed one also ends here —
+            # emit any scope it carries, then drop the whole tail.
+            for i in range(len(stack) - 1, -1, -1):
+                if stack[i][0] == tag:
+                    for _t, scope_start, _inh in stack[i:]:
+                        if scope_start is not None:
+                            spans.append((scope_start, m.end()))
+                    inherited = stack[i][2]
+                    del stack[i:]
+                    break
+            continue
+        if tag in _VOID_ELEMENTS or self_close:
+            continue
+        attr = _DIR_ATTR_RE_ATTR.search(attrs)
+        declared = attr.group(1).lower() if attr else None
+        if tag == "html":
+            # document baseline: never an isolation scope itself
+            stack.append((tag, None, inherited))
+            if declared and declared != "auto":
+                inherited = declared
+            continue
+        if declared and declared != "auto" and declared != inherited:
+            stack.append((tag, m.start(), inherited))
+            inherited = declared
+        else:
+            stack.append((tag, None, inherited))
+    for _t, scope_start, _inh in stack:
+        if scope_start is not None:
+            spans.append((scope_start, len(text)))
+    return spans
+
+
+def _mask_spans_whitespace(text: str, spans: list[tuple[int, int]]) -> str:
+    """Blank every char of *spans* except newlines (line mapping survives)."""
+    out = list(text)
+    for start, end in spans:
+        for i in range(start, min(end, len(out))):
+            if out[i] != "\n":
+                out[i] = " "
+    return "".join(out)
+
+
 def _strip_markup_for_prose(content: str, suffix: str,
                             mask_rtl_isolates: bool = False) -> tuple[str, dict[int, int]]:
     """Reduce markup documents to visible text for prose rules, preserving line numbers.
@@ -508,38 +632,57 @@ def _strip_markup_for_prose(content: str, suffix: str,
     - tags are removed per line (attributes like className digits must not trigger
       RTL009/010/011/012/015/017 — only human-visible text is prose)
     - for markdown/txt: fenced blocks + inline code + URLs are masked instead
-    - RTL hosts: <bdi>/dir="ltr" spans are masked (protected LTR atoms). LTR hosts
-      (es): <bdi>/dir="rtl" spans are masked as well — isolated RTL atoms are the
-      engine's OWN recommendation and must never re-flag as RTL015.
+    - RTL hosts: <bdi>/dir="ltr" scopes are masked (protected LTR atoms). LTR
+      hosts (es): <bdi>/dir="rtl" scopes are masked as well — isolated RTL
+      atoms are the engine's OWN recommendation and must never re-flag as
+      RTL015, no matter which container element carries the dir attribute.
     """
     mapping: dict[int, int] = {}
     if suffix in (".md", ".mdx", ".txt"):
         masked, mapping = _strip_inline_code_and_fences(content)
         return masked, mapping
 
+    # Numeric character references for bidi controls and ZWNJ decode to the
+    # real character BEFORE analysis — a browser renders &#x2066; as U+2066,
+    # so an isolate written as an entity must be recognized as isolation and
+    # never re-flagged. Decoding is limited to the control set: decoding the
+    # full entity table would turn visible &lt;p&gt; text into tag soup.
+    def _decode_bidi_entity(m: re.Match) -> str:
+        cp = int(m.group(1), 16) if m.group(1) else int(m.group(2))
+        ch = chr(cp)
+        return ch if ch in _BIDI_CONTROL_CHARS else m.group(0)
+
+    content = re.sub(
+        r"&#(?:x([0-9A-Fa-f]+)|([0-9]+));",
+        _decode_bidi_entity, content, flags=re.IGNORECASE,
+    )
+
     def blank_block(m: re.Match) -> str:
         return "\n" * m.group(0).count("\n")
-
-    def blank_span(m: re.Match) -> str:
-        """Whitespace-preserving mask: newlines survive, every other char becomes a space."""
-        return re.sub(r"[^\n]", " ", m.group(0))
 
     text = re.sub(r"<script\b.*?</script\s*>", blank_block, content, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"<style\b.*?</style\s*>", blank_block, text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r"<!--.*?-->", blank_block, text, flags=re.DOTALL)
-    # Isolated regions (<bdi>, dir="ltr") are the engine's OWN recommendation —
-    # their contents are protected LTR atoms and must never re-flag as RTL009/
-    # 010/012 findings. Benchmark validator follows the same isolation model.
-    text = re.sub(r"<bdi\b[^>]*>.*?</bdi\s*>", blank_span, text, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(
-        r"<(?:span|div|p|pre|code|td|li|h[1-6])\b[^>]*\bdir\s*=\s*[\"']ltr[\"'][^>]*>.*?</(?:span|div|p|pre|code|td|li|h[1-6])\s*>",
-        blank_span, text, flags=re.DOTALL | re.IGNORECASE,
-    )
+    # Isolated regions (<bdi>, dir="ltr"/dir="rtl" scopes) are the engine's OWN
+    # recommendation — their contents are protected atoms and must never
+    # re-flag as RTL009/010/012/015 findings. The benchmark validator follows
+    # the same isolation model.
+    ltr_spans = _dir_scope_spans(text, "ltr")
+    bdi_spans: list[tuple[int, int]] = []
+    bdi_open: int | None = None
+    for m in _TAG_TOKEN_RE.finditer(text):
+        closing, tag = m.group(1), m.group(2).lower()
+        if tag != "bdi":
+            continue
+        if not closing:
+            if bdi_open is None:
+                bdi_open = m.start()
+        elif bdi_open is not None:
+            bdi_spans.append((bdi_open, m.end()))
+            bdi_open = None
+    text = _mask_spans_whitespace(text, ltr_spans + bdi_spans)
     if mask_rtl_isolates:
-        text = re.sub(
-            r"<(?:span|div|p|pre|code|td|li|h[1-6])\b[^>]*\bdir\s*=\s*[\"']rtl[\"'][^>]*>.*?</(?:span|div|p|pre|code|td|li|h[1-6])\s*>",
-            blank_span, text, flags=re.DOTALL | re.IGNORECASE,
-        )
+        text = _mask_spans_whitespace(text, _dir_scope_spans(text, "rtl"))
     text = re.sub(r"<[^>\n]*>", "", text)
     out_lines = []
     for orig_no, line in enumerate(text.splitlines(), 1):
@@ -632,18 +775,27 @@ def rule_prose(path: str, content: str, profile: dict, options: dict | None = No
             ))
 
         # Collect LTR-atom spans first so RTL010 can suppress phone/URL internals.
+        # An atom already wrapped in bidi isolates (U+2066..U+2069, LRM/RLM,
+        # embedding controls — including entities decoded above) IS isolated:
+        # flagging it would punish the exact fix RTL012 recommends.
+        _ISOLATE_CHARS = {"\u2066", "\u2067", "\u2068", "\u2069",
+                          "\u200e", "\u200f", "\u202a", "\u202b", "\u202c"}
         atom_spans: list[tuple[int, int]] = []
         for m in re.finditer(
             r"(?<![\w>])([\w.+-]+@[\w-]+\.\w+|https?://\S+|\+\d[\d\s-]{6,}\d|\$\d+(?:\.\d+)?)",
             line,
         ):
             atom_spans.append(m.span())
+            before = line[m.start() - 1] if m.start() > 0 else ""
+            after = line[m.end()] if m.end() < len(line) else ""
+            if before in _ISOLATE_CHARS or after in _ISOLATE_CHARS:
+                continue
             findings.append(Finding(
                 rule="RTL012", severity="P2", confidence="medium",
                 file=path, line=orig_no, column=m.start() + 1,
                 message=f"un-isolated LTR atom: {m.group(1)[:32]}…",
-                explanation="URLs/emails/phones/currency inside RTL prose reorder without isolation (bdi or dir=ltr).",
-                suggested_fix='wrap in <bdi>…</bdi> or <span dir="ltr">…</span>',
+                explanation="URLs/emails/phones/currency inside RTL prose reorder without isolation (bdi, dir=ltr, or bidi isolate marks).",
+                suggested_fix='wrap in <bdi>…</bdi>, <span dir="ltr">…</span>, or bidi isolate marks (U+2066 … U+2069)',
                 fixable=False,
             ))
 

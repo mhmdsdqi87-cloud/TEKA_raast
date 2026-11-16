@@ -1,0 +1,16 @@
+<!doctype html>
+<!-- A1 — legit RTL scope must protect children (regression for the
+     dir-scope false positive): Spanish host, RTL section with nested
+     structural containers of every common kind. -->
+<html lang="es">
+<body>
+  <section dir="rtl" lang="ar">
+    <header>العنوان العربي</header>
+    <article><p>نص عربي أصيل داخل المقال</p></article>
+    <aside><blockquote>اقتباس مهم جدا</blockquote></aside>
+    <nav><ul><li>عنصر القائمة</li></ul></nav>
+    <div><span>مقطع عادي</span></div>
+  </section>
+  <footer><p>متن بدون علامت — this one is intentionally bare</p></footer>
+</body>
+</html>

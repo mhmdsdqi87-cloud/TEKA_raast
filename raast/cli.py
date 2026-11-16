@@ -19,9 +19,23 @@ from .fonts import audit_markdown, audit_project
 from .profiles import ProfileError, available_profiles, load_profile
 from .report import Report
 from .rules import Finding, RuleContext, run_rules, SEVERITY_ORDER
-from .scanner import iter_files
+from .scanner import iter_files_with_content
 
 LANGUAGES = ["fa", "ar", "he", "es"]
+
+
+class ScanError(Exception):
+    """A scan target cannot be read (missing, unreadable, or not valid UTF-8).
+    Reported as a clean CLI error (exit code 2), never a traceback."""
+
+
+def _validate_root(root: Path) -> int | None:
+    """Exit-code contract: a scan target that does not exist is a usage error.
+    Returns the exit code to return, or None when the target is usable."""
+    if not root.exists():
+        print(f"error: path does not exist: {root}", file=sys.stderr)
+        return 2
+    return None
 
 
 def _build_context(root: Path, config_path: Path | None, language: str | None = None) -> tuple[RuleContext, str | None]:
@@ -37,12 +51,23 @@ def _scan(root: Path, ctx: RuleContext) -> tuple[list[tuple[Path, str, str, list
     results = []
     count = 0
     if root.is_file():
+        # Explicit single-file target: user intent overrides the include/
+        # exclude/suffix filters, but decode failures are a clean CLI error.
         candidates = [(root, root.name)]
-    else:
-        candidates = list(iter_files(root, ctx.config["include"], ctx.config["exclude"]))
-    for path, rel in candidates:
+        for path, rel in candidates:
+            count += 1
+            try:
+                content = path.read_text(encoding="utf-8")
+            except UnicodeDecodeError as e:
+                raise ScanError(f"{rel}: not valid UTF-8 ({e}) — the scanner only reads UTF-8 text files") from e
+            except OSError as e:
+                raise ScanError(f"{rel}: unreadable ({e})") from e
+            findings = run_rules(path, rel, content, ctx)
+            if findings:
+                results.append((path, rel, content, findings))
+        return results, count
+    for path, rel, content in iter_files_with_content(root, ctx.config["include"], ctx.config["exclude"]):
         count += 1
-        content = path.read_text(encoding="utf-8")
         findings = run_rules(path, rel, content, ctx)
         if findings:
             results.append((path, rel, content, findings))
@@ -114,13 +139,15 @@ def _fmt_report(report: Report, fmt: str) -> str:
 
 def cmd_doctor(args) -> int:
     root = Path(args.path).resolve()
+    if (code := _validate_root(root)) is not None:
+        return code
     try:
         ctx, source = _build_context(root, Path(args.config) if args.config else None,
                                      language=getattr(args, "language", None))
-    except (ConfigError, ProfileError) as e:
+        report, _ = _collect_report(root, ctx, source, with_frameworks=True)
+    except (ConfigError, ProfileError, ScanError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
-    report, _ = _collect_report(root, ctx, source, with_frameworks=True)
     print(_fmt_report(report, args.format))
     fail_on = args.fail_on or ctx.config["fail_on"]
     return 1 if report.should_fail(fail_on) else 0
@@ -147,12 +174,14 @@ def cmd_audit(args) -> int:
 
 def cmd_fix(args) -> int:
     root = Path(args.path).resolve()
+    if (code := _validate_root(root)) is not None:
+        return code
     try:
         ctx, source = _build_context(root, Path(args.config) if args.config else None)
-    except (ConfigError, ProfileError) as e:
+        groups, _count = _scan(root, ctx)
+    except (ConfigError, ProfileError, ScanError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
-    groups, _count = _scan(root, ctx)
     changed_files = 0
     total_fixes = 0
     total_findings = sum(len(fs) for (_p, _r, _c, fs) in groups)
@@ -256,14 +285,20 @@ def cmd_revert(args) -> int:
 
 def cmd_report(args) -> int:
     root = Path(args.path).resolve()
+    if (code := _validate_root(root)) is not None:
+        return code
     try:
         ctx, source = _build_context(root, Path(args.config) if args.config else None)
-    except (ConfigError, ProfileError) as e:
+        report, _ = _collect_report(root, ctx, source, with_frameworks=True)
+        out = Path(args.output)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(report.to_markdown(), encoding="utf-8")
+    except (ConfigError, ProfileError, ScanError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
-    report, _ = _collect_report(root, ctx, source, with_frameworks=True)
-    out = Path(args.output)
-    out.write_text(report.to_markdown(), encoding="utf-8")
+    except OSError as e:
+        print(f"error: cannot write report: {e}", file=sys.stderr)
+        return 2
     print(f"wrote {out} — {report.summary_line()}")
     return 0
 

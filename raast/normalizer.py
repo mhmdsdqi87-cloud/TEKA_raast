@@ -129,7 +129,11 @@ def normalize(
         lambda m: m.group(1) + ZWNJ + m.group(2),
         masked,
     )
-    masked = masked.translate(AR_YEH_KAF)
+    # Persian-only unification: Arabic orthography REQUIRES U+064A (Arabic
+    # Yeh) and U+0643 (Arabic Kaf) — rewriting them to the Persian shapes
+    # corrupts Arabic text. The Persian profile is the only consumer.
+    if lang == "fa":
+        masked = masked.translate(AR_YEH_KAF)
 
     if digits and lang == "fa":
         def fix_line(line: str) -> str:

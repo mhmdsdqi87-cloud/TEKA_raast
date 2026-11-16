@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- A7 — canonical LTR-host page: <html lang="es" dir="ltr"> is the
+     DOCUMENT BASELINE and must never count as an isolation scope. The bare
+     Hebrew run must fire RTL015+RTL016; the dir=rtl section stays silent;
+     redundant dir="ltr" deeper in the tree is the inherited baseline, not
+     isolation. Regression anchor for bug-corpus CS-008/012/032. -->
+<html lang="es" dir="ltr">
+<body>
+  <main dir="ltr">
+    <section dir="rtl" lang="he">
+      <h2>כותרת בעברית</h2>
+      <p>טקסט בתוך הסקשן</p>
+    </section>
+    <article>
+      <p>התוכן הזה חשוף בלי בידוד</p>
+      <p>Otro párrafo completamente en español.</p>
+    </article>
+  </main>
+</body>
+</html>

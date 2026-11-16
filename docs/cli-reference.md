@@ -40,7 +40,10 @@ Static diagnostics. `path` may be a directory or a single file.
 - `--format github` emits `::error`/`::warning` annotations for Actions.
 - `--fail-on P0` exits 1 when P0 findings exist (default comes from config `fail_on`).
 - `--language` overrides the profile from config (`fa`, `ar`, `he`, `es`).
-- Exit codes: 0 clean, 1 findings >= threshold, 2 config/profile error.
+- Exit codes: 0 clean, 1 findings >= threshold, 2 usage/config/profile error —
+  including a missing scan target, an explicitly given `--config` that does
+  not exist, and an explicit single-file input that is not valid UTF-8
+  (these were silently tolerated or crashed before 0.4.3).
 
 Language behavior is profile-driven: `fa`/`ar` enforce their own digits and punctuation in prose, `he` keeps Western digits and Latin punctuation valid while flagging discouraged letter-spacing at P1, and `es` (LTR host) flips the engine — RTL runs inside Spanish prose must be isolated (RTL015), RTL-run elements need `dir` (RTL016), and RAE inverted marks ¿ ¡ are checked (RTL017).
 

@@ -2,7 +2,7 @@
 
 Generated from real runs of the engine against fixture projects — regenerate with `tools/compat/run_matrix.py`; do not edit by hand.
 
-- Engine: RAAST `0.4.2` (`raast.__version__`)
+- Engine: RAAST `0.4.3` (`raast.__version__`)
 - Command per fixture: `python3 -m raast.cli doctor <fixture> --language <lang> --format json`
 - Summary: **14/14 fixtures passing** (PASS = every expected rule fired; extra detections are allowed and listed)
 

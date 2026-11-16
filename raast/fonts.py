@@ -119,12 +119,14 @@ def _parse_format4(data: bytes, offset: int, res: CmapResult) -> None:
             if id_range_offset == 0:
                 glyph = (code + id_delta) & 0xFFFF
             else:
+                # Per the sfnt spec the glyphIndexArray value is used DIRECTLY
+                # (no idDelta) when idRangeOffset != 0 — applying the delta
+                # here could wrap a real glyph index to 0 and report a false
+                # glyph gap.
                 glyph_index_addr = range_base + seg * 2 + id_range_offset + (code - start_code) * 2
                 if glyph_index_addr + 2 > len(data):
                     continue
                 glyph = struct.unpack_from(">H", data, glyph_index_addr)[0]
-                if glyph:
-                    glyph = (glyph + id_delta) & 0xFFFF
             if glyph:
                 res.covered.add(code)
 

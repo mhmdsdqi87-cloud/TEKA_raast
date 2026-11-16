@@ -1,0 +1,47 @@
+{
+  "tool": "raast-perf-baseline",
+  "raast_version": "0.4.2",
+  "generated_at": "2026-11-16T18:04:23+00:00",
+  "environment": {
+    "python": "3.12.16",
+    "platform": "Linux-5.10.134-013.15.kangaroo.al8.x86_64-x86_64-with-glibc2.41",
+    "machine": "x86_64"
+  },
+  "config": {
+    "files": 600,
+    "repeat": 3,
+    "seed": 3
+  },
+  "runs": [
+    {
+      "files_written": 801,
+      "files_scanned": 801,
+      "wall_seconds": 0.2278,
+      "files_per_second": 3515.6,
+      "peak_rss_kb": 21500
+    },
+    {
+      "files_written": 801,
+      "files_scanned": 801,
+      "wall_seconds": 0.2186,
+      "files_per_second": 3665.0,
+      "peak_rss_kb": 21880
+    },
+    {
+      "files_written": 801,
+      "files_scanned": 801,
+      "wall_seconds": 0.2203,
+      "files_per_second": 3636.0,
+      "peak_rss_kb": 21880
+    }
+  ],
+  "median": {
+    "wall_seconds": 0.2203,
+    "files_per_second": 3636.0
+  },
+  "notes": [
+    "Same machine before/after comparisons only; absolute numbers are hardware-dependent.",
+    "Synthetic tree is deterministic for a given --files value (fixed seed).",
+    "Throughput counts scanner-visible text files, not total repo files."
+  ]
+}

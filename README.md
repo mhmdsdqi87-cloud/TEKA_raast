@@ -8,7 +8,7 @@
 
 Open-source RTL engineering for AI-powered development — Persian, Arabic & Hebrew first, with Spanish as the first LTR host.
 
-[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases·A_B_14→20-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Runtime rules](https://img.shields.io/badge/runtime_rules-6-34D399)](#real-browser-inspection-runtime-inspector) [![Corpus](https://img.shields.io/badge/bug_corpus-32_verified-34D399)](#the-bug-corpus--evidence-first) [![i18n](https://img.shields.io/badge/i18n_gate-9_checks-34D399)](#language-quality-gate--beyond-rtl-pages) [![Tests](https://img.shields.io/badge/unit_tests-302_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
+[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases·A_B_14→20-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Runtime rules](https://img.shields.io/badge/runtime_rules-6-34D399)](#real-browser-inspection-runtime-inspector) [![Corpus](https://img.shields.io/badge/bug_corpus-32_verified-34D399)](#the-bug-corpus--evidence-first) [![i18n](https://img.shields.io/badge/i18n_gate-9_checks-34D399)](#language-quality-gate--beyond-rtl-pages) [![Tests](https://img.shields.io/badge/unit_tests-348_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
 
 `rtl` · `persian` · `farsi` · `arabic` · `hebrew` · `espanol` · `bidi` · `typography` · `i18n` · `l10n` · `internationalization` · `claude-code` · `claude-skills` · `ai-agents` · `developer-tools` · `linting` · `accessibility` · `right-to-left` · `urdu` · `localization` · `nextjs` · `tailwind`
 
@@ -224,7 +224,7 @@ Anything that ingests Markdown can use the skills; verified environments and hon
 
 ```
 $ python3 -m unittest discover -s tests
-Ran 302 tests in 7.4s — OK (1 skipped)
+Ran 348 tests in 7.0s — OK (1 skipped)
 # with the [runtime] extra installed; without Playwright the 5 browser
 # tests self-skip and the ImportError guard runs instead
 
@@ -257,7 +257,7 @@ byte-identical revert, path-escape refusal) and `test_i18n.py` (all nine
 LQG rules with their suppression cases, locale discovery layouts, CLI exit
 codes).
 
-The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (possessive suffixes stay attached), Arabic-Indic digits blocked from conversion in `ar`, Western digits staying valid in `he`/`es` prose, Hebrew `letter-spacing` downgrade to P1, Spanish RTL-run isolation and inverted-mark checks, code-fence protection, config schema validation, scanner globs, end-to-end CLI runs including the backup/restore path — plus packaging regression tests that load every profile from the installed wheel's package directory.
+The unit suite includes a fixed-seed fuzz/property layer (normalization round-trips, glob and diff-parser robustness, config error contracts) and a 7-file adversarial fixture corpus with hand-verified pinned expectations. It also covers Unicode edge cases: ZWNJ joins and their *non*-joins (possessive suffixes stay attached), Arabic-Indic digits blocked from conversion in `ar`, Western digits staying valid in `he`/`es` prose, Hebrew `letter-spacing` downgrade to P1, Spanish RTL-run isolation and inverted-mark checks, code-fence protection, config schema validation, scanner globs, end-to-end CLI runs including the backup/restore path — plus packaging regression tests that load every profile from the installed wheel's package directory.
 
 ## Documentation
 
@@ -284,6 +284,7 @@ The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (poss
 - **v0.3** ✅ **shipped** — RAAST Playground (browser audit, all 17 rules client-side, GitHub Pages); agent integration files for Codex CLI (`AGENTS.md`), GitHub Copilot (`.github/copilot-instructions.md`) and Cursor (`.cursor/rules/*.mdc`)
 - **v0.4** ✅ **shipped** — Runtime Inspector (Playwright LTR/RTL mirror diff, RT001–006); diff-scoped PR reviewer with idempotent PR comments; Auto-Fix 2.0 (safe/suggested/manual tiers + fix journal + `raast revert`); 32-specimen bug corpus with machine-verified evidence; Language Quality Gate (LQG001–009); generated compatibility matrix; VS Code extension scaffold
 - **v0.4.2** ✅ **shipped** — CSS-in-JS camelCase style objects are first-class (React inline styles, styled-components, Emotion fire the same rules; camelCase logical fixes); `.svelte` SFC scanning; 6 new compatibility fixtures — Astro, Svelte, Remix, Nuxt, Vite, Angular (14-stack matrix); native-language review program for fa/ar/he/es
+- **v0.4.3** ✅ **shipped** — zero-defect round: 14 reproduced defects fixed (dir-scope false positives, Arabic text corruption in `fix --zwnj`, CLI hang on malformed config globs, config-validator crash, annotation escaping, spec-correct cmap parsing, isolate-aware RTL012, CLI exit-code contract); fuzz/property testing layer + 7-file adversarial fixture corpus with pinned expectations; single-read scanner (~2× I/O on large repos); reproducible performance baseline (~3,600 files/s)
 - **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories; `.po`/`.arb` locale formats for the i18n gate; Claude Code plugin manifest + marketplace flow
 
 ## Contributing

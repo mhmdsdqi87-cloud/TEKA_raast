@@ -1,0 +1,17 @@
+<!doctype html>
+<!-- A4 — malformed markup: unclosed tags, attributes spanning newlines,
+     duplicate quotes, stray closing tags, void elements with dir attrs.
+     The scope scanner must stay protective and never crash. -->
+<html lang="ar">
+<body>
+  <section dir="rtl">
+    <p>نص عربي سليم داخل نطاق غير مغلق
+  <div class="multi
+       line" dir="rtl">نص داخل وسم متعدد الأسطر</div>
+  <p style="margin-left: 8px">نص مع هامش فيزيائي</p>
+  </div>
+  </p>
+  <br dir="rtl">
+  <img src="x.png" alt="صورة" >
+  <p>نص بدون نطاق</p>
+</body>
