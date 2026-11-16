@@ -1,0 +1,40 @@
+---
+// Deliberate fixture for the compat matrix (Astro islands stack).
+// The engine reads the page as source text: frontmatter, template and
+// the component style block are all scanned lexically. The defect is a
+// physical margin declaration in the style block (RTL001); the logical
+// twin in the second rule must stay silent. Persian copy in the
+// template arms the evidence gate. Compilation and style scoping are
+// not modeled.
+const storeName = "فروشگاه نور";
+const headline = "هر هفته محصولات تازه با ارسال سریع به خانه شما می‌رسد";
+---
+
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <title>{storeName}</title>
+  </head>
+  <body>
+    <main class="hero">
+      <h1>{storeName}</h1>
+      <p class="hero-lead">{headline}</p>
+      <!-- defect block: physical margin declaration, RTL001 -->
+      <button class="cart-btn">افزودن به سبد</button>
+      <!-- correct block: logical twin, must stay silent -->
+      <button class="cart-btn-ok">مشاهده سبد خرید</button>
+    </main>
+  </body>
+</html>
+
+<style>
+/* defect block — RTL001 */
+.cart-btn {
+  margin-left: 12px;
+}
+
+/* correct block — logical twin, must stay silent */
+.cart-btn-ok {
+  margin-inline-start: 12px;
+}
+</style>

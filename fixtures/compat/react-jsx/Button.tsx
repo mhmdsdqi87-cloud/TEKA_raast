@@ -1,11 +1,11 @@
 // Deliberate fixture: React button for the compat matrix.
-// Defect actually caught: the kebab-case physical declaration inside the
-// CSS-in-JS template literal (RTL001) — the engine's CSS scanner is lexical
-// and reads template literals like stylesheets.
-// Honest limitation, documented in the matrix: the camelCase style object
-// (marginLeft: 8) is NOT detected by the current engine, because the scanner
-// matches kebab-case property names only. A dedicated JSX style-object rule
-// is future work; until then this gap is reported, not hidden.
+// Both spellings the engine covers are present:
+//   1. the kebab-case declaration inside the CSS-in-JS template literal —
+//      the lexical CSS scanner reads template literals like stylesheets.
+//   2. the camelCase style object below — property names are normalized to
+//      kebab-case before matching, so style objects fire the same rule;
+//      the suggested fix stays camelCase (marginInlineStart).
+// Correct counterparts use logical inline properties and must stay silent.
 const cardCss = `
   .btn-card {
     margin-left: 8px;

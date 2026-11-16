@@ -82,9 +82,9 @@ raast doctor ./your-project --language es
 
 | Rule | Detects | Sev |
 |---|---|---|
-| `RTL001/002` | physical `margin/padding-left/right` | P1 |
+| `RTL001/002` | physical `margin/padding-left/right` — stylesheets **and** CSS-in-JS style objects (`marginLeft` fires the same rule) | P1 |
 | `RTL003` | physical `left:/right:` positioning | P2 review |
-| `RTL004` | `text-align: left/right` | P1 |
+| `RTL004` | `text-align: left/right` (incl. `textAlign: 'left'` in style objects) | P1 |
 | `RTL005` | non-zero `letter-spacing` on Arabic script | **P0** |
 | `RTL006/014` | missing `dir` / `lang` on `<html>` | P0 / P1 |
 | `RTL007` | `translate-x` without an RTL twin | P2 review |
@@ -182,7 +182,7 @@ Scans locale files for missing keys, empty values, placeholder mismatches (`{nam
 
 ## Compatibility matrix — generated, not claimed
 
-Eight framework fixtures (vanilla CSS, CSS Modules, Tailwind, Bootstrap, React JSX, Next styled-jsx, Vue SFC, Spanish LTR host) are scanned by the real engine; [docs/compatibility-matrix.md](docs/compatibility-matrix.md) is **generated from those runs** and CI fails if the doc is stale (`tools/compat/run_matrix.py --check`). Per-stack limitations are stated on the matrix itself.
+Fourteen framework fixtures (vanilla CSS, CSS Modules, Tailwind, Bootstrap, React JSX — stylesheets *and* camelCase style objects, Next styled-jsx, Vue SFC, Astro, Svelte, Remix, Nuxt, Vite, Angular, Spanish LTR host) are scanned by the real engine; [docs/compatibility-matrix.md](docs/compatibility-matrix.md) is **generated from those runs** and CI fails if the doc is stale (`tools/compat/run_matrix.py --check`). Per-stack limitations are stated on the matrix itself.
 
 ## VS Code
 
@@ -275,7 +275,8 @@ The unit suite covers Unicode edge cases: ZWNJ joins and their *non*-joins (poss
 - **v0.2** ✅ **shipped** — Hebrew profile (full rules), Spanish LTR host profile (RTL015–017), packaging hardening (`py.typed`, zip-safe profile loading, graceful `ProfileError`, `raast profiles` command), 80-test suite
 - **v0.3** ✅ **shipped** — RAAST Playground (browser audit, all 17 rules client-side, GitHub Pages); agent integration files for Codex CLI (`AGENTS.md`), GitHub Copilot (`.github/copilot-instructions.md`) and Cursor (`.cursor/rules/*.mdc`)
 - **v0.4** ✅ **shipped** — Runtime Inspector (Playwright LTR/RTL mirror diff, RT001–006); diff-scoped PR reviewer with idempotent PR comments; Auto-Fix 2.0 (safe/suggested/manual tiers + fix journal + `raast revert`); 32-specimen bug corpus with machine-verified evidence; Language Quality Gate (LQG001–009); generated compatibility matrix; VS Code extension scaffold
-- **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories; `.po`/`.arb` locale formats for the i18n gate; camelCase CSS-in-JS coverage (the lexical engine currently matches kebab-case only — documented on the compatibility matrix); Claude Code plugin manifest + marketplace flow
+- **v0.4.2** ✅ **shipped** — CSS-in-JS camelCase style objects are first-class (React inline styles, styled-components, Emotion fire the same rules; camelCase logical fixes); `.svelte` SFC scanning; 6 new compatibility fixtures — Astro, Svelte, Remix, Nuxt, Vite, Angular (14-stack matrix); native-language review program for fa/ar/he/es
+- **v0.5** — Urdu profile after native-speaker review; email-client and PDF categories; `.po`/`.arb` locale formats for the i18n gate; Claude Code plugin manifest + marketplace flow
 
 ## Contributing
 

@@ -222,6 +222,12 @@ def render_markdown(matrix: dict) -> str:
         "to arm them — and the correct logical-property blocks stay silent."
     )
     lines.append(
+        "- CSS-in-JS style objects are first-class: camelCase declarations (marginLeft, "
+        "textAlign) are normalized to kebab-case before matching and fire the same rules, "
+        "with camelCase logical-property fixes. Vendor-cased names normalize with a leading "
+        "hyphen. The react-jsx fixture carries both spellings."
+    )
+    lines.append(
         "- The verdicts are reproducible: `run_matrix.py --check` re-runs every fixture and "
         "compares this file byte-for-byte."
     )
@@ -239,8 +245,10 @@ def render_markdown(matrix: dict) -> str:
         "source text only."
     )
     lines.append(
-        "- That the camelCase style-object gap is closed: `marginLeft: 8` in JSX is not "
-        "detected (kebab-case only). The react-jsx row documents this honestly."
+        "- That camelCase coverage is total: property names are normalized before matching, "
+        "but shorthand and vendor-prefixed forms beyond the known prefixes (Webkit, Moz, ms, "
+        "O, Khtml) are not specially modeled. The react-jsx fixture documents the supported "
+        "spellings."
     )
     lines.append("")
     lines.append("## Commands actually executed")

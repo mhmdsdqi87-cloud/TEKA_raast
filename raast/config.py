@@ -9,7 +9,7 @@ from .profiles import available_profiles
 
 DEFAULT_CONFIG: dict = {
     "language": "fa",
-    "include": ["**/*.{html,css,scss,sass,vue,jsx,tsx,js,ts,mjs,astro,md,mdx,txt}"],
+    "include": ["**/*.{html,css,scss,sass,vue,jsx,tsx,js,ts,mjs,astro,svelte,md,mdx,txt}"],
     "exclude": [
         "node_modules/**",
         "dist/**",

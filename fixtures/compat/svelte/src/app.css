@@ -1,0 +1,20 @@
+/* Deliberate fixture stylesheet for the compat matrix (Svelte stack).
+   Block 1 is the deliberate defect: a physical padding declaration that
+   pins one side of the inline axis and does not flip under RTL (RTL002).
+   The Persian pseudo-element label below arms the per-file evidence gate the
+   engine requires before CSS rules fire on this stylesheet. Block 2
+   uses the logical twin only and must stay silent. */
+
+.panel {
+  padding-right: 16px;
+}
+
+/* evidence string: a Persian price label composed from the component */
+.price::after {
+  content: "تومان";
+}
+
+/* correct block — logical twin, must stay silent */
+.panel-ok {
+  padding-inline-end: 16px;
+}

@@ -28,6 +28,14 @@ pure-LTR file of a mixed project is NOT reported by default. CSS/Tailwind/
 HTML-structure rules do not run on .md/.mdx at all — documents deliberately
 illustrate WRONG patterns; prose rules handle markdown instead.
 
+CSS-in-JS style objects: property names are normalized to kebab-case before
+matching, so camelCase declarations in React inline styles, styled-components
+and Emotion object syntax fire the same rules (marginLeft -> margin-left ->
+RTL001). Suggested fixes preserve the spelling of the source: camelCase
+sources get camelCase logical props (marginInlineStart), stylesheets get
+kebab-case (margin-inline-start). Vendor-cased names (WebkitTransition)
+normalize with a leading hyphen.
+
 Profile-driven behavior (raast/profiles/*.json):
   direction=rtl (fa/ar/he) — RTL006 wants dir="rtl", RTL010/RTL009 fire only
   when the profile marks Western digits / Latin punctuation invalid, RTL012
@@ -46,8 +54,8 @@ from ..normalizer import ARABIC_RE, HEBREW_RE, RTL_SCRIPT_RE, detect_broken_zwnj
 from ..profiles import load_profile
 
 CSS_EXT = {".css", ".scss", ".sass"}
-TAILWIND_EXT = {".html", ".vue", ".jsx", ".tsx", ".js", ".ts", ".mjs", ".astro", ".mdx", ".md", ".php"}
-PROSE_EXT = {".html", ".vue", ".jsx", ".tsx", ".js", ".ts", ".mjs", ".astro", ".mdx", ".md", ".txt"}
+TAILWIND_EXT = {".html", ".vue", ".jsx", ".tsx", ".js", ".ts", ".mjs", ".astro", ".svelte", ".mdx", ".md", ".php"}
+PROSE_EXT = {".html", ".vue", ".jsx", ".tsx", ".js", ".ts", ".mjs", ".astro", ".svelte", ".mdx", ".md", ".txt"}
 
 SEVERITY_ORDER = {"P0": 0, "P1": 1, "P2": 2}
 
@@ -115,7 +123,23 @@ def _strip_inline_code_and_fences(text: str) -> tuple[str, dict[int, int]]:
 
 # ---------------------------------------------------------------- CSS rules
 
-_CSS_DECL = re.compile(r"(?P<prop>[-a-zA-Z]+)\s*:\s*(?P<value>[^;{}]+)")
+_CSS_DECL = re.compile(r"(?P<prop>[-a-zA-Z]+)\s*:\s*(?P<value>(?:[^;{},]|\,(?!\s*[-a-zA-Z]+\s*:))+)")
+
+# text-align / textAlign — matches stylesheet and style-object spellings, and
+# keeps the quote character of the source value ('left' stays quoted in the
+# suggested fix). The kebab alternative is case-insensitive (CSS property
+# names are) but requires the hyphen, so a JS identifier like `textalign`
+# never half-matches; the camel alternative is exact — React style objects
+# spell it textAlign. The trailing lookahead stops before the next token so
+# a value like leftward never half-matches.
+_ALIGN_DECL = re.compile(
+    r"(?P<prop>(?i:text-align)|textAlign)"
+    r"(?P<sep>\s*:\s*)"
+    r"(?P<q>['\"]?)"
+    r"(?P<val>(?i:left|right))"
+    r"(?P=q)"
+    r"(?=[\s,;})]|$)",
+)
 
 _PHYSICAL = {
     "margin-left": ("RTL001", "start"),
@@ -124,6 +148,49 @@ _PHYSICAL = {
     "padding-right": ("RTL002", "end"),
 }
 
+# --- CSS-in-JS style-object support ----------------------------------------
+# React inline styles, styled-components and Emotion object syntax spell CSS
+# properties in camelCase (marginLeft) or vendor-cased (WebkitTransition).
+# The rules below normalize property names to kebab-case before matching, so
+# a single rule set covers stylesheets and style objects alike.
+_VENDOR_PREFIX = re.compile(r"^(Webkit|Moz|ms|O|Khtml)(?=[A-Z])")
+_CAMEL_BOUNDARY = re.compile(r"([a-z0-9])([A-Z])")
+
+
+def _kebab_prop(prop: str) -> str:
+    """Normalize a CSS property name (kebab- or camelCase) to kebab-case.
+
+    Vendor-prefixed React names (WebkitTransition, msTransform) normalize
+    with a leading hyphen: -webkit-transition, -ms-transform.
+    """
+    m = _VENDOR_PREFIX.match(prop)
+    if m:
+        body = prop[m.end():]
+        return f"-{m.group(1).lower()}-{_CAMEL_BOUNDARY.sub(r'\1-\2', body).lower()}"
+    return _CAMEL_BOUNDARY.sub(r"\1-\2", prop).lower()
+
+
+def _camel_prop(kebab: str) -> str:
+    """kebab-case -> camelCase (React style-object spelling).
+
+    margin-inline-start -> marginInlineStart; -webkit-mask-composite ->
+    WebkitMaskComposite. Standard properties keep a lowercase first letter;
+    vendor-prefixed ones capitalize the vendor segment, per React convention.
+    """
+    vendor = kebab.startswith("-")
+    parts = kebab.lstrip("-").split("-")
+    head = parts[0].capitalize() if vendor else parts[0]
+    return head + "".join(w.capitalize() for w in parts[1:])
+
+
+def _is_style_object_name(prop: str) -> bool:
+    """True when the property is spelled in camelCase (a JS style object).
+
+    Uppercase-only names (MARGIN-LEFT, valid but unusual CSS) and plain
+    kebab-case stay on the stylesheet path.
+    """
+    return _CAMEL_BOUNDARY.search(prop) is not None
+
 
 def rule_css_physical(path: str, content: str, config: dict) -> list[Finding]:
     if not _has_rtl_script(content) and not _force_enabled(config, "RTL001"):
@@ -131,11 +198,14 @@ def rule_css_physical(path: str, content: str, config: dict) -> list[Finding]:
     findings: list[Finding] = []
     for i, line in enumerate(content.splitlines(), 1):
         for m in _CSS_DECL.finditer(line):
-            prop = m.group("prop").strip().lower()
-            if prop in _PHYSICAL:
-                rule, end = _PHYSICAL[prop]
+            prop = m.group("prop").strip()
+            prop_kebab = _kebab_prop(prop)
+            if prop_kebab in _PHYSICAL:
+                rule, end = _PHYSICAL[prop_kebab]
                 axis = "margin" if rule == "RTL001" else "padding"
-                logical = f"{axis}-inline-{end}"
+                logical_kebab = f"{axis}-inline-{end}"
+                camel = _is_style_object_name(prop)
+                logical = _camel_prop(logical_kebab) if camel else logical_kebab
                 scoped_ltr = '[dir="ltr"]' in line
                 findings.append(Finding(
                     rule=rule, severity="P1",
@@ -159,21 +229,27 @@ def rule_css_text_align(path: str, content: str, config: dict) -> list[Finding]:
         return []
     findings = []
     for i, line in enumerate(content.splitlines(), 1):
-        for m in re.finditer(r"text-align\s*:\s*(left|right)\b", line, re.IGNORECASE):
-            val = m.group(1).lower()
+        for m in _ALIGN_DECL.finditer(line):
+            val = m.group("val").lower()
+            camel = _is_style_object_name(m.group("prop"))
             scoped_ltr = '[dir="ltr"]' in line or "dir='ltr'" in line
             findings.append(Finding(
                 rule="RTL004", severity="P1",
                 confidence="low" if scoped_ltr else "high",
-                file=path, line=i, column=m.start() + 1,
-                message=f"text-align: {val}",
+                file=path, line=i, column=m.start("prop") + 1,
+                message=f"{m.group('prop') if camel else 'text-align'}: {val}",
                 explanation=(
                     "Physical alignment does not flip with document direction. "
                     "start/end track the inline direction in both LTR and RTL."
                     if not scoped_ltr else
                     "Declaration appears inside a [dir=\"ltr\"] scope — verify it is intentional."
                 ),
-                suggested_fix=f"text-align: {'start' if val == 'left' else 'end'}",
+                suggested_fix=(
+                    f"{m.group('prop')}{m.group('sep')}"
+                    f"{m.group('q')}{'start' if val == 'left' else 'end'}{m.group('q')}"
+                    if camel else
+                    f"text-align: {'start' if val == 'left' else 'end'}"
+                ),
                 fixable=not scoped_ltr,
             ))
     return findings
@@ -185,8 +261,8 @@ def rule_css_left_right(path: str, content: str, config: dict) -> list[Finding]:
     findings = []
     for i, line in enumerate(content.splitlines(), 1):
         for m in _CSS_DECL.finditer(line):
-            prop = m.group("prop").strip().lower()
-            if prop in ("left", "right"):
+            prop = m.group("prop").strip()
+            if _kebab_prop(prop) in ("left", "right"):
                 findings.append(Finding(
                     rule="RTL003", severity="P2", confidence="medium",
                     file=path, line=i, column=m.start("prop") + 1,
@@ -224,15 +300,19 @@ def rule_css_letter_spacing(path: str, content: str, config: dict,
     for i, line in enumerate(content.splitlines(), 1):
         # Value token must stop before quotes/backticks — `` `letter-spacing: 0` ``
         # in markdown prose must resolve to "0" (legal), not "0`" (false positive).
-        m = re.search(r"letter-spacing\s*:\s*([^\s;{}\"'`]+)", line)
+        # Style-object values may be quoted ('2px') — the quote is captured and
+        # echoed so the finding text stays true to the source.
+        m = re.search(
+            r"(?:letter-spacing|letterSpacing)\s*:\s*(['\"]?)([^\s;{},'\"`]+)(?:\1)", line)
         if not m:
             continue
-        if m.group(1).lower() in ("normal", "inherit", "initial", "unset", "0", "0px", "0em", "0rem"):
+        value = m.group(2)
+        if value.lower() in ("normal", "inherit", "initial", "unset", "0", "0px", "0em", "0rem"):
             continue
         findings.append(Finding(
             rule="RTL005", severity=severity, confidence="high",
             file=path, line=i, column=m.start() + 1,
-            message=f"letter-spacing: {m.group(1)}",
+            message=f"letter-spacing: {m.group(1)}{value}{m.group(1)}",
             explanation=explanation,
             suggested_fix="remove the declaration (use size/weight for display emphasis)",
             fixable=True,

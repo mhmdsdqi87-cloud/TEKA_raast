@@ -1,0 +1,65 @@
+name: "3 · Native review"
+description: "Claim a native-speaker review of Persian, Arabic, Hebrew, or Spanish artifacts — see CONTRIBUTING.md, 'Native-language review program'."
+labels: ["native-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for volunteering as a native reviewer. RAAST's engine verifies the mechanical half of RTL correctness; this program covers the half that needs native eyes — idiomatic phrasing, cultural correctness, typographic nuance.
+
+        Title this issue `[Native review] <language>` — for example `[Native review] Persian (fa)`. Process, per-language scope and concrete review questions: [CONTRIBUTING.md → Native-language review program](../../blob/main/CONTRIBUTING.md#native-language-review-program) and [docs/review-program.md](../../blob/main/docs/review-program.md).
+
+        Honest status: no completed native reviews have been published yet — every language is awaiting its first reviewer.
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: "Review language"
+      options:
+        - "Persian (fa)"
+        - "Arabic (ar)"
+        - "Hebrew (he)"
+        - "Spanish (es)"
+        - "Other (describe it in focus areas)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: focus_areas
+    attributes:
+      label: "Focus areas"
+      description: "What will you validate? Be concrete — name the conventions, not just the language."
+      placeholder: |
+        e.g. Persian: ZWNJ affix compounds in corpus and skill examples (می‌ + verb, noun + ها),
+        possessive suffixes that must stay attached, Persian digits ۰-۹ and ، ؟ ؛ punctuation,
+        Arabic Yeh/Kaf (ي ك) appearing as typos in Persian strings.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: artifacts
+    attributes:
+      label: "Artifacts you intend to review"
+      description: "Select everything you plan to cover; a maintainer confirms the final scope on this issue."
+      options:
+        - label: "Corpus prose — corpus/samples/*/broken.html + fixed.html"
+        - label: "Skill examples — skills/*/SKILL.md snippet prose"
+        - label: "Fonts catalog — skills/rtl-typography/fonts.md entries"
+        - label: "Language profile conventions — raast/profiles/<lang>.json"
+        - label: "Benchmark task wording — benchmarks/cases/*.json"
+        - label: "Docs examples — docs/*.md sample copy"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agreements
+    attributes:
+      label: "Agreements"
+      description: "How the program works (CONTRIBUTING.md → Native-language review program)."
+      options:
+        - label: "I will open review PRs from my own GitHub account"
+          required: true
+        - label: "I understand reviews are credited only after a maintainer merges them"
+          required: true
+        - label: "I have read CONTRIBUTING.md"
+          required: true

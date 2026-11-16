@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .normalizer import ARABIC_RE, _mask, _unmask, normalize
-from .rules import Finding, _tw_fix
+from .rules import _CAMEL_BOUNDARY, Finding, _camel_prop, _tw_fix
 
 BACKUP_DIRNAME = ".raast-backup"
 JOURNAL_FILENAME = "journal.json"
@@ -87,20 +87,36 @@ def _apply_css_fixes(content: str, findings: list[Finding]) -> tuple[str, int, l
         new_line = line
 
         if f.rule in ("RTL001", "RTL002"):
-            m = re.search(r"(margin|padding)-(left|right)(\s*:\s*)([^;{}]+)", line)
+            m = re.search(
+                r"(?P<prop>margin-left|margin-right|marginLeft|marginRight|"
+                r"padding-left|padding-right|paddingLeft|paddingRight)"
+                r"(?P<sep>\s*:\s*)(?P<value>[^;{},}]+)", line)
             if m:
-                axis, side, sep, value = m.groups()
-                logical = f"{axis}-inline-{'end' if side == 'right' else 'start'}"
+                pname = m.group("prop")
+                axis = "margin" if pname[:6].lower() == "margin" else "padding"
+                side = "end" if pname.lower().endswith("right") else "start"
+                kebab = f"{axis}-inline-{side}"
+                # Style-object spellings (marginLeft) stay camelCase after the
+                # fix; stylesheet spellings become kebab-case logical props.
+                logical = _camel_prop(kebab) if _CAMEL_BOUNDARY.search(pname) else kebab
+                sep, value = m.group("sep"), m.group("value")
                 new_line = line[: m.start()] + f"{logical}{sep}{value.rstrip()}" + line[m.end():]
 
         elif f.rule == "RTL004":
-            m = re.search(r"text-align(\s*:\s*)(left|right)\b", line, re.IGNORECASE)
+            m = re.search(
+                r"(?P<prop>(?i:text-align)|textAlign)(?P<sep>\s*:\s*)"
+                r"(?P<q>['\"]?)(?P<val>(?i:left|right))(?P=q)", line)
             if m:
-                repl = "start" if m.group(2).lower() == "left" else "end"
-                new_line = line[: m.start()] + f"text-align{m.group(1)}{repl}" + line[m.end():]
+                repl = "start" if m.group("val").lower() == "left" else "end"
+                prop = m.group("prop")
+                if _CAMEL_BOUNDARY.search(prop):
+                    fixed = f"{prop}{m.group('sep')}{m.group('q')}{repl}{m.group('q')}"
+                else:
+                    fixed = f"text-align{m.group('sep')}{repl}"
+                new_line = line[: m.start()] + fixed + line[m.end():]
 
         elif f.rule == "RTL005":
-            m = re.search(r"\s*letter-spacing\s*:\s*[^;{}]+;?", line)
+            m = re.search(r"\s*(?:letter-spacing|letterSpacing)\s*:\s*[^;{},}]+;?", line)
             if m:
                 new_line = line[: m.start()] + line[m.end():]
                 if new_line.strip() == "":

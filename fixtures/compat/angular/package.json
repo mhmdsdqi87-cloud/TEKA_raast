@@ -1,0 +1,7 @@
+{
+  "name": "angular-fa-panel",
+  "private": true,
+  "dependencies": {
+    "@angular/core": "^17.0.0"
+  }
+}

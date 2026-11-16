@@ -61,3 +61,43 @@ The corpus ([corpus/](corpus/README.md)) is the project's evidence base. To add 
 ## Reporting bugs
 
 Use the bug template. For RTL rendering questions include: OS, browser, font stack, and a minimal HTML snippet.
+
+## Native-language review program
+
+RAAST automates the mechanical half of RTL correctness — the rule engine, the corpus verifier, the benchmark and the i18n gate check what a machine can check: physical CSS, missing `dir`, ZWNJ compound *shape*, digit and punctuation classes, placeholder sets. What no engine can judge is whether the language itself reads right: idiomatic phrasing, cultural correctness, and typographic nuance in examples and corpus text. That judgment belongs to native speakers, which is why this program exists.
+
+Honest starting point: much of the bundled Persian/Arabic/Hebrew example copy in `corpus/samples/` and `skills/` was written by non-native contributors. It is machine-verified against the profiles, but it has not been native-reviewed — and that gap is exactly what this program closes. (Adding a *new* language profile, e.g. Urdu, is a separate track — see "Adding a language profile" above; this program reviews the existing fa/ar/he/es artifacts.)
+
+### Languages and scope
+
+| Language | Review scope |
+|---|---|
+| Persian (`fa`) | ZWNJ compound correctness (می‌ + verb, noun + ‌ها) in corpus and docs |
+| Arabic (`ar`) | Arabic-script examples and digit/punctuation conventions |
+| Hebrew (`he`) | Hebrew examples and niqqud handling |
+| Spanish (`es`) | Spanish prose conventions and RTL-fragment isolation examples |
+
+### What reviewers review
+
+- `corpus/samples/*/broken.html` + `fixed.html` — the specimen prose
+- `skills/*/SKILL.md` — the example snippets agents will imitate
+- `skills/rtl-typography/fonts.md` — the Persian/Arabic font-catalog entries
+- `raast/profiles/<lang>.json` — the convention declarations (digits, punctuation, affixes, fonts, dates)
+- `benchmarks/cases/*.json` — task wording and expected behavior
+- docs examples (`docs/*.md` sample copy)
+
+Concrete questions per language and the full process: [docs/review-program.md](docs/review-program.md).
+
+### How to join
+
+1. Open a GitHub issue using the **Native review** issue template: state your language, your focus areas, and the artifacts you intend to review.
+2. A maintainer confirms the scope on the issue.
+3. You open normal PRs from your own account — same ground rules as any other contribution (tests still green, corpus still 32/32).
+
+### Credit policy
+
+Reviewers are credited in CONTRIBUTORS.md (the file is created with the first credit) and in the release notes of the version that lands their review. Review PRs are authored by the reviewer's own GitHub account — credit follows authorship, merged PR by merged PR.
+
+### Status
+
+Status: the program is open as of v0.4.2. No completed native reviews have been published yet — every language is awaiting its first reviewer. Review claims are tracked via the Native review issue template.

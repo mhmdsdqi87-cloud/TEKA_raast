@@ -1,0 +1,15 @@
+<!-- Deliberate fixture template for the compat matrix (Angular stack).
+     This file is scanned like plain HTML; binding syntax and compiler
+     output are not parsed. It carries Persian copy only — the defect
+     pair lives in app.component.css. -->
+<main class="panel">
+  <h2>سبد خرید</h2>
+  <p>محصولات انتخابی شما با ارسال سریع آماده می‌شوند</p>
+  <section class="panel-pricing">
+    <span class="price">۱۲۰</span>
+  </section>
+  <!-- defect lives in the stylesheet; markup stays defect-free -->
+  <button class="panel-btn">ادامه خرید</button>
+  <!-- correct block twin: markup stays defect-free -->
+  <button class="panel-btn-ok">ذخیره تغییرات</button>
+</main>

@@ -1,0 +1,8 @@
+{
+  "name": "nuxt-fa-portal",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "nuxt": "^3.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+/* Deliberate fixture stylesheet for the compat matrix (Angular stack).
+   Block 1 is the deliberate defect: a physical margin declaration that
+   does not flip under RTL (RTL001). The Persian pseudo-element label
+   below arms the per-file evidence gate the engine requires before CSS
+   rules fire on this stylesheet. Block 2 uses the logical twin only and
+   must stay silent. Component encapsulation is not modeled; the scanner
+   reads the raw stylesheet text. */
+
+.panel-btn {
+  margin-left: 10px;
+}
+
+/* evidence string: a Persian price label composed from the template */
+.price::after {
+  content: "تومان";
+}
+
+/* correct block — logical twin, must stay silent */
+.panel-btn-ok {
+  margin-inline-start: 10px;
+}

@@ -2,6 +2,26 @@
 
 All notable changes. Format based on Keep a Changelog; versioning: SemVer.
 
+## [0.4.2] — 2026-11-16
+
+The coverage release. The two most-requested detection gaps close and the compatibility matrix nearly doubles — every claim still machine-verified from real runs.
+
+### Added
+- **CSS-in-JS style objects are first-class.** Property names are normalized to kebab-case before matching, so camelCase declarations in React inline styles, styled-components and Emotion object syntax fire the same rules as stylesheets (`marginLeft` → RTL001, `paddingRight` → RTL002, `textAlign` → RTL004, `letterSpacing` → RTL005, `left`/`right` → RTL003 review-only). Suggested fixes preserve the spelling of the source: style objects get camelCase logical props (`marginInlineStart`), stylesheets get kebab-case (`margin-inline-start`). Vendor-cased names (`WebkitTransition`, `msTransform`) normalize with a leading hyphen. Value boundaries are JS-object-aware: a comma followed by a `property:` pair ends the value, so `{ marginLeft: 8, color: 'red' }` reports once with a clean suggestion while `min(10px, 2vw)` stays intact. 27 dedicated tests in `tests/test_style_objects.py` (normalization, detection, silent logical twins, value boundaries, auto-fix, Svelte dispatch).
+- **`.svelte` files are scanned.** Svelte SFCs join `.vue` and `.astro` in the scanner's extension set and the default include glob; `<style>` blocks are read lexically like the other SFC formats. The compatibility matrix now verifies this with a real SFC fixture instead of documenting the gap.
+- **Six new compatibility fixtures** — Astro, Svelte, Remix, Nuxt, Vite and Angular join the matrix (**14/14 passing**), each with a deliberate defect plus a silent logical twin, verified by real `doctor` runs. The matrix is regenerated from those runs; `run_matrix.py --check` still byte-compares the committed doc.
+- **Native-language review program** — a CONTRIBUTING.md section, a `native_review` issue template and `docs/review-program.md` with per-language checklists (fa/ar/he/es) covering corpus prose, skill examples, font catalogs, profile conventions and benchmark wording. Honest starting point: no completed native reviews exist yet — every language is awaiting its first reviewer, and the status table is only ever updated when a review PR actually lands.
+
+### Changed
+- `fixtures/compat/react-jsx` now carries both spellings (template literal + camelCase style object); `fixtures/compat/svelte` notes updated — the SFC itself is scanned since 0.4.2.
+- `docs/compatibility-matrix.md` regenerated: camelCase style-object support and `.svelte` coverage are documented as proven behavior, with the remaining honest limits (shorthand/vendor forms beyond the known prefixes; no framework-internal compilation modeling).
+
+### Verification (all run locally before push)
+- `python3 -m pytest tests/` → 290 passed, 1 skipped (Playwright self-skip guard)
+- `python3 tools/corpus/verify.py` → 32/32 specimens PASS
+- `python3 -m raast.cli benchmark --cases benchmarks/cases --candidate benchmarks/reference --condition C-reference` → PASS
+- `python3 tools/compat/run_matrix.py --check` → 14/14 fixtures, doc fresh
+
 ## [0.4.1] — 2026-11-15
 
 The verification-debt release: every capability shipped in 0.4.0 now has a dedicated, independent test module of its own. The green self-test run no longer rests on the old engine suite alone — the Runtime Inspector, the PR reviewer, the diff scoper, the fix journal/revert path and the Language Quality Gate each prove their own edge cases.

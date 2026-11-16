@@ -32,7 +32,7 @@
     "path": "fixtures/compat/react-jsx",
     "language": "fa",
     "expect_rules": ["RTL001"],
-    "notes": "Kebab-case declarations inside CSS-in-JS template literals are scanned like stylesheets. Honest gap: camelCase style objects (marginLeft: 8) are NOT matched by the current engine — kebab-case property names only; a dedicated JSX style-object rule is future work."
+    "notes": "Kebab-case declarations inside CSS-in-JS template literals are scanned like stylesheets. The camelCase style object (marginLeft: 8) fires the same rule: property names are normalized to kebab-case before matching, and the suggested fix stays camelCase (marginInlineStart). The logical inline-object twin stays silent."
   },
   {
     "name": "next-jsx",
@@ -54,5 +54,47 @@
     "language": "es",
     "expect_rules": ["RTL015", "RTL016"],
     "notes": "LTR host profile: the direction rules flip — RTL runs inside Spanish prose must be isolated (RTL015) and RTL-only elements need dir (RTL016). The bdi-isolated paragraph stays silent, which is the engine's own recommendation pattern."
+  },
+  {
+    "name": "astro",
+    "path": "fixtures/compat/astro",
+    "language": "fa",
+    "expect_rules": ["RTL001"],
+    "notes": "Astro page scanned as source text: frontmatter, template markup and the component style block are all read lexically in one pass. The physical margin declaration in the style block fires RTL001; the margin-inline-start twin stays silent. Compilation, islands and style scoping are not modeled."
+  },
+  {
+    "name": "svelte",
+    "path": "fixtures/compat/svelte",
+    "language": "fa",
+    "expect_rules": ["RTL002"],
+    "notes": "The SFC and the global stylesheet pair are both scanned: v0.4.2 added .svelte to the scanner's extension set, so the App.svelte style block fires RTL002 alongside the defect in src/app.css and both logical twins stay silent. Svelte compilation and component scoping are not modeled."
+  },
+  {
+    "name": "remix",
+    "path": "fixtures/compat/remix",
+    "language": "fa",
+    "expect_rules": ["RTL004"],
+    "notes": "Route module scanned as source text; the inline critical-CSS template literal is read lexically like a stylesheet, so the physical alignment fires RTL004. Loaders, the compiler and runtime styling are not modeled; the text-align start twin stays silent."
+  },
+  {
+    "name": "nuxt",
+    "path": "fixtures/compat/nuxt",
+    "language": "fa",
+    "expect_rules": ["RTL001"],
+    "notes": "Nuxt 3 root component app.vue scanned like the plain vue fixture: the SFC style block is read lexically while auto-imports and SSR output are not parsed. The physical margin declaration fires RTL001; the margin-inline-end twin stays silent."
+  },
+  {
+    "name": "vite",
+    "path": "fixtures/compat/vite",
+    "language": "fa",
+    "expect_rules": ["RTL004"],
+    "notes": "Vanilla Vite trio: document, entry module and stylesheet are scanned as separate files, and the CSS evidence gate is per-file, so style.css carries its own Persian generated label. The physical alignment in the stylesheet fires RTL004; the text-align end twin stays silent and the clean document keeps proper root meta so no structure rules fire."
+  },
+  {
+    "name": "angular",
+    "path": "fixtures/compat/angular",
+    "language": "fa",
+    "expect_rules": ["RTL001"],
+    "notes": "Angular trio scanned as three plain files: component class, external template and component stylesheet. templateUrl wiring and ViewEncapsulation rewriting are not modeled. The physical margin declaration in app.component.css fires RTL001; the margin-inline-start twin stays silent."
   }
 ]

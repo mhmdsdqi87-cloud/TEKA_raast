@@ -7,7 +7,7 @@ from pathlib import Path
 
 TEXT_SUFFIXES = {
     ".html", ".css", ".scss", ".sass", ".vue", ".jsx", ".tsx", ".js", ".ts",
-    ".mjs", ".astro", ".md", ".mdx", ".txt", ".json", ".yml", ".yaml",
+    ".mjs", ".astro", ".svelte", ".md", ".mdx", ".txt", ".json", ".yml", ".yaml",
 }
 MAX_BYTES = 1_500_000
 

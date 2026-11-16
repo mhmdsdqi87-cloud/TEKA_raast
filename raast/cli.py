@@ -69,7 +69,7 @@ def cmd_init(args) -> int:
     det = detect(root)
     cfg = {
         "language": args.language,
-        "include": ["**/*.{html,css,scss,sass,vue,jsx,tsx,js,ts,mjs,astro,md,mdx,txt}"],
+        "include": ["**/*.{html,css,scss,sass,vue,jsx,tsx,js,ts,mjs,astro,svelte,md,mdx,txt}"],
         "exclude": ["node_modules/**", "dist/**", "build/**", ".next/**", "vendor/**", ".raast-backup/**", "**/*.min.css"],
         "severity_overrides": {},
         "rules": {},

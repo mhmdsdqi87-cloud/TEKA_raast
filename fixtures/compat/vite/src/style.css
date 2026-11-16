@@ -1,0 +1,20 @@
+/* Deliberate fixture stylesheet for the compat matrix (Vite vanilla).
+   Block 1 is the deliberate defect: a physical text alignment that pins
+   the inline axis and does not flip under dir="rtl" (RTL004). The
+   Persian pseudo-element label below arms the per-file evidence gate the
+   engine requires before CSS rules fire on this stylesheet. Block 2
+   uses the logical twin only and must stay silent. */
+
+.gallery-title {
+  text-align: right;
+}
+
+/* evidence string: a Persian price label composed from the markup */
+.price-tag::after {
+  content: "تومان";
+}
+
+/* correct block — logical twin, must stay silent */
+.btn-ok {
+  text-align: end;
+}

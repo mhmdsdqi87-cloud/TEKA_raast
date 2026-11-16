@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!-- Deliberate fixture for the compat matrix (Vite vanilla stack).
+     Defects live ONLY in src/style.css. This document stays clean —
+     proper document meta on the root element and logical properties
+     only — so the matrix isolates the CSS rule. The stylesheet carries
+     its own Persian evidence string because the gate is evaluated per
+     file, not per project. -->
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>گالری تصاویر</title>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+  <main class="gallery">
+    <h1 class="gallery-title">گالری تصاویر</h1>
+    <p class="gallery-lead">هر هفته آثار تازه از هنرمندان مستقل منتشر می‌شود</p>
+    <section class="gallery-pricing">
+      <span class="price-tag">۱۲۰</span>
+    </section>
+    <!-- correct section: logical properties only — must stay silent -->
+    <section class="gallery-actions">
+      <button class="btn">مشاهده گالری</button>
+      <button class="btn-ok">ذخیره تغییرات</button>
+    </section>
+  </main>
+</body>
+</html>
