@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحه پشتیبانی</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/vazirmatn@latest/index.css">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            direction: rtl;
+            text-align: start;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .code-snippet {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            text-align: left;
+            direction: ltr;
+        }
+        .contact-link {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .contact-link:hover {
+            text-decoration: underline;
+        }
+        .phone-number {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>مرکز پشتیبانی فنی</h1>
+    
+    <p>برای دریافت کمک فنی، لطفاً با شماره تلفن <span class="phone-number">۰۲۱-۱۲۳۴۵۶۷۸</span> تماس حاصل فرمایید. کارشناسان ما آماده ارائه خدمات به شما هستند.</p>
+    
+    <div class="price-container">
+        <span>قیمت محصول:</span>
+        <span>$۱۲.۹۹</span>
+        <span>معادل</span>
+        <span>۵۵۰,۰۰۰ تومان</span>
+    </div>
+    
+    <h2>نصب بسته npm</h2>
+    <p>برای نصب این بسته، از دستور زیر استفاده کنید:</p>
+    <div class="code-snippet">
+        npm install my-persian-package
+    </div>
+    
+    <p>در صورت هرگونه سؤال یا پیشنهاد، لطفاً با آدرس ایمیل <a href="mailto:support@example.com" class="contact-link">support@example.com</a> با ما در ارتباط باشید.</p>
+    
+    <p>تاریخ امروز: <span id="current-date"></span></p>
+    
+    <script>
+        // نمایش تاریخ فارسی
+        const options = { year: 'numeric', month: 'long', day: 'numeric', calendar: 'persian' };
+        const persianDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', options);
+        document.getElementById('current-date').textContent = persianDate.format(new Date());
+    </script>
+</body>
+</html>

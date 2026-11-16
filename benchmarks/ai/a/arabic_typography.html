@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجرنا</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        .price {
+            font-weight: bold;
+            color: #d9534f;
+            font-size: 1.2rem;
+        }
+        .navbar {
+            background-color: #f8f9fa;
+        }
+        .product-card {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-image {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: #6a11cb;
+            border-color: #6a11cb;
+        }
+        .btn-primary:hover {
+            background-color: #2575fc;
+            border-color: #2575fc;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 40px 0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">متجرنا</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">المنتجات</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">عن المتجر</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">اتصل بنا</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <h1 class="display-4 mb-4">مرحباً بك في متجرنا الإلكتروني!</h1>
+            <p class="lead">اكتشف أحدث المنتجات والعروض المميزة بأسعار تنافسية</p>
+            <button class="btn btn-primary btn-lg mt-3">تسوق الآن</button>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="container my-5">
+        <h2 class="text-center mb-5">منتجاتنا المميزة</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="product-card">
+                    <img src="https://picsum.photos/seed/product1/400/300.jpg" alt="منتج 1" class="product-image">
+                    <div class="p-3">
+                        <h4>منتج 1</h4>
+                        <p class="price">١٩٩.٩٩ ريال سعودي</p>
+                        <p>وصف قصير للمنتج يتضمن الميزات الرئيسية</p>
+                        <button class="btn btn-primary">أضف إلى السلة</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="product-card">
+                    <img src="https://picsum.photos/seed/product2/400/300.jpg" alt="منتج 2" class="product-image">
+                    <div class="p-3">
+                        <h4>منتج 2</h4>
+                        <p class="price">٢٤٩.٩٩ ريال سعودي</p>
+                        <p>وصف قصير للمنتج يتضمن الميزات الرئيسية</p>
+                        <button class="btn btn-primary">أضف إلى السلة</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="product-card">
+                    <img src="https://picsum.photos/seed/product3/400/300.jpg" alt="منتج 3" class="product-image">
+                    <div class="p-3">
+                        <h4>منتج 3</h4>
+                        <p class="price">١٥٩.٩٩ ريال سعودي</p>
+                        <p>وصف قصير للمنتج يتضمن الميزات الرئيسية</p>
+                        <button class="btn btn-primary">أضف إلى السلة</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="bg-light py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">مميزاتنا</h2>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
+                    <h4>توصيل سريع</h4>
+                    <p>نوصل طلباتك في أسرع وقت ممكن</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h4>دفع آمن</h4>
+                    <p>نضمن لك عملية دفع آمنة وموثوقة</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-undo fa-3x text-primary mb-3"></i>
+                    <h4>إرجاع سهل</h4>
+                    <p>يمكنك إرجاع المنتج خلال ٣٠ يوماً</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>عن المتجر</h4>
+                    <p>نحن متجر إلكتروني متخصص في تقديم أفضل المنتجات بجودة عالية وخدمة عملاء ممتازة.</p>
+                </div>
+                <div class="col-md-4">
+                    <h4>روابط سريعة</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50">الرئيسية</a></li>
+                        <li><a href="#" class="text-white-50">المنتجات</a></li>
+                        <li><a href="#" class="text-white-50">عن المتجر</a></li>
+                        <li><a href="#" class="text-white-50">اتصل بنا</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>تواصل معنا</h4>
+                    <p><i class="fas fa-phone"></i> 966501234567</p>
+                    <p><i class="fas fa-envelope"></i> info@store.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> الرياض، المملكة العربية السعودية</p>
+                </div>
+            </div>
+            <hr class="bg-white my-4">
+            <div class="text-center">
+                <p>&copy; 2023 متجرنا. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add to cart functionality
+        document.querySelectorAll('.btn-primary').forEach(button => {
+            if (button.textContent.includes('أضف إلى السلة')) {
+                button.addEventListener('click', function() {
+                    // Show a simple notification instead of alert
+                    const notification = document.createElement('div');
+                    notification.className = 'position-fixed bottom-0 start-0 m-3 p-3 bg-success text-white rounded';
+                    notification.textContent = 'تمت إضافة المنتج إلى السلة بنجاح!';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 3000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

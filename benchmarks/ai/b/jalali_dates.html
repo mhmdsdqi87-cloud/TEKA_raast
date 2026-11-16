@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تاریخ امروز</title>
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+            color: #333;
+        }
+        .date-container {
+            background-color: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-block-end: 2rem;
+            text-align: center;
+        }
+        .today-date {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .timestamp-container {
+            background-color: #e8f4f8;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        .timestamp-label {
+            font-weight: 600;
+            margin-block-end: 0.5rem;
+        }
+        .relative-time {
+            font-size: 1.25rem;
+            color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>نمایش تاریخ امروز</h1>
+    
+    <div class="date-container">
+        <div class="today-date" id="todayDate"></div>
+    </div>
+    
+    <div class="timestamp-container">
+        <div class="timestamp-label">زمان نسبی:</div>
+        <div class="relative-time" id="relativeTime"></div>
+    </div>
+
+    <script>
+        // Display today's date in Jalali calendar
+        function displayJalaliDate() {
+            const today = new Date();
+            const jalaliDate = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            }).format(today);
+            
+            document.getElementById('todayDate').textContent = jalaliDate;
+        }
+        
+        // Format a relative timestamp in Persian
+        function formatRelativeTimestamp() {
+            // Example timestamp (5 hours ago)
+            const timestamp = Date.now() - (5 * 60 * 60 * 1000);
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const rtf = new Intl.RelativeTimeFormat('fa', { numeric: 'auto' });
+            
+            let value;
+            let unit;
+            
+            if (diff < 60000) {
+                value = Math.floor(diff / 1000);
+                unit = 'second';
+            } else if (diff < 3600000) {
+                value = Math.floor(diff / 60000);
+                unit = 'minute';
+            } else if (diff < 86400000) {
+                value = Math.floor(diff / 3600000);
+                unit = 'hour';
+            } else {
+                value = Math.floor(diff / 86400000);
+                unit = 'day';
+            }
+            
+            const relativeTime = rtf.format(value, unit);
+            document.getElementById('relativeTime').textContent = relativeTime;
+        }
+        
+        // Initialize the page
+        displayJalaliDate();
+        formatRelativeTimestamp();
+    </script>
+</body>
+</html>

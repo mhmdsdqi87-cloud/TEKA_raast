@@ -21,17 +21,58 @@ Artifacts: `benchmarks/results/c-reference.json` and `benchmarks/results/c-refer
 
 **What this proves:** the validators accept genuinely correct implementations (they are not vacuously failing), and the reference implementations satisfy every published rule. It is a meta-test of the benchmark itself, included in CI (`.github/workflows/raast.yml`).
 
-## Conditions A/B — agent comparisons
+## Conditions A/B — controlled with/without-skills run (published, reproducible)
 
-**Not published at v0.1 — deliberately.**
+First controlled A/B run, executed 2026-11-16 with the runner and digest in
+[`tools/ai-benchmark/`](../tools/ai-benchmark/) (see that README for the
+exact reproduction contract):
 
-An honest A/B claim requires controlled runs of a named agent with pinned prompts and versions. This repository does not fabricate numbers. The methodology (docs/benchmark-methodology.md) gives you the exact procedure:
+| Item | Value |
+|---|---|
+| Model | `glm-4-plus` (z-ai-web-dev-sdk, `thinking: disabled`, default temperature) |
+| Calls | 14 — 7 artifact files × 2 conditions, identical user prompts |
+| Condition B delta | identical prompt + `tools/ai-benchmark/skill-digest.md` (`digest_sha256_16: 5b8469cec25a38e3`) |
+| Scoring | unmodified `raast benchmark` (`--condition A-baseline` / `B-raast`) |
 
-1. Run your agent on the 24 `task` prompts without skills → collect output dir → `--condition A-baseline`
-2. Repeat with RAAST skills installed → `--condition B-raast`
-3. Publish both JSON reports with their environment blocks
+| Condition | Passed | Failed | Notable per-category |
+|---|---|---|---|
+| **A — baseline (no skills)** | **14/24** | 10 | jalali 0/2 · a11y 1/3 · components 1/2 · rtl_layout 3/4 |
+| **B — with RAAST skills** | **20/24** | 4 | jalali 2/2 · a11y 3/3 · components 2/2 · rtl_layout 4/4 |
 
-If you run this and publish the two JSON artifacts, open a PR adding them under `benchmarks/results/` — include agent name, version, and prompts.
+**Delta: +6 cases.** The skill digest flipped exactly these: `lang`/`dir`
+on `<html>` (a11y-003, layout-001), `aria-label` on icon buttons (a11y-002,
+comp-002), and Intl-based Jalali dates (`fa-IR-u-ca-persian`) instead of
+hardcoded conversion (jalali-001, jalali-002).
+
+**Still failing in BOTH conditions (the honest part):** `bidi-001/002/004`
+(un-isolated LTR atoms in generated prose) and `fa-typo-003` (Latin
+punctuation in Persian prose). Both conditions were scored with the same
+validators; the digest's bidi guidance did not translate into isolation in
+generated markup — that is the highest-value skill-improvement target this
+run surfaced, and we publish it as such rather than around it.
+
+Raw evidence, all committed:
+
+- Artifacts: `benchmarks/ai/a/*.html`, `benchmarks/ai/b/*.html`
+- Call manifest: `benchmarks/ai/manifest.json` (model, per-call timestamps, byte counts, digest hash)
+- Reports: `benchmarks/results/a-run.json|.md`, `benchmarks/results/b-run.json|.md`
+
+Any number above can be re-verified offline: `raast benchmark --cases
+benchmarks/cases --candidate benchmarks/ai/a --condition A-baseline`
+against the committed artifacts. Re-running the *generation* is
+nondeterministic (model output); re-running the *scoring* is not.
+
+**Small-sample caveat:** 7 artifacts × 2 conditions is evidence of
+direction, not a leaderboard. If you reproduce the run with another
+agent/model, open a PR with both JSON reports + environment block and the
+results table gains a row.
+
+## Historical note
+
+**Not published at v0.1 — deliberately.** Versions ≤ 0.4.1 refused to
+publish A/B numbers because no controlled run had been executed; the
+methodology doc shipped first (docs/benchmark-methodology.md), the
+controlled run second (this section, v0.4.2).
 
 ## Browser validation (development environment, real runs)
 

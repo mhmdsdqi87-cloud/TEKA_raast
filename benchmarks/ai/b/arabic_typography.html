@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر إلكتروني</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Vazirmatn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background-color: #fff;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://picsum.photos/seed/arabstore/1600/800.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            padding: 5rem 1rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #ff6b6b;
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #ff5252;
+        }
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .product-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-info {
+            padding: 1.5rem;
+        }
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 3rem;
+        }
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero p {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>متجر إلكتروني</h1>
+        <p>أفضل المنتجات بأفضل الأسعار</p>
+    </header>
+
+    <section class="hero">
+        <h1>مرحباً بكم في متجرنا الإلكتروني</h1>
+        <p>اكتشف أحدث المنتجات والعروض الخاصة</p>
+        <a href="#" class="btn">تسوق الآن</a>
+    </section>
+
+    <section class="products">
+        <div class="product-card">
+            <img src="https://picsum.photos/seed/product1/400/300.jpg" alt="منتج 1" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">هاتف ذكي جديد</h3>
+                <p class="product-price">١،٩٩٩ ريال سعودي</p>
+            </div>
+        </div>
+        <div class="product-card">
+            <img src="https://picsum.photos/seed/product2/400/300.jpg" alt="منتج 2" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">ساعة ذكية</h3>
+                <p class="product-price">٨٩٩ ريال سعودي</p>
+            </div>
+        </div>
+        <div class="product-card">
+            <img src="https://picsum.photos/seed/product3/400/300.jpg" alt="منتج 3" class="product-image">
+            <div class="product-info">
+                <h3 class="product-title">لابتوب محمول</h3>
+                <p class="product-price">٤،٤٩٩ ريال سعودي</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>جميع الحقوق محفوظة © ٢٠٢٣</p>
+    </footer>
+</body>
+</html>

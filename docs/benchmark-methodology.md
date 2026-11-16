@@ -16,9 +16,9 @@ The runner validates whatever directory you point it at. It **cannot** invent re
 
 ## Honest claims policy
 
-- This repository publishes **condition C results only** (reference self-validation: the validators must accept the reference implementations — a meta-test that the validators are not just always-fail).
-- No A/B agent runs are published by this repo at v0.1. Claims like "skills improve output by X%" require controlled A/B runs with a named agent, version, and prompts — the methodology below enables you to produce them reproducibly.
-- Do not compare models on a tiny, uncontrolled sample. 24 cases is a smoke benchmark, not a leaderboard.
+- Reference self-validation (condition C) runs in CI: the validators must accept the reference implementations — a meta-test that they are not just always-fail.
+- A/B claims require controlled runs with a named agent, pinned prompts, and a published digest — as of v0.4.2 the repo publishes one such run (baseline 14/24 → with-skills 20/24, `glm-4-plus`, 2026-11-16) produced by [`tools/ai-benchmark/`](../tools/ai-benchmark/) and scored by the unmodified runner; raw artifacts and the call manifest are committed for offline re-verification.
+- Do not compare models on a tiny, uncontrolled sample. 24 cases (7 artifacts × 2 conditions) is evidence of direction, not a leaderboard; re-running generation is nondeterministic, re-running scoring is not.
 
 ## Reproducing a run
 

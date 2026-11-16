@@ -1,0 +1,118 @@
+{
+  "digest_sha256_16": "5b8469cec25a38e3",
+  "started_at": "2026-11-16T15:43:51.414Z",
+  "runs": [
+    {
+      "file": "responsive_a11y.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:43:51.414Z",
+      "finished": "2026-11-16T15:44:20.072Z",
+      "bytes": 14301
+    },
+    {
+      "file": "responsive_a11y.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:44:20.372Z",
+      "finished": "2026-11-16T15:44:48.425Z",
+      "bytes": 13683
+    },
+    {
+      "file": "arabic_typography.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:44:48.726Z",
+      "finished": "2026-11-16T15:45:10.870Z",
+      "bytes": 8231
+    },
+    {
+      "file": "arabic_typography.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:45:11.169Z",
+      "finished": "2026-11-16T15:45:22.454Z",
+      "bytes": 4336
+    },
+    {
+      "file": "bidi_isolation.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:45:22.755Z",
+      "finished": "2026-11-16T15:45:32.059Z",
+      "bytes": 2655
+    },
+    {
+      "file": "bidi_isolation.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:45:32.360Z",
+      "finished": "2026-11-16T15:45:41.182Z",
+      "bytes": 2347
+    },
+    {
+      "file": "components.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:45:41.483Z",
+      "finished": "2026-11-16T15:46:00.391Z",
+      "bytes": 8561
+    },
+    {
+      "file": "components.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:46:00.691Z",
+      "finished": "2026-11-16T15:46:19.140Z",
+      "bytes": 9256
+    },
+    {
+      "file": "persian_typography.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:46:19.439Z",
+      "finished": "2026-11-16T15:46:36.344Z",
+      "bytes": 7117
+    },
+    {
+      "file": "persian_typography.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:46:36.643Z",
+      "finished": "2026-11-16T15:46:44.833Z",
+      "bytes": 2891
+    },
+    {
+      "file": "jalali_dates.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:46:45.134Z",
+      "finished": "2026-11-16T15:47:27.679Z",
+      "bytes": 15066
+    },
+    {
+      "file": "jalali_dates.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:47:27.979Z",
+      "finished": "2026-11-16T15:47:34.757Z",
+      "bytes": 3114
+    },
+    {
+      "file": "rtl_layout.html",
+      "condition": "a",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:47:35.057Z",
+      "finished": "2026-11-16T15:47:46.256Z",
+      "bytes": 5201
+    },
+    {
+      "file": "rtl_layout.html",
+      "condition": "b",
+      "model": "glm-4-plus",
+      "started": "2026-11-16T15:47:46.555Z",
+      "finished": "2026-11-16T15:48:00.309Z",
+      "bytes": 5403
+    }
+  ]
+}

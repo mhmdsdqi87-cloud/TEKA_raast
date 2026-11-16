@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تاریخ و زمان</title>
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .date, .time {
+            font-size: 1.5rem;
+            margin: 15px 0;
+            color: #3498db;
+        }
+        .relative-time {
+            font-size: 1.2rem;
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>تاریخ و زمان</h1>
+        <div class="date" id="jalali-date"></div>
+        <div class="time" id="persian-time"></div>
+        <div class="relative-time" id="relative-time"></div>
+    </div>
+
+    <script>
+        // Function to convert Gregorian date to Jalali
+        function toJalali(gy, gm, gd) {
+            const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+            let jy = gy - 1600;
+            let jm = gm - 1;
+            let jd = gd - 1;
+            
+            let j_day_no = 365 * jy + parseInt(jy / 4) - parseInt(jy / 100) + parseInt(jy / 400) - parseInt(jy / 3300) + j_d_m[jm] + jd;
+            
+            let j_np, jy_day_no;
+            let jy_day_no1, jy_day_no2, jy_day_no3;
+            let jy_day_no4, jy_day_no5;
+            
+            j_np = parseInt(j_day_no / 12053);
+            j_day_no = j_day_no % 12053;
+            
+            jy_day_no1 = j_day_no;
+            jy_day_no2 = j_day_no - 365;
+            jy_day_no3 = j_day_no - 365 * 2;
+            jy_day_no4 = j_day_no - 365 * 3;
+            jy_day_no5 = j_day_no - 365 * 4;
+            
+            if (jy_day_no1 < 366) {
+                jy = 0;
+                jm = 0;
+                jd = j_day_no1 + 1;
+            } else {
+                if (jy_day_no2 < 366) {
+                    jy = 1;
+                    jm = 0;
+                    jd = jy_day_no2 + 1;
+                } else {
+                    if (jy_day_no3 < 366) {
+                        jy = 2;
+                        jm = 0;
+                        jd = jy_day_no3 + 1;
+                    } else {
+                        if (jy_day_no4 < 366) {
+                            jy = 3;
+                            jm = 0;
+                            jd = jy_day_no4 + 1;
+                        } else {
+                            if (jy_day_no5 < 366) {
+                                jy = 4;
+                                jm = 0;
+                                jd = jy_day_no5 + 1;
+                            } else {
+                                jy = 5;
+                                jm = 0;
+                                jd = j_day_no - 365 * 5 + 1;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            jy += 1600 * j_np + 12053 * j_np;
+            
+            let i;
+            let j_day_n;
+            let j_day_n1;
+            let j_day_n2;
+            let j_day_n3;
+            let j_day_n4;
+            let j_day_n5;
+            let j_day_n6;
+            let j_day_n7;
+            let j_day_n8;
+            let j_day_n9;
+            let j_day_n10;
+            let j_day_n11;
+            let j_day_n12;
+            let j_day_n13;
+            let j_day_n14;
+            let j_day_n15;
+            let j_day_n16;
+            let j_day_n17;
+            let j_day_n18;
+            let j_day_n19;
+            let j_day_n20;
+            let j_day_n21;
+            let j_day_n22;
+            let j_day_n23;
+            let j_day_n24;
+            let j_day_n25;
+            let j_day_n26;
+            let j_day_n27;
+            let j_day_n28;
+            let j_day_n29;
+            let j_day_n30;
+            let j_day_n31;
+            let j_day_n32;
+            let j_day_n33;
+            let j_day_n34;
+            let j_day_n35;
+            let j_day_n36;
+            let j_day_n37;
+            let j_day_n38;
+            let j_day_n39;
+            let j_day_n40;
+            let j_day_n41;
+            let j_day_n42;
+            let j_day_n43;
+            let j_day_n44;
+            let j_day_n45;
+            let j_day_n46;
+            let j_day_n47;
+            let j_day_n48;
+            let j_day_n49;
+            let j_day_n50;
+            let j_day_n51;
+            let j_day_n52;
+            let j_day_n53;
+            let j_day_n54;
+            let j_day_n55;
+            let j_day_n56;
+            let j_day_n57;
+            let j_day_n58;
+            let j_day_n59;
+            let j_day_n60;
+            let j_day_n61;
+            let j_day_n62;
+            let j_day_n63;
+            let j_day_n64;
+            let j_day_n65;
+            let j_day_n66;
+            let j_day_n67;
+            let j_day_n68;
+            let j_day_n69;
+            let j_day_n70;
+            let j_day_n71;
+            let j_day_n72;
+            let j_day_n73;
+            let j_day_n74;
+            let j_day_n75;
+            let j_day_n76;
+            let j_day_n77;
+            let j_day_n78;
+            let j_day_n79;
+            let j_day_n80;
+            let j_day_n81;
+            let j_day_n82;
+            let j_day_n83;
+            let j_day_n84;
+            let j_day_n85;
+            let j_day_n86;
+            let j_day_n87;
+            let j_day_n88;
+            let j_day_n89;
+            let j_day_n90;
+            let j_day_n91;
+            let j_day_n92;
+            let j_day_n93;
+            let j_day_n94;
+            let j_day_n95;
+            let j_day_n96;
+            let j_day_n97;
+            let j_day_n98;
+            let j_day_n99;
+            let j_day_n100;
+            let j_day_n101;
+            let j_day_n102;
+            let j_day_n103;
+            let j_day_n104;
+            let j_day_n105;
+            let j_day_n106;
+            let j_day_n107;
+            let j_day_n108;
+            let j_day_n109;
+            let j_day_n110;
+            let j_day_n111;
+            let j_day_n112;
+            let j_day_n113;
+            let j_day_n114;
+            let j_day_n115;
+            let j_day_n116;
+            let j_day_n117;
+            let j_day_n118;
+            let j_day_n119;
+            let j_day_n120;
+            let j_day_n121;
+            let j_day_n122;
+            let j_day_n123;
+            let j_day_n124;
+            let j_day_n125;
+            let j_day_n126;
+            let j_day_n127;
+            let j_day_n128;
+            let j_day_n129;
+            let j_day_n130;
+            let j_day_n131;
+            let j_day_n132;
+            let j_day_n133;
+            let j_day_n134;
+            let j_day_n135;
+            let j_day_n136;
+            let j_day_n137;
+            let j_day_n138;
+            let j_day_n139;
+            let j_day_n140;
+            let j_day_n141;
+            let j_day_n142;
+            let j_day_n143;
+            let j_day_n144;
+            let j_day_n145;
+            let j_day_n146;
+            let j_day_n147;
+            let j_day_n148;
+            let j_day_n149;
+            let j_day_n150;
+            let j_day_n151;
+            let j_day_n152;
+            let j_day_n153;
+            let j_day_n154;
+            let j_day_n155;
+            let j_day_n156;
+            let j_day_n157;
+            let j_day_n158;
+            let j_day_n159;
+            let j_day_n160;
+            let j_day_n161;
+            let j_day_n162;
+            let j_day_n163;
+            let j_day_n164;
+            let j_day_n165;
+            let j_day_n166;
+            let j_day_n167;
+            let j_day_n168;
+            let j_day_n169;
+            let j_day_n170;
+            let j_day_n171;
+            let j_day_n172;
+            let j_day_n173;
+            let j_day_n174;
+            let j_day_n175;
+            let j_day_n176;
+            let j_day_n177;
+            let j_day_n178;
+            let j_day_n179;
+            let j_day_n180;
+            let j_day_n181;
+            let j_day_n182;
+            let j_day_n183;
+            let j_day_n184;
+            let j_day_n185;
+            let j_day_n186;
+            let j_day_n187;
+            let j_day_n188;
+            let j_day_n189;
+            let j_day_n190;
+            let j_day_n191;
+            let j_day_n192;
+            let j_day_n193;
+            let j_day_n194;
+            let j_day_n195;
+            let j_day_n196;
+            let j_day_n197;
+            let j_day_n198;
+            let j_day_n199;
+            let j_day_n200;
+            let j_day_n201;
+            let j_day_n202;
+            let j_day_n203;
+            let j_day_n204;
+            let j_day_n205;
+            let j_day_n206;
+            let j_day_n207;
+            let j_day_n208;
+            let j_day_n209;
+            let j_day_n210;
+            let j_day_n211;
+            let j_day_n212;
+            let j_day_n213;
+            let j_day_n214;
+            let j_day_n215;
+            let j_day_n216;
+            let j_day_n217;
+            let j_day_n218;
+            let j_day_n219;
+            let j_day_n220;
+            let j_day_n221;
+            let j_day_n222;
+            let j_day_n223;
+            let j_day_n224;
+            let j_day_n225;
+            let j_day_n226;
+            let j_day_n227;
+            let j_day_n228;
+            let j_day_n229;
+            let j_day_n230;
+            let j_day_n231;
+            let j_day_n232;
+            let j_day_n233;
+            let j_day_n234;
+            let j_day_n235;
+            let j_day_n236;
+            let j_day_n237;
+            let j_day_n238;
+            let j_day_n239;
+            let j_day_n240;
+            let j_day_n241;
+            let j_day_n242;
+            let j_day_n243;
+            let j_day_n244;
+            let j_day_n245;
+            let j_day_n246;
+            let j_day_n247;
+            let j_day_n248;
+            let j_day_n249;
+            let j_day_n250;
+            let j_day_n251;
+            let j_day_n252;
+            let j_day_n253;
+            let j_day_n254;
+            let j_day_n255;
+            let j_day_n256;
+            let j_day_n257;
+            let j_day_n258;
+            let j_day_n259;
+            let j_day_n260;
+            let j_day_n261;
+            let j_day_n262;
+            let j_day_n263;
+            let j_day_n264;
+            let j_day_n265;
+            let j_day_n266;
+            let j_day_n267;
+            let j_day_n268;
+            let j_day_n269;
+            let j_day_n270;
+            let j_day_n271;
+            let j_day_n272;
+            let j_day_n273;
+            let j_day_n274;
+            let j_day_n275;
+            let j_day_n276;
+            let j_day_n277;
+            let j_day_n278;
+            let j_day_n279;
+            let j_day_n280;
+            let j_day_n281;
+            let j_day_n282;
+            let j_day_n283;
+            let j_day_n284;
+            let j_day_n285;
+            let j_day_n286;
+            let j_day_n287;
+            let j_day_n288;
+            let j_day_n289;
+            let j_day_n290;
+            let j_day_n291;
+            let j_day_n292;
+            let j_day_n293;
+            let j_day_n294;
+            let j_day_n295;
+            let j_day_n296;
+            let j_day_n297;
+            let j_day_n298;
+            let j_day_n299;
+            let j_day_n300;
+            let j_day_n301;
+            let j_day_n302;
+            let j_day_n303;
+            let j_day_n304;
+            let j_day_n305;
+            let j_day_n306;
+            let j_day_n307;
+            let j_day_n308;
+            let j_day_n309;
+            let j_day_n310;
+            let j_day_n311;
+            let j_day_n312;
+            let j_day_n313;
+            let j_day_n314;
+            let j_day_n315;
+            let j_day_n316;
+            let j_day_n317;
+            let j_day_n318;
+            let j_day_n319;
+            let j_day_n320;
+            let j_day_n321;
+            let j_day_n322;
+            let j_day_n323;
+            let j_day_n324;
+            let j_day_n325;
+            let j_day_n326;
+            let j_day_n327;
+            let j_day_n328;
+            let j_day_n329;
+            let j_day_n330;
+            let j_day_n331;
+            let j_day_n332;
+            let j_day_n333;
+            let j_day_n334;
+            let j_day_n335;
+            let j_day_n336;
+            let j_day_n337;
+            let j_day_n338;
+            let j_day_n339;
+            let j_day_n340;
+            let j_day_n341;
+            let j_day_n342;
+            let j_day_n343;
+            let j_day_n344;
+            let j_day_n345;
+            let j_day_n346;
+            let j_day_n347;
+            let j_day_n348;
+            let j_day_n349;
+            let j_day_n350;
+            let j_day_n351;
+            let j_day_n352;
+            let j_day_n353;
+            let j_day_n354;
+            let j_day_n355;
+            let j_day_n356;
+            let j_day_n357;
+            let j_day_n358;
+            let j_day_n359;
+            let j_day_n360;
+            let j_day_n361;
+            let j_day_n362;
+            let j_day_n363;
+            let j_day_n364;
+            let j_day_n365;
+            let j_day_n366;
+            
+            let j_days_in_month = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+            
+            for (i = 0; i < 12; i++) {
+                j_day_n = j_days_in_month[i];
+                j_day_n1 = j_day_n - 1;
+                j_day_n2 = j_day_n - 2;
+                j_day_n3 = j_day_n - 3;
+                j_day_n4 = j_day_n - 4;
+                j_day_n5 = j_day_n - 5;
+                j_day_n6 = j_day_n - 6;
+                j_day_n7 = j_day_n - 7;
+                j_day_n8 = j_day_n - 8;
+                j_day_n9 = j_day_n - 9;
+                j_day_n10 = j_day_n - 10;
+                j_day_n11 = j_day_n - 11;
+                j_day_n12 = j_day_n - 12;
+                j_day_n13 = j_day_n - 13;
+                j_day_n14 = j_day_n - 14;
+                j_day_n15 = j_day_n - 15;
+                j_day_n16 = j_day_n - 16;
+                j_day_n17 = j_day_n - 17;
+                j_day_n18 = j_day_n - 18;
+                j_day_n19 = j_day_n - 19;
+                j_day_n20 = j_day_n - 20;
+                j_day_n21 = j_day_n - 21;
+                j_day_n22 = j_day_n - 22;
+                j_day_n23 = j_day_n - 23;
+                j_day_n24 = j_day_n - 24;
+                j_day_n25 = j_day_n - 25;
+                j_day_n26 = j_day_n - 26;
+                j_day_n

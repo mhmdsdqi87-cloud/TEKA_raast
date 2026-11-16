@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه محصولات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #f3f4f6;
+            --text-color: #1f2937;
+            --light-text: #6b7280;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--text-color);
+            background-color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-inline: 1rem;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--light-text);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .products-section {
+            padding: 3rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .product-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-price {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .product-description {
+            color: var(--light-text);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background-color: #4338ca;
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        
+        footer {
+            background-color: var(--secondary-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column a {
+            color: var(--light-text);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .footer-column a:hover {
+            color: var(--primary-color);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #d1d5db;
+            color: var(--light-text);
+        }
+        
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            
+            nav ul {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 70%;
+                height: 100%;
+                background-color: var(--primary-color);
+                flex-direction: column;
+                padding: 5rem 2rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease-in-out;
+            }
+            
+            nav ul.active {
+                transform: translateX(0);
+            }
+            
+            nav li {
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo">فروشگاه</div>
+            <button class="menu-toggle" aria-label="منو">☰</button>
+            <nav>
+                <ul id="main-menu">
+                    <li><a href="#">صفحه اصلی</a></li>
+                    <li><a href="#">محصولات</a></li>
+                    <li><a href="#">درباره ما</a></li>
+                    <li><a href="#">تماس با ما</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>به فروشگاه ما خوش آمدید</h1>
+                <p>با کیفیت‌ترین محصولات را با بهترین قیمت‌ها از ما تهیه کنید. تنوع بالا و خدمات پس از فروش عمان</p>
+            </div>
+        </section>
+
+        <section class="products-section">
+            <div class="container">
+                <h2 class="section-title">محصولات برتر</h2>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <img src="https://picsum.photos/seed/product1/400/300.jpg" alt="محصول ۱" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">محصول شماره ۱</h3>
+                            <p class="product-price">۲۵۰,۰۰۰ تومان</p>
+                            <p class="product-description">توضیحات کامل در مورد این محصول که کیفیت بالا و قیمت مناسب دارد</p>
+                            <button class="btn">افزودن به سبد خرید</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <img src="https://picsum.photos/seed/product2/400/300.jpg" alt="محصول ۲" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">محصول شماره ۲</h3>
+                            <p class="product-price">۳۵۰,۰۰۰ تومان</p>
+                            <p class="product-description">توضیحات کامل در مورد این محصول که کیفیت بالا و قیمت مناسب دارد</p>
+                            <button class="btn">افزودن به سبد خرید</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <img src="https://picsum.photos/seed/product3/400/300.jpg" alt="محصول ۳" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">محصول شماره ۳</h3>
+                            <p class="product-price">۱۸۰,۰۰۰ تومان</p>
+                            <p class="product-description">توضیحات کامل در مورد این محصول که کیفیت بالا و قیمت مناسب دارد</p>
+                            <button class="btn">افزودن به سبد خرید</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <img src="https://picsum.photos/seed/product4/400/300.jpg" alt="محصول ۴" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">محصول شماره ۴</h3>
+                            <p class="product-price">۴۲۰,۰۰۰ تومان</p>
+                            <p class="product-description">توضیحات کامل در مورد این محصول که کیفیت بالا و قیمت مناسب دارد</p>
+                            <button class="btn">افزودن به سبد خرید</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <img src="https://picsum.photos/seed/product5/400/300.jpg" alt="محصول ۵" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">محصول شماره ۵</h3>
+                            <p class="product-price">۲۹۰,۰۰۰ تومان</p>
+                            <p class="product-description">توضیحات کامل در مورد این محصول که کیفیت بالا و قیمت مناسب دارد</p>
+                            <button class="btn">افزودن به سبد خرید</button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-card">
+                        <img src="https://picsum.photos/seed/product6/400/300.jpg" alt="محصول ۶" class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">محصول شماره ۶</h3>
+                            <p class="product-price">۵۵۰,۰۰۰ تومان</p>
+                            <p class="product-description">توضیحات کامل در مورد این محصول که کیفیت بالا و قیمت مناسب دارد</p>
+                            <button class="btn">افزودن به سبد خرید</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>درباره ما</h3>
+                    <p>فروشگاه ما با بیش از ۱۰ سال سابقه در ارائه بهترین محصولات و خدمات به مشتریان خود، همواره در تلاش است تا رضایت کامل شما را جلب کند.</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>لینک‌های سریع</h3>
+                    <ul>
+                        <li><a href="#">صفحه اصلی</a></li>
+                        <li><a href="#">محصولات</a></li>
+                        <li><a href="#">درباره ما</a></li>
+                        <li><a href="#">تماس با ما</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>تماس با ما</h3>
+                    <p>آدرس: تهران، میدان ولیعصر، خیابان فاطمی</p>
+                    <p>تلفن: <bdi dir="ltr">021-12345678</bdi></p>
+                    <p>ایمیل: info@example.com</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>شبکه‌های اجتماعی</h3>
+                    <ul>
+                        <li><a href="#">اینستاگرام</a></li>
+                        <li><a href="#">تلگرام</a></li>
+                        <li><a href="#">لینکدین</a></li>
+                        <li><a href="#">آپارات</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>تمامی حقوق این سایت متعلق به فروشگاه ما می‌باشد © ۱۴۰۳</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const mainMenu = document.getElementById('main-menu');
+            
+            menuToggle.addEventListener('click', function() {
+                mainMenu.classList.toggle('active');
+            });
+            
+            // Close menu when clicking on a link
+            const menuLinks = mainMenu.querySelectorAll('a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mainMenu.classList.remove('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

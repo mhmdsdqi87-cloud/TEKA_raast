@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTL Pagination Example</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #f0f2f5;
+            --text-color: #333;
+            --border-color: #ddd;
+            --hover-color: #e8ecf1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--text-color);
+            background-color: #f9fafb;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+        }
+
+        .toolbar-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            color: var(--text-color);
+            transition: background-color 0.2s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toolbar-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .toolbar-button.active {
+            color: var(--primary-color);
+        }
+
+        .list-container {
+            padding: 20px;
+        }
+
+        .list-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .list-item:hover {
+            background-color: var(--hover-color);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-inline-start: 15px;
+            font-weight: bold;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 5px;
+        }
+
+        .page-button {
+            min-width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            color: var(--text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .page-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .page-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            margin: 0 10px;
+            color: var(--text-color);
+        }
+
+        @media (max-width: 600px) {
+            .toolbar {
+                flex-wrap: wrap;
+            }
+            
+            .list-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .item-number {
+                margin-inline-start: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toolbar">
+            <button class="toolbar-button" aria-label="افزودن آیتم جدید">
+                <i class="fas fa-plus"></i>
+            </button>
+            <button class="toolbar-button" aria-label="جستجو">
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="toolbar-button" aria-label="فیلتر">
+                <i class="fas fa-filter"></i>
+            </button>
+            <button class="toolbar-button" aria-label="تنظیمات">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+
+        <div class="list-container" id="list-container">
+            <!-- List items will be populated by JavaScript -->
+        </div>
+
+        <div class="pagination">
+            <button class="page-button" id="prev-button" aria-label="صفحه قبلی">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <button class="page-button active" data-page="1">۱</button>
+            <button class="page-button" data-page="2">۲</button>
+            <button class="page-button" data-page="3">۳</button>
+            <button class="page-button" data-page="4">۴</button>
+            <button class="page-button" data-page="5">۵</button>
+            
+            <span class="page-info">از ۵ صفحه</span>
+            
+            <button class="page-button" id="next-button" aria-label="صفحه بعدی">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const listContainer = document.getElementById('list-container');
+            const pageButtons = document.querySelectorAll('.page-button[data-page]');
+            const prevButton = document.getElementById('prev-button');
+            const nextButton = document.getElementById('next-button');
+            
+            const itemsPerPage = 5;
+            let currentPage = 1;
+            const totalItems = 25;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            
+            // Generate list items
+            function generateListItems(page) {
+                listContainer.innerHTML = '';
+                const startIndex = (page - 1) * itemsPerPage;
+                const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+                
+                for (let i = startIndex; i < endIndex; i++) {
+                    const item = document.createElement('div');
+                    item.className = 'list-item';
+                    
+                    const itemNumber = document.createElement('div');
+                    itemNumber.className = 'item-number';
+                    itemNumber.textContent = i + 1;
+                    
+                    const itemContent = document.createElement('div');
+                    itemContent.className = 'item-content';
+                    itemContent.textContent = `مقاله شماره ${i + 1}: این یک نمونه متن برای نمایش در لیست است`;
+                    
+                    item.appendChild(itemContent);
+                    item.appendChild(itemNumber);
+                    listContainer.appendChild(item);
+                }
+            }
+            
+            // Update pagination buttons
+            function updatePaginationButtons() {
+                // Update page number buttons
+                pageButtons.forEach(button => {
+                    const page = parseInt(button.getAttribute('data-page'));
+                    button.classList.toggle('active', page === currentPage);
+                });
+                
+                // Update prev/next buttons
+                prevButton.classList.toggle('disabled', currentPage === 1);
+                nextButton.classList.toggle('disabled', currentPage === totalPages);
+            }
+            
+            // Handle page button clicks
+            pageButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentPage = parseInt(this.getAttribute('data-page'));
+                    generateListItems(currentPage);
+                    updatePaginationButtons();
+                });
+            });
+            
+            // Handle prev button click
+            prevButton.addEventListener('click', function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    generateListItems(currentPage);
+                    updatePaginationButtons();
+                }
+            });
+            
+            // Handle next button click
+            nextButton.addEventListener('click', function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    generateListItems(currentPage);
+                    updatePaginationButtons();
+                }
+            });
+            
+            // Initialize
+            generateListItems(currentPage);
+            updatePaginationButtons();
+        });
+    </script>
+</body>
+</html>

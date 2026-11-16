@@ -8,7 +8,7 @@
 
 Open-source RTL engineering for AI-powered development — Persian, Arabic & Hebrew first, with Spanish as the first LTR host.
 
-[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Runtime rules](https://img.shields.io/badge/runtime_rules-6-34D399)](#real-browser-inspection-runtime-inspector) [![Corpus](https://img.shields.io/badge/bug_corpus-32_verified-34D399)](#the-bug-corpus--evidence-first) [![i18n](https://img.shields.io/badge/i18n_gate-9_checks-34D399)](#language-quality-gate--beyond-rtl-pages) [![Tests](https://img.shields.io/badge/unit_tests-80_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
+[![CI](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/raast.yml) [![Release](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml/badge.svg)](https://github.com/mhmdsdqi87-cloud/TEKA_raast/actions/workflows/release.yml) [![Skills](https://img.shields.io/badge/agent_skills-6-34D399)](#pillar-1--raast-skills-the-intelligence-layer) [![CLI rules](https://img.shields.io/badge/doctor_rules-17-34D399)](#pillar-2--raast-doctor-cli-the-engineering-layer) [![Languages](https://img.shields.io/badge/profiles_fa·ar·he·es_4-34D399)](#language-profiles) [![Benchmark](https://img.shields.io/badge/benchmark-24_cases·A_B_14→20-34D399)](#pillar-3--raast-benchmark-the-evaluation-layer) [![Runtime rules](https://img.shields.io/badge/runtime_rules-6-34D399)](#real-browser-inspection-runtime-inspector) [![Corpus](https://img.shields.io/badge/bug_corpus-32_verified-34D399)](#the-bug-corpus--evidence-first) [![i18n](https://img.shields.io/badge/i18n_gate-9_checks-34D399)](#language-quality-gate--beyond-rtl-pages) [![Tests](https://img.shields.io/badge/unit_tests-302_passing-34D399)](#test-evidence) [![License](https://img.shields.io/badge/license-MIT-9AA3A0)](LICENSE) [![Playground](https://img.shields.io/badge/playground-try_in_browser-34D399)](https://mhmdsdqi87-cloud.github.io/TEKA_raast/)
 
 `rtl` · `persian` · `farsi` · `arabic` · `hebrew` · `espanol` · `bidi` · `typography` · `i18n` · `l10n` · `internationalization` · `claude-code` · `claude-skills` · `ai-agents` · `developer-tools` · `linting` · `accessibility` · `right-to-left` · `urdu` · `localization` · `nextjs` · `tailwind`
 
@@ -112,7 +112,7 @@ Safe fixes only. Ambiguous code is never rewritten — the [normalization decisi
 24 machine-validated cases across 8 categories with 17 validators. The runner **only reports what actually passes** — it cannot fabricate numbers.
 
 - **Condition C (reference)** — human-verified implementations, validated in CI: **24/24** ([results](docs/benchmark-results.md))
-- **Conditions A/B (with vs. without skills)** — methodology published, numbers *deliberately not fabricated*; run it on your agent per [docs/benchmark-methodology.md](docs/benchmark-methodology.md)
+- **Conditions A/B (with vs. without skills)** — first controlled run published in v0.4.2: **baseline 14/24 → with skills 20/24** (`glm-4-plus`, 7 artifacts × 2 conditions, identical prompts; scoring is the unmodified runner). Raw artifacts + call manifest committed; reproduce with [`tools/ai-benchmark/`](tools/ai-benchmark/) per [docs/benchmark-results.md](docs/benchmark-results.md) — still-failing cases (bidi isolation, Persian punctuation) are published too, not swept away
 
 ## Real browser testing
 
@@ -224,7 +224,7 @@ Anything that ingests Markdown can use the skills; verified environments and hon
 
 ```
 $ python3 -m unittest discover -s tests
-Ran 264 tests in 6.6s — OK (1 skipped)
+Ran 302 tests in 7.4s — OK (1 skipped)
 # with the [runtime] extra installed; without Playwright the 5 browser
 # tests self-skip and the ImportError guard runs instead
 
